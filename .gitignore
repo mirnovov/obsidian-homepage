@@ -8,7 +8,7 @@ node_modules
 package-lock.json
 
 # build
-out/
+main.js
 
 # obsidian
 data.json
