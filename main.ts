@@ -50,6 +50,8 @@ class HomepageSettingTab extends PluginSettingTab {
 
 	display(): void {
 		let {containerEl} = this;
+		let currentValue = this.plugin.settings.defaultNote;
+		let defaultValue = DEFAULT_SETTINGS.defaultNote;
 
 		containerEl.empty();
 
@@ -60,9 +62,9 @@ class HomepageSettingTab extends PluginSettingTab {
 			)
 			.addText(text => text
 				.setPlaceholder("Home")
-				.setValue("")
+				.setValue(defaultValue == currentValue ? "" : currentValue)
 				.onChange(async (value) => {
-					this.plugin.settings.defaultNote = value;
+					this.plugin.settings.defaultNote = value == "" ? defaultValue : value;
 					await this.plugin.saveSettings();
 				})
 			);
