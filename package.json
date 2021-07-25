@@ -1,6 +1,6 @@
 {
   "name": "obsidian-homepage",
-  "version": "0.w",
+  "version": "0.2",
   "description": "Opens a specified note upon launching Obsidian, instead of the most recent note.",
   "main": "main.js",
   "scripts": {
