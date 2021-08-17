@@ -39,6 +39,7 @@ export default class Homepage extends Plugin {
 			//only do on startup, not plugin activation
 			this.app.workspace.onLayoutReady(this.openHomepage);
 		}
+		console.log(`Default note: ${this.settings.defaultNote}`);
 	}
 	
 	async loadSettings() {
@@ -93,7 +94,7 @@ class HomepageSettingTab extends PluginSettingTab {
 				.setPlaceholder("Home")
 				.setValue(DEFAULT.defaultNote == this.settings.defaultNote ? "" : this.settings.defaultNote)
 				.onChange(async (value) => {
-					this.settings.defaultNote = value || DEFAULT.defaultNote;
+					this.settings.defaultNote = value.replace(/\\+/g, "/") || DEFAULT.defaultNote;
 					await this.plugin.saveSettings();
 				}
 			)
