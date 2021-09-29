@@ -13,14 +13,16 @@ export interface HomepageSettings {
 	defaultNote: string,
 	workspaceEnabled: boolean,
 	hasRibbonIcon: boolean,
-	openMode: string
+	openMode: string,
+	alwaysPreview: boolean
 }
 
 export const DEFAULT: HomepageSettings = {
 	defaultNote: "Home",
 	workspaceEnabled: false,
 	hasRibbonIcon: true,
-	openMode: Mode.ReplaceAll
+	openMode: Mode.ReplaceAll,
+	alwaysPreview: false
 }
 
 export class HomepageSettingTab extends PluginSettingTab {
@@ -84,6 +86,17 @@ export class HomepageSettingTab extends PluginSettingTab {
 		ribbonSetting.descEl.createDiv({ text: "Takes effect on startup.", attr: {class: "mod-warning"}});
 		
 		if(!this.plugin.workspacesMode()) {
+			new Setting(containerEl)
+				.setName("Open in preview mode")
+				.setDesc("When opening the homepage, always do so in preview mode.")
+				.addToggle(toggle => toggle
+					.setValue(this.settings.alwaysPreview)
+					.onChange(async value => {
+						this.settings.alwaysPreview = value;
+						await this.plugin.saveSettings();
+					})
+				);
+			
 			new Setting(containerEl)
 				.setName("Opening mode")
 				.setDesc("Determine how existing notes are affected on startup.")

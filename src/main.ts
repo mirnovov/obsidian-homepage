@@ -1,4 +1,4 @@
-import { Notice, Plugin, addIcon } from "obsidian";
+import { Notice, Plugin, MarkdownView, addIcon } from "obsidian";
 import { Mode, HomepageSettings, HomepageSettingTab, DEFAULT } from "./settings";
 import { trimFile, getWorkspacePlugin } from "./utils";
 
@@ -55,11 +55,16 @@ export default class Homepage extends Plugin {
 			return;
 		}
 		else if (this.settings.openMode != Mode.ReplaceAll) {
-			const isExtant = this.app.workspace.getLeavesOfType("markdown").some(
+			//keep any open homepage leaves rather than creating a new one
+			const extant = this.app.workspace.getLeavesOfType("markdown").find(
 				leaf => trimFile((leaf.view as any).file) == this.settings.defaultNote
 			);
 			
-			if (isExtant) return;
+			if (extant !== undefined) {
+				this.app.workspace.setActiveLeaf(extant);
+				this.setHomepageMode();
+				return
+			}
 		}
 		else {
 			this.app.workspace.detachLeavesOfType("markdown");
@@ -68,7 +73,18 @@ export default class Homepage extends Plugin {
 		await this.app.workspace.openLinkText(
 			this.settings.defaultNote, "", this.settings.openMode == Mode.Retain, { active: true }
 		);
+		
+		this.setHomepageMode();
 	};
+	
+	setHomepageMode(): void {
+		const leaf = this.app.workspace.activeLeaf;
+		if(!this.settings.alwaysPreview || !(leaf.view instanceof MarkdownView)) return;
+		
+		const state = leaf.view.getState();
+		state.mode = "preview";
+		leaf.setViewState({type: leaf.view.getViewType(), state: state})
+	}
 	
 	workspacesMode(): boolean {
 		return this.workspacePlugin?.enabled && this.settings.workspaceEnabled;
