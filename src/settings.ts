@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting, TAbstractFile, TFile } from "obsidian";
+import { App, PluginSettingTab, Setting, TAbstractFile, TFile, normalizePath } from "obsidian";
 import Homepage from "./main";
 import { TextInputSuggest } from "./suggest";
 import { trimFile, getWorkspacePlugin } from "./utils";
@@ -53,7 +53,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 				text.setPlaceholder("Home")
 					.setValue(DEFAULT.defaultNote == this.settings.defaultNote ? "" : this.settings.defaultNote)
 					.onChange(async (value) => {
-						this.settings.defaultNote = value.replace(/\\+/g, "/") || DEFAULT.defaultNote;
+						this.settings.defaultNote = normalizePath(value || DEFAULT.defaultNote);
 						await this.plugin.saveSettings();
 					});
 			});
