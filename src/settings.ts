@@ -34,6 +34,10 @@ export class HomepageSettingTab extends PluginSettingTab {
 		this.plugin = plugin;
 		this.settings = plugin.settings;
 	}
+	
+	isInvalidNote(newNote: string): boolean { 
+		return newNote === null || newNote.match(/^\s*$/) !== null;
+	};
 
 	display(): void {
 		let {containerEl} = this;
@@ -52,8 +56,8 @@ export class HomepageSettingTab extends PluginSettingTab {
 				
 				text.setPlaceholder("Home")
 					.setValue(DEFAULT.defaultNote == this.settings.defaultNote ? "" : this.settings.defaultNote)
-					.onChange(async (value) => {
-						this.settings.defaultNote = normalizePath(value || DEFAULT.defaultNote);
+					.onChange(async (value) => {						
+						this.settings.defaultNote = this.isInvalidNote(value) ? DEFAULT.defaultNote : normalizePath(value);
 						await this.plugin.saveSettings();
 					});
 			});
