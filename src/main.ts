@@ -1,4 +1,4 @@
-import { Notice, Plugin, MarkdownView, addIcon } from "obsidian";
+import { Notice, Platform, Plugin, MarkdownView, addIcon } from "obsidian";
 import { Mode, HomepageSettings, HomepageSettingTab, DEFAULT } from "./settings";
 import { trimFile, getWorkspacePlugin } from "./utils";
 
@@ -87,7 +87,7 @@ export default class Homepage extends Plugin {
 	}
 	
 	workspacesMode(): boolean {
-		return this.workspacePlugin?.enabled && this.settings.workspaceEnabled;
+		return this.workspacePlugin?.enabled && this.settings.workspaceEnabled && !Platform.isMobile;
 	}
 }
 
