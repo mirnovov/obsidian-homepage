@@ -17,7 +17,9 @@ export enum View {
 }
 
 export interface HomepageSettings {
+	version: number,
 	defaultNote: string,
+	defaultWorkspace: string,
 	workspaceEnabled: boolean,
 	hasRibbonIcon: boolean,
 	openMode: string,
@@ -25,7 +27,9 @@ export interface HomepageSettings {
 }
 
 export const DEFAULT: HomepageSettings = {
+	version: 0,
 	defaultNote: "Home",
+	defaultWorkspace: "Homepage",
 	workspaceEnabled: false,
 	hasRibbonIcon: true,
 	openMode: Mode.ReplaceAll,
