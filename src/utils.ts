@@ -15,7 +15,7 @@ export function getWorkspacePlugin(app: App) {
 };
 
 export async function upgradeSettings(plugin: Homepage) {
-	plugin.settings.defaultWorkspace = plugin.settings.defaultNote;
+	plugin.settings.workspace = plugin.settings.defaultNote;
 	
 	if((plugin.settings as any).alwaysPreview) {
 		plugin.settings.openMode = View.Reading;

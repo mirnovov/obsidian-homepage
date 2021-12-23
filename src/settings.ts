@@ -19,7 +19,7 @@ export enum View {
 export interface HomepageSettings {
 	version: number,
 	defaultNote: string,
-	defaultWorkspace: string,
+	workspace: string,
 	workspaceEnabled: boolean,
 	hasRibbonIcon: boolean,
 	openMode: string,
@@ -29,11 +29,15 @@ export interface HomepageSettings {
 export const DEFAULT: HomepageSettings = {
 	version: 0,
 	defaultNote: "Home",
-	defaultWorkspace: "Homepage",
+	workspace: "Homepage",
 	workspaceEnabled: false,
 	hasRibbonIcon: true,
 	openMode: Mode.ReplaceAll,
 	view: View.Default
+}
+
+function disable(setting: Setting) {
+	setting.settingEl.setAttribute("style", "opacity: .5; pointer-events: none !important")		
 }
 
 export class HomepageSettingTab extends PluginSettingTab {
@@ -46,35 +50,38 @@ export class HomepageSettingTab extends PluginSettingTab {
 		this.settings = plugin.settings;
 	}
 	
-	isInvalidNote(newNote: string): boolean { 
-		return newNote === null || newNote.match(/^\s*$/) !== null;
+	sanitiseNote(value: string): string { 
+		if (value === null || value.match(/^\s*$/) !== null) {
+			return null;
+		}
+		return normalizePath(value);
 	};
 
 	display(): void {
-		let {containerEl} = this;
-		containerEl.empty();
+		const workspacesMode = this.plugin.workspacesMode();
+		this.containerEl.empty();
 		
-		new Setting(containerEl)
-			.setName("Open on startup")
-			.setDesc(
-				this.plugin.workspacesMode() ?
-				"The name of the workspace to open on startup." :
-				"The name of the note to open on startup. If it doesn't exist, a new note will be created."
-			)
+		const suggestor = workspacesMode ? WorkspaceSuggest : FileSuggest;
+		const homepageDesc = workspacesMode ?
+			"The name of the workspace to open on startup." :
+			"The name of the note to open on startup. If it doesn't exist, a new note will be created.";
+		const homepage = workspacesMode ? "workspace" : "defaultNote";
+		
+		new Setting(this.containerEl)
+			.setName("Homepage")
+			.setDesc(homepageDesc)
 			.addText(text => {
-				const suggestType = !this.plugin.workspacesMode() ? FileSuggest : WorkspaceSuggest;
-				new suggestType(this.app, text.inputEl);
-				
-				text.setPlaceholder("Home")
-					.setValue(DEFAULT.defaultNote == this.settings.defaultNote ? "" : this.settings.defaultNote)
-					.onChange(async (value) => {						
-						this.settings.defaultNote = this.isInvalidNote(value) ? DEFAULT.defaultNote : normalizePath(value);
+				new suggestor(this.app, text.inputEl);
+				text.setPlaceholder(DEFAULT[homepage])
+					.setValue(DEFAULT[homepage] == this.settings[homepage] ? "" : this.settings[homepage])
+					.onChange(async (value) => {
+						this.settings[homepage] = this.sanitiseNote(value) || DEFAULT[homepage];
 						await this.plugin.saveSettings();
 					});
 			});
-		
+			
 		if(this.plugin.workspacePlugin?.enabled) {
-			new Setting(containerEl)
+			new Setting(this.containerEl)
 				.setName("Use workspaces")
 				.setDesc("Open a workspace, instead of a note, as the homepage.")
 				.addToggle(toggle => toggle
@@ -82,12 +89,12 @@ export class HomepageSettingTab extends PluginSettingTab {
 					.onChange(async value => {
 						this.settings.workspaceEnabled = value;
 						await this.plugin.saveSettings();
-						this.display(); //update open on startup's text
+						this.display(); //update stuff
 					})
 				);
 		}
 		
-		let ribbonSetting = new Setting(containerEl)
+		let ribbonSetting = new Setting(this.containerEl)
 			.setName("Display ribbon icon")
 			.setDesc("Show a little house on the ribbon, allowing you to quickly access the homepage.")
 			.addToggle(toggle => toggle
@@ -97,39 +104,41 @@ export class HomepageSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				})
 			);
-			
+		
+		ribbonSetting.settingEl.setAttribute("style", "padding-top: 70px; border-top: none !important");	
 		ribbonSetting.descEl.createDiv({ text: "Takes effect on startup.", attr: {class: "mod-warning"}});
 		
-		if(!this.plugin.workspacesMode()) {				
-			new Setting(containerEl)
-				.setName("Homepage view")
-				.setDesc("Choose what view to open the homepage in.")
-				.addDropdown(async dropdown => {
-					for (let key of Object.values(View)) {
-						dropdown.addOption(key, key);
-					}
-					dropdown.setValue(this.settings.view);
-					dropdown.onChange(async option => { 
-						this.settings.view = option; 
-						await this.plugin.saveSettings();
-					});
+		let viewSetting = new Setting(this.containerEl)
+			.setName("Homepage view")
+			.setDesc("Choose what view to open the homepage in.")
+			.addDropdown(async dropdown => {
+				for (let key of Object.values(View)) {
+					dropdown.addOption(key, key);
+				}
+				dropdown.setValue(this.settings.view);
+				dropdown.onChange(async option => { 
+					this.settings.view = option; 
+					await this.plugin.saveSettings();
 				});
+			});
 			
-			new Setting(containerEl)
-				.setName("Opening method")
-				.setDesc("Determine how existing notes are affected on startup.")
-				.addDropdown(async dropdown => {
-					for (let key of Object.values(Mode)) {
-						dropdown.addOption(key, key);
-					}
-					dropdown.setValue(this.settings.openMode);
-					dropdown.onChange(async option => { 
-						this.settings.openMode = option; 
-						await this.plugin.saveSettings();
-					});
+		let modeSetting = new Setting(this.containerEl)
+			.setName("Opening method")
+			.setDesc("Determine how existing notes are affected on startup.")
+			.addDropdown(async dropdown => {
+				for (let key of Object.values(Mode)) {
+					dropdown.addOption(key, key);
+				}
+				dropdown.setValue(this.settings.openMode);
+				dropdown.onChange(async option => { 
+					this.settings.openMode = option; 
+					await this.plugin.saveSettings();
 				});
+			});
+
+		if (workspacesMode) {
+			[viewSetting, modeSetting].forEach(disable)
 		}
-		
 	}
 }
 

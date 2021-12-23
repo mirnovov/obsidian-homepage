@@ -51,12 +51,12 @@ export default class Homepage extends Plugin {
 	
 	openHomepage = async (): Promise<void> => {
 		if(this.workspacesMode()) {
-			if(!(this.settings.defaultNote in this.workspacePlugin?.instance.workspaces)) {
-				new Notice(`Cannot find the workspace "${this.settings.defaultNote}" to use as the homepage.`);
+			if(!(this.settings.workspace in this.workspacePlugin?.instance.workspaces)) {
+				new Notice(`Cannot find the workspace "${this.settings.workspace}" to use as the homepage.`);
 				return;
 			}
 			
-			this.workspacePlugin.instance.loadWorkspace(this.settings.defaultNote);
+			this.workspacePlugin.instance.loadWorkspace(this.settings.workspace);
 			return;
 		}
 		else if (this.settings.openMode != Mode.ReplaceAll) {
