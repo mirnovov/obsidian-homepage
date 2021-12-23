@@ -1,4 +1,4 @@
-import { App, TFile } from "obsidian";
+import { App, Setting, TFile } from "obsidian";
 import Homepage from "./main";
 import { View } from "./settings";
 
@@ -13,6 +13,10 @@ export function wrapAround(value: number, size: number): number {
 export function getWorkspacePlugin(app: App) { 
 	return (<any> app)?.internalPlugins?.plugins?.workspaces; 
 };
+
+export function disableSetting(setting: Setting) {
+	setting.settingEl.setAttribute("style", "opacity: .5; pointer-events: none !important")		
+}
 
 export async function upgradeSettings(plugin: Homepage) {
 	plugin.settings.workspace = plugin.settings.defaultNote;

@@ -1,7 +1,7 @@
 import { App, PluginSettingTab, Setting, TAbstractFile, TFile, normalizePath } from "obsidian";
 import Homepage from "./main";
 import { TextInputSuggest } from "./suggest";
-import { trimFile, getWorkspacePlugin } from "./utils";
+import { disableSetting, getWorkspacePlugin, trimFile } from "./utils";
 
 export enum Mode {
 	ReplaceAll = "Replace all open notes",
@@ -29,15 +29,11 @@ export interface HomepageSettings {
 export const DEFAULT: HomepageSettings = {
 	version: 0,
 	defaultNote: "Home",
-	workspace: "Homepage",
+	workspace: "Home",
 	workspaceEnabled: false,
 	hasRibbonIcon: true,
 	openMode: Mode.ReplaceAll,
 	view: View.Default
-}
-
-function disable(setting: Setting) {
-	setting.settingEl.setAttribute("style", "opacity: .5; pointer-events: none !important")		
 }
 
 export class HomepageSettingTab extends PluginSettingTab {
@@ -57,7 +53,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		return normalizePath(value);
 	};
 
-	display(): void {
+	display() {
 		const workspacesMode = this.plugin.workspacesMode();
 		this.containerEl.empty();
 		
@@ -137,7 +133,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 			});
 
 		if (workspacesMode) {
-			[viewSetting, modeSetting].forEach(disable)
+			[viewSetting, modeSetting].forEach(disableSetting)
 		}
 	}
 }
@@ -160,11 +156,11 @@ class FileSuggest extends TextInputSuggest<TFile> {
 		return files;
 	}
 	
-	renderSuggestion(file: TFile, el: HTMLElement): void {
+	renderSuggestion(file: TFile, el: HTMLElement) {
 		el.setText(trimFile(file));
 	 }
 
-	selectSuggestion(file: TFile): void {
+	selectSuggestion(file: TFile) {
 		this.inputEl.value = trimFile(file);
 		this.inputEl.trigger("input");
 		this.close();
@@ -179,11 +175,11 @@ class WorkspaceSuggest extends TextInputSuggest<string> {
 		return workspaces.filter((workspace: string) => workspace.toLowerCase().contains(inputLower));
 	}
 	
-	renderSuggestion(workspace: string, el: HTMLElement): void {
+	renderSuggestion(workspace: string, el: HTMLElement) {
 		el.setText(workspace);
 	 }
 
-	selectSuggestion(workspace: string): void {
+	selectSuggestion(workspace: string) {
 		this.inputEl.value = workspace;
 		this.inputEl.trigger("input");
 		this.close();
