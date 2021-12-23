@@ -9,12 +9,19 @@ export enum Mode {
 	Retain = "Keep open notes"
 }
 
+export enum View {
+	Default = "Default view",
+	Reading = "Reading view",
+	Source = "Editing view (Source)",
+	LivePreview = "Editing view (Live Preview)"
+}
+
 export interface HomepageSettings {
 	defaultNote: string,
 	workspaceEnabled: boolean,
 	hasRibbonIcon: boolean,
 	openMode: string,
-	alwaysPreview: boolean
+	view: string
 }
 
 export const DEFAULT: HomepageSettings = {
@@ -22,7 +29,7 @@ export const DEFAULT: HomepageSettings = {
 	workspaceEnabled: false,
 	hasRibbonIcon: true,
 	openMode: Mode.ReplaceAll,
-	alwaysPreview: false
+	view: View.Default
 }
 
 export class HomepageSettingTab extends PluginSettingTab {
@@ -89,20 +96,23 @@ export class HomepageSettingTab extends PluginSettingTab {
 			
 		ribbonSetting.descEl.createDiv({ text: "Takes effect on startup.", attr: {class: "mod-warning"}});
 		
-		if(!this.plugin.workspacesMode()) {
+		if(!this.plugin.workspacesMode()) {				
 			new Setting(containerEl)
-				.setName("Open in preview mode")
-				.setDesc("When opening the homepage, always do so in preview mode.")
-				.addToggle(toggle => toggle
-					.setValue(this.settings.alwaysPreview)
-					.onChange(async value => {
-						this.settings.alwaysPreview = value;
+				.setName("Homepage view")
+				.setDesc("Choose what view to open the homepage in.")
+				.addDropdown(async dropdown => {
+					for (let key of Object.values(View)) {
+						dropdown.addOption(key, key);
+					}
+					dropdown.setValue(this.settings.view);
+					dropdown.onChange(async option => { 
+						this.settings.view = option; 
 						await this.plugin.saveSettings();
-					})
-				);
+					});
+				});
 			
 			new Setting(containerEl)
-				.setName("Opening mode")
+				.setName("Opening method")
 				.setDesc("Determine how existing notes are affected on startup.")
 				.addDropdown(async dropdown => {
 					for (let key of Object.values(Mode)) {
