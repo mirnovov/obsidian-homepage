@@ -94,7 +94,7 @@ export default class Homepage extends Plugin {
 				state.source = this.settings.view != View.LivePreview;
 				break;
 			case View.Reading:
-				state.mode = "source";
+				state.mode = "preview";
 				break;
 		}
 		
