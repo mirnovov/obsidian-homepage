@@ -54,10 +54,6 @@ export class HomepageSettingTab extends PluginSettingTab {
 		}
 		return normalizePath(value);
 	}
-	
-	addWarning(setting: Setting, value: string) {
-		setting.descEl.createDiv({ text: value, attr: {class: "mod-warning"}});
-	}
 
 	display() {
 		const workspacesMode = this.plugin.workspacesMode();
@@ -104,11 +100,11 @@ export class HomepageSettingTab extends PluginSettingTab {
 				.onChange(async value => {
 					this.settings.hasRibbonIcon = value;
 					await this.plugin.saveSettings();
+					this.plugin.setIcon(value);
 				})
 			);
 		
 		ribbonSetting.settingEl.setAttribute("style", "padding-top: 70px; border-top: none !important");		
-		this.addWarning(ribbonSetting, "Takes effect on startup.");
 		
 		let viewSetting = new Setting(this.containerEl)
 			.setName("Homepage view")
@@ -139,7 +135,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 			});
 
 		if (workspacesMode) {
-			[viewSetting, modeSetting].forEach(disableSetting)
+			[viewSetting, modeSetting].forEach(disableSetting);
 		}
 		
 		if (hasDataview(this.plugin.app)) {
@@ -153,8 +149,10 @@ export class HomepageSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					})
 				);
-				
-			this.addWarning(refreshSetting, "Requires Dataview auto-refresh to be enabled.");
+			
+			refreshSetting.descEl.createDiv({
+				text: "Requires Dataview auto-refresh to be enabled.", attr: {class: "mod-warning"}
+			});	
 		}
 	}
 }

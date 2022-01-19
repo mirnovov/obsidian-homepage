@@ -15,6 +15,9 @@ export default class Homepage extends Plugin {
 		
 		this.addSettingTab(new HomepageSettingTab(this.app, this));
 		
+		addIcon("homepage", ICON);
+		this.setIcon(this.settings.hasRibbonIcon);
+		
 		if (this.settings.version < 2) {
 			await upgradeSettings(this);
 		}
@@ -24,11 +27,6 @@ export default class Homepage extends Plugin {
 			name: "Open homepage",
 			callback: this.openHomepage,
 		});	
-		
-		if(this.settings.hasRibbonIcon) {
-			addIcon("homepage", ICON);
-			this.addRibbonIcon("homepage", "Open homepage", this.openHomepage);
-		}
 			
 		if(this.app.workspace.activeLeaf == null) {
 			//only do on startup, not plugin activation
@@ -47,6 +45,16 @@ export default class Homepage extends Plugin {
 
 	async saveSettings() {
 		await this.saveData(this.settings);
+	}
+	
+	setIcon(value: boolean) {
+		if (value) {
+			this.addRibbonIcon("homepage", "Open homepage", this.openHomepage)
+				.setAttribute("id", "nv-homepage-icon");
+		}
+		else {
+			document.getElementById("nv-homepage-icon")?.remove();
+		}
 	}
 	
 	openHomepage = async (): Promise<void> => {
