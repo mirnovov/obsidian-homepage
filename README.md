@@ -1,14 +1,21 @@
-## Homepage Obsidian Plugin
-#### Opens a specified note upon launching Obsidian, instead of the most recent note.
+<h1 align="center">Homepage</h1>
+<p align="center">Open a specified note upon launching <a href="https://obsidian.md">Obsidian</a>, instead of the most recent one.</p>
+<br>
 
-By default, this plugin opens a note called `Home` in the root directory on startup. If such a note is already open, it will be kept. This can be changed in the plugin settings:
+* Choose **any note or workspace** in the vault to open. If a specified note doesn't exist, it is automatically created.
+* Use a variety of **opening methods** to decide what happens to any notes that were left open - keep them, replace the last note, or remove them all.
+* Access the homepage layout **at any time** using the `Open homepage` command, or clicking the dedicated ribbon button.
+* Open notes in **any viewing mode** - Reading, Source, and Obsidian's new Live Preview mode.
+* Works effectively with **other plugins** such as [Dataview](https://github.com/blacksmithgu/obsidian-dataview), allowing advanced landing pages that keep tabs on every note.
 
-* Enable `Use workspaces` to open a workspace of that name instead.
-* Use `Open on startup` to change the note or workspace to open. If a specified note is nonexistent, it will be created.
-* Choose an `Open mode` to decide what happens to any notes that were left open.
+### Installation
 
-The homepage can also be opened at any time with the `Open homepage` command, or by clicking on the house icon on Obsidian's ribbon (this can be disabled in the plugin settings).
+The easiest way to install Homepage is to use Obsidian's built-in plugin browser - or for pre-release versions, a tool such as [BRAT](https://github.com/TfTHacker/obsidian42-brat). 
 
-## Installation
+But if you've a developer, you can install it manually: download the directory and initialise sources using `npm install`. Once installed, you can get ESBuild to rebuild the plugin every time you've changed something:
 
-You can either obtain the plugin using Obsidian's built-in browser, or install it manually by putting it in your vault's `.obsidian/plugins` folder. If doing the latter, you'll need to run `npm i` in the plugin directory to initialise the npm package and download required sources. Then execute `npm run build`, which will compile the package's TypeScript files into JavaScript.
+```bash	
+npm dev path/to/test/vault/.obsidian/plugins/homepage/main.js
+```
+
+You can also run `npm run build` to create production sources in an `./out` folder. These can then be copied to `path/to/vault/.obsidian/plugins/homepage` in your vault to use as a plugin.
