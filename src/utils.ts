@@ -28,3 +28,11 @@ export async function upgradeSettings(plugin: Homepage) {
 	plugin.settings.version = 2;
 	await plugin.saveSettings();
 }
+
+export function hasDataview(app: App): boolean {
+	return (app as any).plugins.plugins.dataview != null;
+}
+
+export function touchDataview(app: App) {
+	(app as any).plugins.plugins.dataview?.index.touch();
+}

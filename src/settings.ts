@@ -1,7 +1,7 @@
 import { App, PluginSettingTab, Setting, TAbstractFile, TFile, normalizePath } from "obsidian";
 import Homepage from "./main";
 import { TextInputSuggest } from "./suggest";
-import { disableSetting, getWorkspacePlugin, trimFile } from "./utils";
+import { disableSetting, getWorkspacePlugin, hasDataview, trimFile } from "./utils";
 
 export enum Mode {
 	ReplaceAll = "Replace all open notes",
@@ -23,7 +23,8 @@ export interface HomepageSettings {
 	workspaceEnabled: boolean,
 	hasRibbonIcon: boolean,
 	openMode: string,
-	view: string
+	view: string,
+	refreshDataview: boolean
 }
 
 export const DEFAULT: HomepageSettings = {
@@ -33,7 +34,8 @@ export const DEFAULT: HomepageSettings = {
 	workspaceEnabled: false,
 	hasRibbonIcon: true,
 	openMode: Mode.ReplaceAll,
-	view: View.Default
+	view: View.Default,
+	refreshDataview: false
 }
 
 export class HomepageSettingTab extends PluginSettingTab {
@@ -51,7 +53,11 @@ export class HomepageSettingTab extends PluginSettingTab {
 			return null;
 		}
 		return normalizePath(value);
-	};
+	}
+	
+	addWarning(setting: Setting, value: string) {
+		setting.descEl.createDiv({ text: value, attr: {class: "mod-warning"}});
+	}
 
 	display() {
 		const workspacesMode = this.plugin.workspacesMode();
@@ -101,8 +107,8 @@ export class HomepageSettingTab extends PluginSettingTab {
 				})
 			);
 		
-		ribbonSetting.settingEl.setAttribute("style", "padding-top: 70px; border-top: none !important");	
-		ribbonSetting.descEl.createDiv({ text: "Takes effect on startup.", attr: {class: "mod-warning"}});
+		ribbonSetting.settingEl.setAttribute("style", "padding-top: 70px; border-top: none !important");		
+		this.addWarning(ribbonSetting, "Takes effect on startup.");
 		
 		let viewSetting = new Setting(this.containerEl)
 			.setName("Homepage view")
@@ -134,6 +140,21 @@ export class HomepageSettingTab extends PluginSettingTab {
 
 		if (workspacesMode) {
 			[viewSetting, modeSetting].forEach(disableSetting)
+		}
+		
+		if (hasDataview(this.plugin.app)) {
+			let refreshSetting = new Setting(this.containerEl)
+				.setName("Refresh Dataview")
+				.setDesc("Always attempt to reload Dataview views when opening the homepage.")
+				.addToggle(toggle => toggle
+					.setValue(this.settings.refreshDataview)
+					.onChange(async value => {
+						this.settings.refreshDataview = value;
+						await this.plugin.saveSettings();
+					})
+				);
+				
+			this.addWarning(refreshSetting, "Requires Dataview auto-refresh to be enabled.");
 		}
 	}
 }
