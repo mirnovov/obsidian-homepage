@@ -9,32 +9,32 @@ export default class Homepage extends Plugin {
 	workspacePlugin: any;
 	loaded: boolean = false;
 
-	async onload() {
+	async onload(): Promise<void> {
 		this.settings = Object.assign({}, DEFAULT, await this.loadData());
 		this.workspacePlugin = getWorkspacePlugin(this.app);
 		
 		this.addSettingTab(new HomepageSettingTab(this.app, this));
 		
-		addIcon("homepage", ICON);
-		this.setIcon(this.settings.hasRibbonIcon);
-		
 		if (this.settings.version < 2) {
 			await upgradeSettings(this);
 		}
 		
-		this.addCommand({
-			id: "open-homepage",
-			name: "Open homepage",
-			callback: this.openHomepage,
-		});	
-			
-		if(this.app.workspace.activeLeaf == null) {
+		if (this.app.workspace.activeLeaf == null) {
 			//only do on startup, not plugin activation
 			this.app.workspace.onLayoutReady(async () => {
 				await this.openHomepage();
 				this.loaded = true;
 			});
 		}
+		
+		addIcon("homepage", ICON);
+		this.setIcon(this.settings.hasRibbonIcon);
+		
+		this.addCommand({
+			id: "open-homepage",
+			name: "Open homepage",
+			callback: this.openHomepage,
+		});	
 		
 		console.log(
 			`Homepage: ${this.settings.defaultNote} `+ 
@@ -43,11 +43,11 @@ export default class Homepage extends Plugin {
 		);
 	}
 
-	async saveSettings() {
+	async saveSettings(): Promise<void> {
 		await this.saveData(this.settings);
 	}
 	
-	setIcon(value: boolean) {
+	setIcon(value: boolean): void {
 		if (value) {
 			this.addRibbonIcon("homepage", "Open homepage", this.openHomepage)
 				.setAttribute("id", "nv-homepage-icon");
@@ -93,7 +93,7 @@ export default class Homepage extends Plugin {
 		);		
 	}
 	
-	async configureHomepage() {
+	async configureHomepage(): Promise<void> {
 		const leaf = this.app.workspace.activeLeaf;
 		if(this.settings.openMode == View.Default || !(leaf.view instanceof MarkdownView)) return;
 		

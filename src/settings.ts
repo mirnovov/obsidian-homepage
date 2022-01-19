@@ -55,7 +55,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		return normalizePath(value);
 	}
 
-	display() {
+	display(): void {
 		const workspacesMode = this.plugin.workspacesMode();
 		this.containerEl.empty();
 		
@@ -78,7 +78,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 					});
 			});
 			
-		if(this.plugin.workspacePlugin?.enabled) {
+		if (this.plugin.workspacePlugin?.enabled) {
 			new Setting(this.containerEl)
 				.setName("Use workspaces")
 				.setDesc("Open a workspace, instead of a note, as the homepage.")

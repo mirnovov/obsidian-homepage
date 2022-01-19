@@ -1,23 +1,21 @@
 {
-  "name": "obsidian-homepage",
-  "version": "2.1",
-  "description": "Opens a specified note upon launching Obsidian, instead of the most recent note.",
-  "main": "main.js",
-  "scripts": {
-     "dev": "esbuild src/main.ts --bundle --external:obsidian --outdir=.  --target=es2016 --format=cjs --sourcemap=inline --watch",
-     "build": "esbuild src/main.ts --bundle --external:obsidian --outdir=.  --target=es2016 --format=cjs"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "MIT",
-  "dependencies": {
-    "@popperjs/core": "2.9.1"
-  },
-  "devDependencies": {
-    "@types/node": "^16.11.1",
-    "obsidian": "^0.12.0",
-    "esbuild": "0.13.8",
-    "tslib": "^2.3.0",
-    "typescript": "^4.3.5"
-  }
+	"name": "obsidian-homepage",
+	"version": "2.1",
+	"description": "Opens a specified note upon launching Obsidian, instead of the most recent note.",
+	"main": "main.js",
+	"scripts": {
+  		"dev": "node esbuild.config.mjs",
+		"build": "node esbuild.config.mjs production"
+	},
+	"keywords": [],
+	"author": "novov",
+	"license": "MIT",
+	"dependencies": { "@popperjs/core": "2.9.1" },
+	"devDependencies": {
+		"@types/node": "^16.11.1",
+		"obsidian": "^0.12.0",
+		"esbuild": "0.13.8",
+		"tslib": "^2.3.0",
+		"typescript": "^4.3.5"
+	}
 }

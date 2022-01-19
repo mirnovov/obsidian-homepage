@@ -10,18 +10,18 @@ export function wrapAround(value: number, size: number): number {
 	return ((value % size) + size) % size;
 };
 
-export function getWorkspacePlugin(app: App) { 
-	return (<any> app)?.internalPlugins?.plugins?.workspaces; 
+export function getWorkspacePlugin(app: App): any { 
+	return (app as any).internalPlugins.plugins.workspaces; 
 };
 
-export function disableSetting(setting: Setting) {
+export function disableSetting(setting: Setting): void {
 	setting.settingEl.setAttribute("style", "opacity: .5; pointer-events: none !important")		
 }
 
-export async function upgradeSettings(plugin: Homepage) {
+export async function upgradeSettings(plugin: Homepage): Promise<void> {
 	plugin.settings.workspace = plugin.settings.defaultNote;
 	
-	if((plugin.settings as any).alwaysPreview) {
+	if ((plugin.settings as any).alwaysPreview) {
 		plugin.settings.openMode = View.Reading;
 	}
 	
@@ -33,6 +33,6 @@ export function hasDataview(app: App): boolean {
 	return (app as any).plugins.plugins.dataview != null;
 }
 
-export function touchDataview(app: App) {
+export function touchDataview(app: App): void {
 	(app as any).plugins.plugins.dataview?.index.touch();
 }

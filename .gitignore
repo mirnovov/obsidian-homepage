@@ -2,13 +2,14 @@
 *.iml
 .idea
 .nova
+.vscode
 
 # npm
 node_modules
 package-lock.json
 
 # build
-main.js
+out
 
 # obsidian
 data.json
