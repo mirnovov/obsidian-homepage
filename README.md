@@ -3,6 +3,7 @@
 <br>
 
 * Choose **any note or workspace** in the vault to open. If a specified note doesn't exist, it is automatically created.
+* Use [moment syntax](https://momentjs.com/docs/#/displaying/format/) to **set different homepages** for different  days, weeks, months or other time periods.
 * Use a variety of **opening methods** to decide what happens to any notes that were left open - keep them, replace the last note, or remove them all.
 * Access the homepage layout **at any time** using the `Open homepage` command, or clicking the dedicated ribbon button.
 * Open notes in **any viewing mode** - Reading, Source, and Obsidian's new Live Preview mode.
@@ -10,11 +11,11 @@
 
 ### Installation
 
-The easiest way to install Homepage is to use Obsidian's built-in plugin browser - or for pre-release versions, a tool such as [BRAT](https://github.com/TfTHacker/obsidian42-brat). 
+The easiest way to install Homepage is to use Obsidian's built-in plugin browser - or for pre-release versions, a tool such as [BRAT](https://github.com/TfTHacker/obsidian42-brat).
 
 But if you've a developer, you can install it manually: download the directory and initialise sources using `npm install`. Once installed, you can get ESBuild to rebuild the plugin every time you've changed something:
 
-```bash	
+```bash
 npm dev path/to/test/vault/.obsidian/plugins/homepage/main.js
 ```
 

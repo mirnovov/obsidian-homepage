@@ -19,6 +19,8 @@ export enum View {
 export interface HomepageSettings {
 	version: number,
 	defaultNote: string,
+	useMoment: boolean,
+	momentFormat: string,
 	workspace: string,
 	workspaceEnabled: boolean,
 	hasRibbonIcon: boolean,
@@ -30,6 +32,8 @@ export interface HomepageSettings {
 export const DEFAULT: HomepageSettings = {
 	version: 0,
 	defaultNote: "Home",
+	useMoment: false,
+	momentFormat: "YYYY-MM-DD",
 	workspace: "Home",
 	workspaceEnabled: false,
 	hasRibbonIcon: true,
@@ -47,8 +51,8 @@ export class HomepageSettingTab extends PluginSettingTab {
 		this.plugin = plugin;
 		this.settings = plugin.settings;
 	}
-	
-	sanitiseNote(value: string): string { 
+
+	sanitiseNote(value: string): string {
 		if (value === null || value.match(/^\s*$/) !== null) {
 			return null;
 		}
@@ -58,26 +62,53 @@ export class HomepageSettingTab extends PluginSettingTab {
 	display(): void {
 		const workspacesMode = this.plugin.workspacesMode();
 		this.containerEl.empty();
-		
+
 		const suggestor = workspacesMode ? WorkspaceSuggest : FileSuggest;
 		const homepageDesc = workspacesMode ?
 			"The name of the workspace to open on startup." :
 			"The name of the note to open on startup. If it doesn't exist, a new note will be created.";
 		const homepage = workspacesMode ? "workspace" : "defaultNote";
-		
+
+		// only show the moment field if they're enabled and the workspace isn't, other show the regular entry field
+		if (this.plugin.settings.useMoment && !this.plugin.settings.workspaceEnabled) {
+			new Setting(this.containerEl)
+				.setName("Homepage")
+				.setDesc("The name of the note to be opened on startup, using moment syntax. If it doesn't exist, a new note will be created.")
+				.addMomentFormat(text => text
+					.setDefaultFormat("YYYY-MM-DD")
+					.setValue(this.plugin.settings.momentFormat)
+					.onChange(value => {
+						this.plugin.settings.momentFormat = value;
+						this.plugin.saveSettings();
+					})
+				);
+		} else {
+			new Setting(this.containerEl)
+				.setName("Homepage")
+				.setDesc(homepageDesc)
+				.addText(text => {
+					new suggestor(this.app, text.inputEl);
+					text.setPlaceholder(DEFAULT[homepage])
+						.setValue(DEFAULT[homepage] == this.settings[homepage] ? "" : this.settings[homepage])
+						.onChange(async (value) => {
+							this.settings[homepage] = this.sanitiseNote(value) || DEFAULT[homepage];
+							await this.plugin.saveSettings();
+						});
+				});
+		}
+
 		new Setting(this.containerEl)
-			.setName("Homepage")
-			.setDesc(homepageDesc)
-			.addText(text => {
-				new suggestor(this.app, text.inputEl);
-				text.setPlaceholder(DEFAULT[homepage])
-					.setValue(DEFAULT[homepage] == this.settings[homepage] ? "" : this.settings[homepage])
-					.onChange(async (value) => {
-						this.settings[homepage] = this.sanitiseNote(value) || DEFAULT[homepage];
-						await this.plugin.saveSettings();
-					});
-			});
-			
+			.setName("Use date formatting")
+			.setDesc("Format the file name as a moment date.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.useMoment)
+				.onChange(value => {
+					this.plugin.settings.useMoment = value;
+					this.plugin.saveSettings();
+					this.display();
+				})
+			);
+
 		if (this.plugin.workspacePlugin?.enabled) {
 			new Setting(this.containerEl)
 				.setName("Use workspaces")
@@ -91,7 +122,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 					})
 				);
 		}
-		
+
 		let ribbonSetting = new Setting(this.containerEl)
 			.setName("Display ribbon icon")
 			.setDesc("Show a little house on the ribbon, allowing you to quickly access the homepage.")
@@ -103,9 +134,9 @@ export class HomepageSettingTab extends PluginSettingTab {
 					this.plugin.setIcon(value);
 				})
 			);
-		
-		ribbonSetting.settingEl.setAttribute("style", "padding-top: 70px; border-top: none !important");		
-		
+
+		ribbonSetting.settingEl.setAttribute("style", "padding-top: 70px; border-top: none !important");
+
 		let viewSetting = new Setting(this.containerEl)
 			.setName("Homepage view")
 			.setDesc("Choose what view to open the homepage in.")
@@ -114,12 +145,12 @@ export class HomepageSettingTab extends PluginSettingTab {
 					dropdown.addOption(key, key);
 				}
 				dropdown.setValue(this.settings.view);
-				dropdown.onChange(async option => { 
-					this.settings.view = option; 
+				dropdown.onChange(async option => {
+					this.settings.view = option;
 					await this.plugin.saveSettings();
 				});
 			});
-			
+
 		let modeSetting = new Setting(this.containerEl)
 			.setName("Opening method")
 			.setDesc("Determine how existing notes are affected on startup.")
@@ -128,8 +159,8 @@ export class HomepageSettingTab extends PluginSettingTab {
 					dropdown.addOption(key, key);
 				}
 				dropdown.setValue(this.settings.openMode);
-				dropdown.onChange(async option => { 
-					this.settings.openMode = option; 
+				dropdown.onChange(async option => {
+					this.settings.openMode = option;
 					await this.plugin.saveSettings();
 				});
 			});
@@ -137,7 +168,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		if (workspacesMode) {
 			[viewSetting, modeSetting].forEach(disableSetting);
 		}
-		
+
 		if (hasDataview(this.plugin.app)) {
 			let refreshSetting = new Setting(this.containerEl)
 				.setName("Refresh Dataview")
@@ -149,10 +180,10 @@ export class HomepageSettingTab extends PluginSettingTab {
 						await this.plugin.saveSettings();
 					})
 				);
-			
+
 			refreshSetting.descEl.createDiv({
 				text: "Requires Dataview auto-refresh to be enabled.", attr: {class: "mod-warning"}
-			});	
+			});
 		}
 	}
 }
@@ -165,16 +196,16 @@ class FileSuggest extends TextInputSuggest<TFile> {
 
 		abstractFiles.forEach((file: TAbstractFile) => {
 			if (
-				file instanceof TFile && file.extension === "md" && 
+				file instanceof TFile && file.extension === "md" &&
 				file.path.toLowerCase().contains(inputLower)
 			) {
 				files.push(file);
 			}
 		});
-	
+
 		return files;
 	}
-	
+
 	renderSuggestion(file: TFile, el: HTMLElement) {
 		el.setText(trimFile(file));
 	 }
@@ -190,10 +221,10 @@ class WorkspaceSuggest extends TextInputSuggest<string> {
 	getSuggestions(inputStr: string): string[] {
 		const workspaces = Object.keys(getWorkspacePlugin(this.app)?.instance.workspaces);
 		const inputLower = inputStr.toLowerCase();
-		
+
 		return workspaces.filter((workspace: string) => workspace.toLowerCase().contains(inputLower));
 	}
-	
+
 	renderSuggestion(workspace: string, el: HTMLElement) {
 		el.setText(workspace);
 	 }
