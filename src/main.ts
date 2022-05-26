@@ -37,7 +37,7 @@ export default class Homepage extends Plugin {
 		});
 
 		console.log(
-			`Homepage: ${this.getHomePageName()} `+
+			`Homepage: ${this.getHomepageName()} `+
 			`(method: ${this.settings.openMode}, view: ${this.settings.view}, `+
 			`workspaces: ${this.settings.workspaceEnabled})`
 		);
@@ -83,13 +83,13 @@ export default class Homepage extends Plugin {
 
 
 		await this.app.workspace.openLinkText(
-			this.getHomePageName(), "", this.settings.openMode == Mode.Retain, { active: true }
+			this.getHomepageName(), "", this.settings.openMode == Mode.Retain, { active: true }
 		);
 
 		await this.configureHomepage();
 	}
 
-	getHomePageName(): string {
+	getHomepageName(): string {
 		var homepage = this.settings.defaultNote;
 
 		if (this.settings.useMoment) {
@@ -101,7 +101,7 @@ export default class Homepage extends Plugin {
 
 	getOpenedHomepage(): WorkspaceLeaf {
 		return this.app.workspace.getLeavesOfType("markdown").find(
-			leaf => trimFile((leaf.view as any).file) == this.getHomePageName()
+			leaf => trimFile((leaf.view as any).file) == this.getHomepageName()
 		);
 	}
 

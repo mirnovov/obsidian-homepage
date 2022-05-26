@@ -71,9 +71,12 @@ export class HomepageSettingTab extends PluginSettingTab {
 
 		// only show the moment field if they're enabled and the workspace isn't, other show the regular entry field
 		if (this.plugin.settings.useMoment && !this.plugin.settings.workspaceEnabled) {
-			new Setting(this.containerEl)
-				.setName("Homepage")
-				.setDesc("The name of the note to be opened on startup, using moment syntax. If it doesn't exist, a new note will be created.")
+			let dateSetting = new Setting(this.containerEl)
+				.setName("Homepage format")
+				.setDesc(
+					"A valid Moment format specification determining the note to be opened on startup." +
+					" If the resulting note doesn't exist, a new one will be created."
+				)
 				.addMomentFormat(text => text
 					.setDefaultFormat("YYYY-MM-DD")
 					.setValue(this.plugin.settings.momentFormat)
@@ -82,6 +85,11 @@ export class HomepageSettingTab extends PluginSettingTab {
 						this.plugin.saveSettings();
 					})
 				);
+			
+			dateSetting.descEl.createEl("br");	
+			dateSetting.descEl.createEl("a", {
+				text: "Moment formatting info", attr: {href: "https://momentjs.com/docs/#/displaying/format/"}
+			});
 		} else {
 			new Setting(this.containerEl)
 				.setName("Homepage")
@@ -99,7 +107,9 @@ export class HomepageSettingTab extends PluginSettingTab {
 
 		new Setting(this.containerEl)
 			.setName("Use date formatting")
-			.setDesc("Format the file name as a moment date.")
+			.setDesc(
+				"Open the homepage using Moment date syntax. This allows opening different homepages at different times or dates."
+			)
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.useMoment)
 				.onChange(value => {
