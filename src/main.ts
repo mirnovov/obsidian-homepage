@@ -1,4 +1,4 @@
-import { MarkdownView, Notice, Platform, Plugin, WorkspaceLeaf, addIcon } from "obsidian";
+import { MarkdownView, Notice, Platform, Plugin, WorkspaceLeaf, addIcon, moment } from "obsidian";
 import { DEFAULT, Mode, View, HomepageSettings, HomepageSettingTab  } from "./settings";
 import { getWorkspacePlugin, trimFile, touchDataview, upgradeSettings } from "./utils";
 
@@ -12,13 +12,13 @@ export default class Homepage extends Plugin {
 	async onload(): Promise<void> {
 		this.settings = Object.assign({}, DEFAULT, await this.loadData());
 		this.workspacePlugin = getWorkspacePlugin(this.app);
-		
+
 		this.addSettingTab(new HomepageSettingTab(this.app, this));
-		
+
 		if (this.settings.version < 2) {
 			await upgradeSettings(this);
 		}
-		
+
 		if (this.app.workspace.activeLeaf == null) {
 			//only do on startup, not plugin activation
 			this.app.workspace.onLayoutReady(async () => {
@@ -26,18 +26,18 @@ export default class Homepage extends Plugin {
 				this.loaded = true;
 			});
 		}
-		
+
 		addIcon("homepage", ICON);
 		this.setIcon(this.settings.hasRibbonIcon);
-		
+
 		this.addCommand({
 			id: "open-homepage",
 			name: "Open homepage",
 			callback: this.openHomepage,
-		});	
-		
+		});
+
 		console.log(
-			`Homepage: ${this.settings.defaultNote} `+ 
+			`Homepage: ${this.getHomePageName()} `+
 			`(method: ${this.settings.openMode}, view: ${this.settings.view}, `+
 			`workspaces: ${this.settings.workspaceEnabled})`
 		);
@@ -46,7 +46,7 @@ export default class Homepage extends Plugin {
 	async saveSettings(): Promise<void> {
 		await this.saveData(this.settings);
 	}
-	
+
 	setIcon(value: boolean): void {
 		if (value) {
 			this.addRibbonIcon("homepage", "Open homepage", this.openHomepage)
@@ -56,20 +56,21 @@ export default class Homepage extends Plugin {
 			document.getElementById("nv-homepage-icon")?.remove();
 		}
 	}
-	
+
 	openHomepage = async (): Promise<void> => {
+
 		if(this.workspacesMode()) {
 			if(!(this.settings.workspace in this.workspacePlugin?.instance.workspaces)) {
 				new Notice(`Cannot find the workspace "${this.settings.workspace}" to use as the homepage.`);
 				return;
 			}
-			
+
 			this.workspacePlugin.instance.loadWorkspace(this.settings.workspace);
 			return;
 		}
 		else if (this.settings.openMode != Mode.ReplaceAll) {
 			const alreadyOpened = this.getOpenedHomepage();
-			
+
 			if (alreadyOpened !== undefined) {
 				this.app.workspace.setActiveLeaf(alreadyOpened);
 				await this.configureHomepage();
@@ -79,26 +80,37 @@ export default class Homepage extends Plugin {
 		else {
 			this.app.workspace.detachLeavesOfType("markdown");
 		}
-		
+
+
 		await this.app.workspace.openLinkText(
-			this.settings.defaultNote, "", this.settings.openMode == Mode.Retain, { active: true }
+			this.getHomePageName(), "", this.settings.openMode == Mode.Retain, { active: true }
 		);
-		
+
 		await this.configureHomepage();
 	}
-	
+
+	getHomePageName(): string {
+		var homepage = this.settings.defaultNote;
+
+		if (this.settings.useMoment) {
+			homepage = moment().format(this.settings.momentFormat);
+		}
+
+		return homepage
+	}
+
 	getOpenedHomepage(): WorkspaceLeaf {
 		return this.app.workspace.getLeavesOfType("markdown").find(
-			leaf => trimFile((leaf.view as any).file) == this.settings.defaultNote
-		);		
+			leaf => trimFile((leaf.view as any).file) == this.getHomePageName()
+		);
 	}
-	
+
 	async configureHomepage(): Promise<void> {
 		const leaf = this.app.workspace.activeLeaf;
 		if(this.settings.openMode == View.Default || !(leaf.view instanceof MarkdownView)) return;
-		
+
 		const state = leaf.view.getState();
-		
+
 		switch(this.settings.view) {
 			case View.LivePreview:
 			case View.Source:
@@ -109,11 +121,11 @@ export default class Homepage extends Plugin {
 				state.mode = "preview";
 				break;
 		}
-		
+
 		await leaf.setViewState({type: "markdown", state: state});
 		if (this.loaded && this.settings.refreshDataview) { touchDataview(this.app); }
 	}
-	
+
 	workspacesMode(): boolean {
 		return this.workspacePlugin?.enabled && this.settings.workspaceEnabled && !Platform.isMobile;
 	}
