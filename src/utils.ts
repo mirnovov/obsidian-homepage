@@ -10,6 +10,10 @@ export function wrapAround(value: number, size: number): number {
 	return ((value % size) + size) % size;
 };
 
+export function getDailynotesAutorun(app: App): any { 
+	return (app as any).internalPlugins.getPluginById("daily-notes").instance.options.autorun; 
+};
+
 export function getWorkspacePlugin(app: App): any { 
 	return (app as any).internalPlugins.plugins.workspaces; 
 };

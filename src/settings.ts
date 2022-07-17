@@ -1,7 +1,7 @@
 import { App, PluginSettingTab, Setting, TAbstractFile, TFile, normalizePath } from "obsidian";
 import Homepage from "./main";
 import { TextInputSuggest } from "./suggest";
-import { disableSetting, getWorkspacePlugin, hasDataview, trimFile } from "./utils";
+import { disableSetting, getDailynotesAutorun, getWorkspacePlugin, hasDataview, trimFile } from "./utils";
 
 export enum Mode {
 	ReplaceAll = "Replace all open notes",
@@ -62,6 +62,13 @@ export class HomepageSettingTab extends PluginSettingTab {
 	display(): void {
 		const workspacesMode = this.plugin.workspacesMode();
 		this.containerEl.empty();
+		
+		if (getDailynotesAutorun(this.app)) {
+			this.containerEl.insertAdjacentHTML("afterbegin",
+				"<div class='mod-warning' style='margin-bottom: 20px'>Daily Notes' 'Open daily note on startup'" +
+				" setting is not compatible with this plugin, so functionality has been disabled.</div>"
+			);
+		}
 
 		const suggestor = workspacesMode ? WorkspaceSuggest : FileSuggest;
 		const homepageDesc = workspacesMode ?
