@@ -11,7 +11,8 @@ export function wrapAround(value: number, size: number): number {
 };
 
 export function getDailynotesAutorun(app: App): any { 
-	return (app as any).internalPlugins.getPluginById("daily-notes").instance.options.autorun; 
+	let dailyNotes = (app as any).internalPlugins.getPluginById("daily-notes");
+	return dailyNotes?.enabled && dailyNotes?.instance.options.autorun; 
 };
 
 export function getWorkspacePlugin(app: App): any { 
