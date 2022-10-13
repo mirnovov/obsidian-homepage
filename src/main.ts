@@ -19,15 +19,10 @@ export default class Homepage extends Plugin {
 			await upgradeSettings(this);
 		}
 		
-		
-
-		if (this.app.workspace.activeLeaf == null) {
-			//only do on startup, not plugin activation
-			this.app.workspace.onLayoutReady(async () => {
-				await this.openHomepage();
-				this.loaded = true;
-			});
-		}
+		this.app.workspace.onLayoutReady(async () => {
+			await this.openHomepage();
+			this.loaded = true;
+		});
 
 		addIcon("homepage", ICON);
 		this.setIcon(this.settings.hasRibbonIcon);
