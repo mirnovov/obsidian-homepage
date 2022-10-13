@@ -84,13 +84,21 @@ export default class Homepage extends Plugin {
 		else {
 			this.app.workspace.detachLeavesOfType("markdown");
 		}
+		
+		await this.openHomepageLink();
+		
+		if (this.app.workspace.activeLeaf.view.getViewType() === "empty") {
+			//hack to fix bug with opening link when homepage is already extant beforehand
+			await this.openHomepageLink();
+		}
 
-
+		await this.configureHomepage();
+	}
+	
+	async openHomepageLink() {
 		await this.app.workspace.openLinkText(
 			this.getHomepageName(), "", this.settings.openMode == Mode.Retain, { active: true }
 		);
-
-		await this.configureHomepage();
 	}
 
 	getHomepageName(): string {
