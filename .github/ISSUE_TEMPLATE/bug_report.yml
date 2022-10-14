@@ -1,0 +1,40 @@
+name: Bug report
+description: Report something that isn't working correctly
+labels: bug
+body:
+    - type: input
+      attributes:
+        label: Summary
+        description: A clear and concise description of what the bug is. 
+      validations:
+        required: true
+    - type: textarea
+      attributes:
+        label: Steps to reproduce
+        description: If the bug isn't easily replicable, detail exactly how it can be reproduced.
+    - type: textarea
+      attributes:
+        label: Obsidian info
+        description: >
+          **Include any other plugins you have installed and enabled.**
+            
+          If the issue is with the homepage not opening/displaying correctly, also include:
+          
+          **Settings > Editor**: Default view for new tabs, Default editing mode and
+          
+          **Settings > Homepage**: Homepage view, Opening method, if Moment/Workspaces are enabled                
+      validations:
+        required: true
+    - type: input
+      attributes:
+        label: Obsidian version
+        description: What version of Obsidian you have. This can be found in the "About" section of Obsidian's settings. 
+      validations:
+        required: true
+    - type: checkboxes
+      attributes:
+        label: Checklist
+        options:
+          - label: I updated to the latest version of the plugin.
+            required: true
+
