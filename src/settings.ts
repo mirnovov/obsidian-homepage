@@ -1,7 +1,7 @@
 import { App, PluginSettingTab, Setting, TAbstractFile, TFile, normalizePath } from "obsidian";
 import Homepage from "./main";
 import { TextInputSuggest } from "./suggest";
-import { disableSetting, getDailynotesAutorun, getWorkspacePlugin, hasDataview, trimFile } from "./utils";
+import { disableSetting, getDailynotesAutorun, getDataviewPlugin, getWorkspacePlugin, trimFile } from "./utils";
 
 export enum Mode {
 	ReplaceAll = "Replace all open notes",
@@ -186,7 +186,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 			[viewSetting, modeSetting].forEach(disableSetting);
 		}
 
-		if (hasDataview(this.plugin.app)) {
+		if (getDataviewPlugin(this.plugin.app)) {
 			let refreshSetting = new Setting(this.containerEl)
 				.setName("Refresh Dataview")
 				.setDesc("Always attempt to reload Dataview views when opening the homepage.")

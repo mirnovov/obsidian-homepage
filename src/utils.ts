@@ -15,10 +15,6 @@ export function getDailynotesAutorun(app: App): any {
 	return dailyNotes?.enabled && dailyNotes?.instance.options.autorun; 
 };
 
-export function getWorkspacePlugin(app: App): any { 
-	return (app as any).internalPlugins.plugins.workspaces; 
-};
-
 export function disableSetting(setting: Setting): void {
 	setting.settingEl.setAttribute("style", "opacity: .5; pointer-events: none !important")		
 }
@@ -34,10 +30,14 @@ export async function upgradeSettings(plugin: Homepage): Promise<void> {
 	await plugin.saveSettings();
 }
 
-export function hasDataview(app: App): boolean {
-	return (app as any).plugins.plugins.dataview != null;
+export function getDataviewPlugin(app: App): any {
+	return (app as any).plugins.plugins.dataview;
 }
 
-export function touchDataview(app: App): void {
-	(app as any).plugins.plugins.dataview?.index.touch();
+export function getWorkspacePlugin(app: App): any { 
+	return (app as any).internalPlugins.plugins.workspaces; 
+};
+
+export function getNewTabPagePlugin(app: App): any {
+	return (app as any).plugins.plugins["new-tab-default-page"];
 }
