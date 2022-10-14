@@ -112,7 +112,6 @@ export default class Homepage extends Plugin {
 		}
 
 		await this.configureHomepage();
-		this.executing = false;
 	}
 	
 	async openHomepageLink() {
@@ -138,6 +137,8 @@ export default class Homepage extends Plugin {
 	}
 
 	async configureHomepage(): Promise<void> {
+		this.executing = false;
+		
 		const leaf = this.app.workspace.activeLeaf;
 		if(this.settings.openMode == View.Default || !(leaf.view instanceof MarkdownView)) return;
 
