@@ -73,6 +73,7 @@ export default class Homepage extends Plugin {
 
 	openHomepage = async (): Promise<void> => {
 		this.executing = true;
+		var mode = this.loaded ? this.settings.manualOpenMode : this.settings.openMode;
 
 		if (getDailynotesAutorun(this.app)) {
 			new Notice(
@@ -91,7 +92,7 @@ export default class Homepage extends Plugin {
 			this.workspacePlugin.instance.loadWorkspace(this.settings.workspace);
 			return;
 		}
-		else if (this.settings.openMode != Mode.ReplaceAll) {
+		else if (mode != Mode.ReplaceAll) {
 			const alreadyOpened = this.getOpenedHomepage();
 
 			if (alreadyOpened !== undefined) {
@@ -104,19 +105,19 @@ export default class Homepage extends Plugin {
 			this.app.workspace.detachLeavesOfType("markdown");
 		}
 		
-		await this.openHomepageLink();
+		await this.openHomepageLink(mode as Mode);
 		
 		if (this.app.workspace.activeLeaf.view.getViewType() === "empty") {
 			//hack to fix bug with opening link when homepage is already extant beforehand
-			await this.openHomepageLink();
+			await this.openHomepageLink(mode as Mode);
 		}
 
 		await this.configureHomepage();
 	}
 	
-	async openHomepageLink() {
+	async openHomepageLink(mode: Mode) {
 		await this.app.workspace.openLinkText(
-			this.getHomepageName(), "", this.settings.openMode == Mode.Retain, { active: true }
+			this.getHomepageName(), "", mode == Mode.Retain, { active: true }
 		);
 	}
 
@@ -140,7 +141,7 @@ export default class Homepage extends Plugin {
 		this.executing = false;
 		
 		const leaf = this.app.workspace.activeLeaf;
-		if(this.settings.openMode == View.Default || !(leaf.view instanceof MarkdownView)) return;
+		if(this.settings.view == View.Default || !(leaf.view instanceof MarkdownView)) return;
 
 		const state = leaf.view.getState();
 

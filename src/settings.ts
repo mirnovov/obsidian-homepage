@@ -25,6 +25,7 @@ export interface HomepageSettings {
 	workspaceEnabled: boolean,
 	hasRibbonIcon: boolean,
 	openMode: string,
+	manualOpenMode: string,
 	view: string,
 	refreshDataview: boolean
 }
@@ -38,6 +39,7 @@ export const DEFAULT: HomepageSettings = {
 	workspaceEnabled: false,
 	hasRibbonIcon: true,
 	openMode: Mode.ReplaceAll,
+	manualOpenMode: Mode.Retain,
 	view: View.Default,
 	refreshDataview: false
 }
@@ -181,9 +183,23 @@ export class HomepageSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				});
 			});
+			
+		let manualModeSetting = new Setting(this.containerEl)
+			.setName("Manual opening method")
+			.setDesc("Determine how existing notes are affected when opening with commands or the ribbon button.")
+			.addDropdown(async dropdown => {
+				for (let key of Object.values(Mode)) {
+					dropdown.addOption(key, key);
+				}
+				dropdown.setValue(this.settings.manualOpenMode);
+				dropdown.onChange(async option => {
+					this.settings.manualOpenMode = option;
+					await this.plugin.saveSettings();
+				});
+			});
 
 		if (workspacesMode) {
-			[viewSetting, modeSetting].forEach(disableSetting);
+			[viewSetting, modeSetting, manualModeSetting].forEach(disableSetting);
 		}
 
 		if (getDataviewPlugin(this.plugin.app)) {
