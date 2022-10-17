@@ -11,10 +11,10 @@ export default class Homepage extends Plugin {
 	executing: boolean = false;
 
 	async onload(): Promise<void> {
+		let activeInitially = document.body.querySelector(".progress-bar") !== null;
+		
 		this.settings = Object.assign({}, DEFAULT, await this.loadData());
 		this.workspacePlugin = getWorkspacePlugin(this.app);
-
-		this.addSettingTab(new HomepageSettingTab(this.app, this));
 
 		if (this.settings.version < 2) {
 			await upgradeSettings(this);
@@ -31,12 +31,13 @@ export default class Homepage extends Plugin {
 				}; 
 			}
 			
-			await this.openHomepage();
+			if (activeInitially) await this.openHomepage();
 			this.loaded = true;
 		});
 
 		addIcon("homepage", ICON);
 		this.setIcon(this.settings.hasRibbonIcon);
+		this.addSettingTab(new HomepageSettingTab(this.app, this));
 
 		this.addCommand({
 			id: "open-homepage",
