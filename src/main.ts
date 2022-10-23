@@ -108,7 +108,7 @@ export default class Homepage extends Plugin {
 		
 		await this.openHomepageLink(mode as Mode);
 		
-		if (this.app.workspace.activeLeaf.view.getViewType() === "empty") {
+		if (!this.app.workspace.getActiveViewOfType(MarkdownView)) {
 			//hack to fix bug with opening link when homepage is already extant beforehand
 			await this.openHomepageLink(mode as Mode);
 		}
@@ -141,10 +141,10 @@ export default class Homepage extends Plugin {
 	async configureHomepage(): Promise<void> {
 		this.executing = false;
 		
-		const leaf = this.app.workspace.activeLeaf;
-		if(this.settings.view == View.Default || !(leaf.view instanceof MarkdownView)) return;
+		const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+		if(this.settings.view == View.Default || !view) return;
 
-		const state = leaf.view.getState();
+		const state = view.getState();
 
 		switch(this.settings.view) {
 			case View.LivePreview:
@@ -157,7 +157,7 @@ export default class Homepage extends Plugin {
 				break;
 		}
 
-		await leaf.setViewState({type: "markdown", state: state});
+		await view.leaf.setViewState({type: "markdown", state: state});
 		if (this.loaded && this.settings.refreshDataview) { getDataviewPlugin(this.app)?.index.touch(); }
 	}
 

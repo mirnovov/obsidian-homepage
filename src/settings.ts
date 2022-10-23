@@ -89,9 +89,9 @@ export class HomepageSettingTab extends PluginSettingTab {
 				.addMomentFormat(text => text
 					.setDefaultFormat("YYYY-MM-DD")
 					.setValue(this.plugin.settings.momentFormat)
-					.onChange(value => {
+					.onChange(async value => {
 						this.plugin.settings.momentFormat = value;
-						this.plugin.saveSettings();
+						await this.plugin.saveSettings();
 					})
 				);
 			
