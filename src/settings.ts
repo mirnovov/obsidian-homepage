@@ -27,7 +27,8 @@ export interface HomepageSettings {
 	openMode: string,
 	manualOpenMode: string,
 	view: string,
-	refreshDataview: boolean
+	refreshDataview: boolean,
+	autoCreate: boolean
 }
 
 export const DEFAULT: HomepageSettings = {
@@ -41,7 +42,8 @@ export const DEFAULT: HomepageSettings = {
 	openMode: Mode.ReplaceAll,
 	manualOpenMode: Mode.Retain,
 	view: View.Default,
-	refreshDataview: false
+	refreshDataview: false,
+	autoCreate: true
 }
 
 export class HomepageSettingTab extends PluginSettingTab {
@@ -73,19 +75,14 @@ export class HomepageSettingTab extends PluginSettingTab {
 		}
 
 		const suggestor = workspacesMode ? WorkspaceSuggest : FileSuggest;
-		const homepageDesc = workspacesMode ?
-			"The name of the workspace to open on startup." :
-			"The name of the note to open on startup. If it doesn't exist, a new note will be created.";
+		const homepageDesc = `The name of the ${workspacesMode ? "workspace": "note"} to open on startup.`;
 		const homepage = workspacesMode ? "workspace" : "defaultNote";
 
 		// only show the moment field if they're enabled and the workspace isn't, other show the regular entry field
-		if (this.plugin.settings.useMoment && !this.plugin.settings.workspaceEnabled) {
+		if (this.plugin.settings.useMoment && !workspacesMode) {
 			let dateSetting = new Setting(this.containerEl)
 				.setName("Homepage format")
-				.setDesc(
-					"A valid Moment format specification determining the note to be opened on startup." +
-					" If the resulting note doesn't exist, a new one will be created."
-				)
+				.setDesc("A valid Moment format specification determining the note to be opened on startup.")
 				.addMomentFormat(text => text
 					.setDefaultFormat("YYYY-MM-DD")
 					.setValue(this.plugin.settings.momentFormat)
@@ -99,7 +96,8 @@ export class HomepageSettingTab extends PluginSettingTab {
 			dateSetting.descEl.createEl("a", {
 				text: "Moment formatting info", attr: {href: "https://momentjs.com/docs/#/displaying/format/"}
 			});
-		} else {
+		} 
+		else {
 			new Setting(this.containerEl)
 				.setName("Homepage")
 				.setDesc(homepageDesc)
@@ -114,7 +112,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 				});
 		}
 
-		new Setting(this.containerEl)
+		let momentSetting = new Setting(this.containerEl)
 			.setName("Use date formatting")
 			.setDesc(
 				"Open the homepage using Moment date syntax. This allows opening different homepages at different times or dates."
@@ -197,9 +195,21 @@ export class HomepageSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				});
 			});
+			
+		let autoCreateSetting = new Setting(this.containerEl)
+			.setName("Auto-create")
+			.setDesc("If the homepage doesn't exist, create a note with the specified name.")
+			.addToggle(toggle => toggle
+				.setValue(this.settings.autoCreate)
+				.onChange(async value => {
+					this.settings.autoCreate = value;
+					await this.plugin.saveSettings();
+				})
+			);
+
 
 		if (workspacesMode) {
-			[viewSetting, modeSetting, manualModeSetting].forEach(disableSetting);
+			[viewSetting, modeSetting, manualModeSetting, autoCreateSetting, momentSetting].forEach(disableSetting);
 		}
 
 		if (getDataviewPlugin(this.plugin.app)) {

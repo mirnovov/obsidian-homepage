@@ -7,8 +7,11 @@ const ICON: string = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg
 export default class Homepage extends Plugin {
 	settings: HomepageSettings;
 	workspacePlugin: any;
+	
 	loaded: boolean = false;
 	executing: boolean = false;
+	
+	homepage: string = "";
 
 	async onload(): Promise<void> {
 		let activeInitially = document.body.querySelector(".progress-bar") !== null;
@@ -74,6 +77,7 @@ export default class Homepage extends Plugin {
 
 	openHomepage = async (): Promise<void> => {
 		this.executing = true;
+		this.homepage = this.getHomepageName();
 		var mode = this.loaded ? this.settings.manualOpenMode : this.settings.openMode;
 
 		if (getDailynotesAutorun(this.app)) {
@@ -83,7 +87,11 @@ export default class Homepage extends Plugin {
 			);
 			return;
 		}
-
+		else if (!this.settings.autoCreate && await this.getHomepageNonextancy()) {
+			new Notice(`Homepage "${this.homepage}" does not exist.`);
+			return;
+		}
+		
 		if (this.workspacesMode()) {
 			if(!(this.settings.workspace in this.workspacePlugin?.instance.workspaces)) {
 				new Notice(`Cannot find the workspace "${this.settings.workspace}" to use as the homepage.`);
@@ -116,10 +124,14 @@ export default class Homepage extends Plugin {
 		await this.configureHomepage();
 	}
 	
-	async openHomepageLink(mode: Mode) {
+	async openHomepageLink(mode: Mode): Promise<void> {
 		await this.app.workspace.openLinkText(
-			this.getHomepageName(), "", mode == Mode.Retain, { active: true }
+			this.homepage, "", mode == Mode.Retain, { active: true }
 		);
+	}
+	
+	async getHomepageNonextancy(): Promise<boolean> {
+		return !(await this.app.vault.adapter.exists(`${this.homepage}.md`)) && !this.workspacesMode();
 	}
 
 	getHomepageName(): string {
@@ -134,7 +146,7 @@ export default class Homepage extends Plugin {
 
 	getOpenedHomepage(): WorkspaceLeaf {
 		return this.app.workspace.getLeavesOfType("markdown").find(
-			leaf => trimFile((leaf.view as any).file) == this.getHomepageName()
+			leaf => trimFile((leaf.view as any).file) == this.homepage
 		);
 	}
 
