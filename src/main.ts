@@ -112,11 +112,12 @@ export default class Homepage extends Plugin {
 		}
 		else {
 			this.app.workspace.detachLeavesOfType("markdown");
+			this.app.workspace.detachLeavesOfType("kanban");
 		}
 		
 		await this.openHomepageLink(mode as Mode);
 		
-		if (!this.app.workspace.getActiveViewOfType(MarkdownView)) {
+		if (this.app.workspace.getActiveFile() == null) {
 			//hack to fix bug with opening link when homepage is already extant beforehand
 			await this.openHomepageLink(mode as Mode);
 		}
@@ -145,7 +146,10 @@ export default class Homepage extends Plugin {
 	}
 
 	getOpenedHomepage(): WorkspaceLeaf {
-		return this.app.workspace.getLeavesOfType("markdown").find(
+		let leaves = this.app.workspace.getLeavesOfType("markdown").concat(
+			this.app.workspace.getLeavesOfType("kanban")
+		);
+		return leaves.find(
 			leaf => trimFile((leaf.view as any).file) == this.homepage
 		);
 	}
