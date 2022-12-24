@@ -28,7 +28,8 @@ export interface HomepageSettings {
 	manualOpenMode: string,
 	view: string,
 	refreshDataview: boolean,
-	autoCreate: boolean
+	autoCreate: boolean,
+	pin: boolean
 }
 
 export const DEFAULT: HomepageSettings = {
@@ -43,7 +44,8 @@ export const DEFAULT: HomepageSettings = {
 	manualOpenMode: Mode.Retain,
 	view: View.Default,
 	refreshDataview: false,
-	autoCreate: true
+	autoCreate: true,
+	pin: false
 }
 
 export class HomepageSettingTab extends PluginSettingTab {
@@ -206,10 +208,22 @@ export class HomepageSettingTab extends PluginSettingTab {
 					await this.plugin.saveSettings();
 				})
 			);
+			
+		let pinSetting = new Setting(this.containerEl)
+			.setName("Pin")
+			.setDesc("Pin the homepage when opening.")
+			.addToggle(toggle => toggle
+				.setValue(this.settings.pin)
+				.onChange(async value => {
+					this.settings.pin = value;
+					await this.plugin.saveSettings();
+				})
+			);
+
 
 
 		if (workspacesMode) {
-			[viewSetting, modeSetting, manualModeSetting, autoCreateSetting, momentSetting].forEach(disableSetting);
+			[viewSetting, modeSetting, manualModeSetting, autoCreateSetting, momentSetting, pinSetting].forEach(disableSetting);
 		}
 
 		if (getDataviewPlugin(this.plugin.app)) {

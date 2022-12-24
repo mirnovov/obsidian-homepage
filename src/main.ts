@@ -158,7 +158,8 @@ export default class Homepage extends Plugin {
 		this.executing = false;
 		
 		const view = this.app.workspace.getActiveViewOfType(MarkdownView);
-		if(this.settings.view == View.Default || !view) return;
+		if (this.settings.pin && view) view.leaf.setPinned(true);			
+		if (this.settings.view == View.Default || !view) return;
 
 		const state = view.getState();
 
