@@ -1,7 +1,7 @@
 import { App, PluginSettingTab, Setting, TAbstractFile, TFile, normalizePath } from "obsidian";
 import Homepage from "./main";
 import { TextInputSuggest } from "./suggest";
-import { disableSetting, getDailynotesAutorun, getDataviewPlugin, getWorkspacePlugin, trimFile } from "./utils";
+import { getDailynotesAutorun, getDataviewPlugin, getWorkspacePlugin, trimFile } from "./utils";
 
 export enum Mode {
 	ReplaceAll = "Replace all open notes",
@@ -17,6 +17,7 @@ export enum View {
 }
 
 export interface HomepageSettings {
+	[member: string]: any,
 	version: number,
 	defaultNote: string,
 	useMoment: boolean,
@@ -48,6 +49,8 @@ export const DEFAULT: HomepageSettings = {
 	pin: false
 }
 
+export const HIDDEN: string = "nv-workspace-hidden";
+
 export class HomepageSettingTab extends PluginSettingTab {
 	plugin: Homepage;
 	settings: HomepageSettings;
@@ -64,7 +67,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		}
 		return normalizePath(value);
 	}
-
+	
 	display(): void {
 		const workspacesMode = this.plugin.workspacesMode();
 		this.containerEl.empty();
@@ -114,134 +117,106 @@ export class HomepageSettingTab extends PluginSettingTab {
 				});
 		}
 
-		let momentSetting = new Setting(this.containerEl)
-			.setName("Use date formatting")
-			.setDesc(
-				"Open the homepage using Moment date syntax. This allows opening different homepages at different times or dates."
-			)
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.useMoment)
-				.onChange(value => {
-					this.plugin.settings.useMoment = value;
-					this.plugin.saveSettings();
-					this.display();
-				})
-			);
+		this.addToggle(
+			"Use date formatting",
+			"Open the homepage using Moment date syntax. This allows opening different homepages at different times or dates.",
+			"useMoment",
+			(_) => this.display()
+		)
 
 		if (this.plugin.workspacePlugin?.enabled) {
-			new Setting(this.containerEl)
-				.setName("Use workspaces")
-				.setDesc("Open a workspace, instead of a note, as the homepage.")
-				.addToggle(toggle => toggle
-					.setValue(this.settings.workspaceEnabled)
-					.onChange(async value => {
-						this.settings.workspaceEnabled = value;
-						await this.plugin.saveSettings();
-						this.display(); //update stuff
-					})
-				);
+			this.addToggle(
+				"Use workspaces",
+				"Open a workspace, instead of a note, as the homepage.",
+				"workspaceEnabled",
+				(_) => this.display(),
+				true
+			)
 		}
 
-		let ribbonSetting = new Setting(this.containerEl)
-			.setName("Display ribbon icon")
-			.setDesc("Show a little house on the ribbon, allowing you to quickly access the homepage.")
-			.addToggle(toggle => toggle
-				.setValue(this.settings.hasRibbonIcon)
-				.onChange(async value => {
-					this.settings.hasRibbonIcon = value;
-					await this.plugin.saveSettings();
-					this.plugin.setIcon(value);
-				})
-			);
-
+		let ribbonSetting = this.addToggle(
+			"Display ribbon icon",
+			"Show a little house on the ribbon, allowing you to quickly access the homepage.",
+			"hasRibbonIcon",
+			(value) => this.plugin.setIcon(value),
+			true
+		)
+		
 		ribbonSetting.settingEl.setAttribute("style", "padding-top: 70px; border-top: none !important");
 
-		let viewSetting = new Setting(this.containerEl)
-			.setName("Homepage view")
-			.setDesc("Choose what view to open the homepage in.")
-			.addDropdown(async dropdown => {
-				for (let key of Object.values(View)) {
-					dropdown.addOption(key, key);
-				}
-				dropdown.setValue(this.settings.view);
-				dropdown.onChange(async option => {
-					this.settings.view = option;
-					await this.plugin.saveSettings();
-				});
-			});
-
-		let modeSetting = new Setting(this.containerEl)
-			.setName("Opening method")
-			.setDesc("Determine how existing notes are affected on startup.")
-			.addDropdown(async dropdown => {
-				for (let key of Object.values(Mode)) {
-					dropdown.addOption(key, key);
-				}
-				dropdown.setValue(this.settings.openMode);
-				dropdown.onChange(async option => {
-					this.settings.openMode = option;
-					await this.plugin.saveSettings();
-				});
-			});
+		this.addDropdown(
+			"Homepage view", 
+			"Choose what view to open the homepage in.", 
+			"view",
+			View
+		)
+		
+		this.addDropdown(
+			"Opening method", 
+			"Determine how existing notes are affected on startup.", 
+			"openMode",
+			Mode
+		)
+		
+		this.addDropdown(
+			"Manual opening method", 
+			"Determine how existing notes are affected when opening with commands or the ribbon button.", 
+			"manualOpenMode",
+			Mode
+		)
 			
-		let manualModeSetting = new Setting(this.containerEl)
-			.setName("Manual opening method")
-			.setDesc("Determine how existing notes are affected when opening with commands or the ribbon button.")
-			.addDropdown(async dropdown => {
-				for (let key of Object.values(Mode)) {
-					dropdown.addOption(key, key);
-				}
-				dropdown.setValue(this.settings.manualOpenMode);
-				dropdown.onChange(async option => {
-					this.settings.manualOpenMode = option;
-					await this.plugin.saveSettings();
-				});
-			});
-			
-		let autoCreateSetting = new Setting(this.containerEl)
-			.setName("Auto-create")
-			.setDesc("If the homepage doesn't exist, create a note with the specified name.")
-			.addToggle(toggle => toggle
-				.setValue(this.settings.autoCreate)
-				.onChange(async value => {
-					this.settings.autoCreate = value;
-					await this.plugin.saveSettings();
-				})
-			);
-			
-		let pinSetting = new Setting(this.containerEl)
-			.setName("Pin")
-			.setDesc("Pin the homepage when opening.")
-			.addToggle(toggle => toggle
-				.setValue(this.settings.pin)
-				.onChange(async value => {
-					this.settings.pin = value;
-					await this.plugin.saveSettings();
-				})
-			);
-
-
-
-		if (workspacesMode) {
-			[viewSetting, modeSetting, manualModeSetting, autoCreateSetting, momentSetting, pinSetting].forEach(disableSetting);
-		}
-
+		this.addToggle("Auto-create", "If the homepage doesn't exist, create a note with the specified name.", "autoCreate")
+		this.addToggle("Pin", "Pin the homepage when opening.", "pin")
+		
 		if (getDataviewPlugin(this.plugin.app)) {
-			let refreshSetting = new Setting(this.containerEl)
-				.setName("Refresh Dataview")
-				.setDesc("Always attempt to reload Dataview views when opening the homepage.")
-				.addToggle(toggle => toggle
-					.setValue(this.settings.refreshDataview)
-					.onChange(async value => {
-						this.settings.refreshDataview = value;
-						await this.plugin.saveSettings();
-					})
-				);
+			let refreshSetting = this.addToggle(
+				"Refresh Dataview", "Always attempt to reload Dataview views when opening the homepage.", "refreshDataview"
+			);
 
 			refreshSetting.descEl.createDiv({
 				text: "Requires Dataview auto-refresh to be enabled.", attr: {class: "mod-warning"}
 			});
 		}
+		
+		if (workspacesMode) {
+			Array.from(document.getElementsByClassName(HIDDEN)).forEach(
+				s => s.setAttribute("style", "opacity: .5; pointer-events: none !important")
+			);
+		}
+	}
+	
+	addDropdown(name: string, desc: string, setting: string, source: object): Setting {
+		const dropdown = new Setting(this.containerEl)
+			.setName(name).setDesc(desc)
+			.addDropdown(async dropdown => {
+				for (let key of Object.values(source)) {
+					dropdown.addOption(key, key);
+				}
+				dropdown.setValue(this.settings[setting]);
+				dropdown.onChange(async option => {
+					this.settings[setting] = option;
+					await this.plugin.saveSettings();
+				});
+			})
+		
+		dropdown.settingEl.addClass(HIDDEN);
+		return dropdown;
+	}
+
+	addToggle(name: string, desc: string, setting: string, callback?: (v: any) => any, workspaces: boolean = false): Setting {
+		const toggle = new Setting(this.containerEl)
+			.setName(name).setDesc(desc)
+			.addToggle(toggle => toggle
+				.setValue(this.settings[setting])
+				.onChange(async value => {
+					this.settings[setting] = value;
+					await this.plugin.saveSettings();
+					if (callback) callback(value);
+				})
+			);
+		
+		if (!workspaces) toggle.settingEl.addClass(HIDDEN);
+		return toggle;
 	}
 }
 

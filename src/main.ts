@@ -1,6 +1,6 @@
 import { MarkdownView, Notice, Platform, Plugin, WorkspaceLeaf, addIcon, moment } from "obsidian";
 import { DEFAULT, Mode, View, HomepageSettings, HomepageSettingTab  } from "./settings";
-import { getDailynotesAutorun, getNewTabPagePlugin, getWorkspacePlugin, getDataviewPlugin, trimFile, upgradeSettings } from "./utils";
+import { getDailynotesAutorun, getNewTabPagePlugin, getWorkspacePlugin, getDataviewPlugin, trimFile } from "./utils";
 
 const ICON: string = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5"><path d="M10.025 21H6v-7H3v-1.5L12 3l9 9.5V14h-3v7h-4v-7h-3.975v7Z" style="fill:none;stroke:currentColor;stroke-width:2px"/></svg>`
 
@@ -19,10 +19,6 @@ export default class Homepage extends Plugin {
 		this.settings = Object.assign({}, DEFAULT, await this.loadData());
 		this.workspacePlugin = getWorkspacePlugin(this.app);
 
-		if (this.settings.version < 2) {
-			await upgradeSettings(this);
-		}
-		
 		this.app.workspace.onLayoutReady(async () => {
 			let ntp = getNewTabPagePlugin(this.app);
 
@@ -74,11 +70,31 @@ export default class Homepage extends Plugin {
 			document.getElementById("nv-homepage-icon")?.remove();
 		}
 	}
-
+	
 	openHomepage = async (): Promise<void> => {
+		this.workspacesMode() ? await this.launchWorkspace() : await this.launchPage();
+	}
+	
+	async launchWorkspace() {
+		if(!(this.settings.workspace in this.workspacePlugin?.instance.workspaces)) {
+			new Notice(`Cannot find the workspace "${this.settings.workspace}" to use as the homepage.`);
+			return;
+		}
+		
+		this.workspacePlugin.instance.loadWorkspace(this.settings.workspace);
+	}
+
+	async launchPage() {
+		const mode = this.loaded ? this.settings.manualOpenMode : this.settings.openMode;
+		const nonextant = async () => !(await this.app.vault.adapter.exists(`${this.homepage}.md`)) && !this.workspacesMode();
+		const openHomepageLink = async (mode: Mode): Promise<void> => {
+			await this.app.workspace.openLinkText(
+				this.homepage, "", mode == Mode.Retain, { active: true }
+			);
+		}
+		
 		this.executing = true;
 		this.homepage = this.getHomepageName();
-		var mode = this.loaded ? this.settings.manualOpenMode : this.settings.openMode;
 
 		if (getDailynotesAutorun(this.app)) {
 			new Notice(
@@ -87,21 +103,12 @@ export default class Homepage extends Plugin {
 			);
 			return;
 		}
-		else if (!this.settings.autoCreate && await this.getHomepageNonextancy()) {
+		else if (!this.settings.autoCreate && await nonextant()) {
 			new Notice(`Homepage "${this.homepage}" does not exist.`);
 			return;
 		}
 		
-		if (this.workspacesMode()) {
-			if(!(this.settings.workspace in this.workspacePlugin?.instance.workspaces)) {
-				new Notice(`Cannot find the workspace "${this.settings.workspace}" to use as the homepage.`);
-				return;
-			}
-
-			this.workspacePlugin.instance.loadWorkspace(this.settings.workspace);
-			return;
-		}
-		else if (mode != Mode.ReplaceAll) {
+		if (mode != Mode.ReplaceAll) {
 			const alreadyOpened = this.getOpenedHomepage();
 
 			if (alreadyOpened !== undefined) {
@@ -115,24 +122,14 @@ export default class Homepage extends Plugin {
 			this.app.workspace.detachLeavesOfType("kanban");
 		}
 		
-		await this.openHomepageLink(mode as Mode);
+		await openHomepageLink(mode as Mode);
 		
 		if (this.app.workspace.getActiveFile() == null) {
 			//hack to fix bug with opening link when homepage is already extant beforehand
-			await this.openHomepageLink(mode as Mode);
+			await openHomepageLink(mode as Mode);
 		}
 
 		await this.configureHomepage();
-	}
-	
-	async openHomepageLink(mode: Mode): Promise<void> {
-		await this.app.workspace.openLinkText(
-			this.homepage, "", mode == Mode.Retain, { active: true }
-		);
-	}
-	
-	async getHomepageNonextancy(): Promise<boolean> {
-		return !(await this.app.vault.adapter.exists(`${this.homepage}.md`)) && !this.workspacesMode();
 	}
 
 	getHomepageName(): string {
@@ -182,4 +179,3 @@ export default class Homepage extends Plugin {
 		return this.workspacePlugin?.enabled && this.settings.workspaceEnabled && !Platform.isMobile;
 	}
 }
-
