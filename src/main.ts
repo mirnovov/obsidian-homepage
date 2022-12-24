@@ -10,6 +10,7 @@ export default class Homepage extends Plugin {
 	
 	loaded: boolean = false;
 	executing: boolean = false;
+	reverting: boolean = false;
 	
 	homepage: string = "";
 
@@ -36,6 +37,7 @@ export default class Homepage extends Plugin {
 
 		addIcon("homepage", ICON);
 		this.setIcon(this.settings.hasRibbonIcon);
+		this.setReversion(this.settings.revertView);
 		this.addSettingTab(new HomepageSettingTab(this.app, this));
 
 		this.addCommand({
@@ -68,6 +70,15 @@ export default class Homepage extends Plugin {
 		}
 		else {
 			document.getElementById("nv-homepage-icon")?.remove();
+		}
+	}
+	
+	async setReversion(value: boolean): Promise<void> {
+		if (value && this.settings.view !== View.Default) {
+			this.registerEvent(this.app.workspace.on("layout-change", this.revertView));
+		} 
+		else {
+			this.app.workspace.off("layout-change", this.revertView);
 		}
 	}
 	
@@ -153,6 +164,7 @@ export default class Homepage extends Plugin {
 
 	async configureHomepage(): Promise<void> {
 		this.executing = false;
+		this.reverting = true;
 		
 		const view = this.app.workspace.getActiveViewOfType(MarkdownView);
 		if (this.settings.pin && view) view.leaf.setPinned(true);			
@@ -173,6 +185,23 @@ export default class Homepage extends Plugin {
 
 		await view.leaf.setViewState({type: "markdown", state: state});
 		if (this.loaded && this.settings.refreshDataview) { getDataviewPlugin(this.app)?.index.touch(); }
+	}
+	
+	revertView = async (): Promise<void> => {
+		if (!this.loaded || !this.reverting || trimFile(this.app.workspace.getActiveFile()) == this.homepage) {
+			return;
+		}
+		
+		const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+		if (!view) return;
+
+		const state = view.getState();
+		const config = (this.app.vault as any).config;
+		
+		state.mode = config.defaultViewMode;
+		state.source = !config.livePreview;
+		await view.leaf.setViewState({type: "markdown", state: state});
+		this.reverting = false;
 	}
 
 	workspacesMode(): boolean {

@@ -28,13 +28,14 @@ export interface HomepageSettings {
 	openMode: string,
 	manualOpenMode: string,
 	view: string,
+	revertView: boolean,
 	refreshDataview: boolean,
 	autoCreate: boolean,
 	pin: boolean
 }
 
 export const DEFAULT: HomepageSettings = {
-	version: 0,
+	version: 2,
 	defaultNote: "Home",
 	useMoment: false,
 	momentFormat: "YYYY-MM-DD",
@@ -44,6 +45,7 @@ export const DEFAULT: HomepageSettings = {
 	openMode: Mode.ReplaceAll,
 	manualOpenMode: Mode.Retain,
 	view: View.Default,
+	revertView: true,
 	refreshDataview: false,
 	autoCreate: true,
 	pin: false
@@ -118,55 +120,56 @@ export class HomepageSettingTab extends PluginSettingTab {
 		}
 
 		this.addToggle(
-			"Use date formatting",
-			"Open the homepage using Moment date syntax. This allows opening different homepages at different times or dates.",
+			"Use date formatting", "Open the homepage using Moment date syntax. This allows opening different homepages at different times or dates.",
 			"useMoment",
 			(_) => this.display()
-		)
+		);
 
 		if (this.plugin.workspacePlugin?.enabled) {
 			this.addToggle(
-				"Use workspaces",
-				"Open a workspace, instead of a note, as the homepage.",
+				"Use workspaces", "Open a workspace, instead of a note, as the homepage.",
 				"workspaceEnabled",
 				(_) => this.display(),
 				true
-			)
+			);
 		}
 
 		let ribbonSetting = this.addToggle(
-			"Display ribbon icon",
-			"Show a little house on the ribbon, allowing you to quickly access the homepage.",
+			"Display ribbon icon", "Show a little house on the ribbon, allowing you to quickly access the homepage.",
 			"hasRibbonIcon",
 			(value) => this.plugin.setIcon(value),
 			true
-		)
+		);
 		
 		ribbonSetting.settingEl.setAttribute("style", "padding-top: 70px; border-top: none !important");
 
 		this.addDropdown(
-			"Homepage view", 
-			"Choose what view to open the homepage in.", 
+			"Homepage view", "Choose what view to open the homepage in.", 
 			"view",
 			View
-		)
+		);
+		
+		this.addToggle(
+			"Revert view on close", "When navigating away from the homepage, restore the default view.", 
+			"revertView",
+			(value) => this.plugin.setReversion(value)
+		);
 		
 		this.addDropdown(
-			"Opening method", 
-			"Determine how existing notes are affected on startup.", 
+			"Opening method", "Determine how existing notes are affected on startup.", 
 			"openMode",
 			Mode
-		)
+		);
 		
 		this.addDropdown(
 			"Manual opening method", 
 			"Determine how existing notes are affected when opening with commands or the ribbon button.", 
 			"manualOpenMode",
 			Mode
-		)
+		);
 			
-		this.addToggle("Auto-create", "If the homepage doesn't exist, create a note with the specified name.", "autoCreate")
-		this.addToggle("Pin", "Pin the homepage when opening.", "pin")
+		this.addToggle("Auto-create", "If the homepage doesn't exist, create a note with the specified name.", "autoCreate");
+		this.addToggle("Pin", "Pin the homepage when opening.", "pin");
 		
 		if (getDataviewPlugin(this.plugin.app)) {
 			let refreshSetting = this.addToggle(

@@ -1,4 +1,4 @@
-import { App, Setting, TFile } from "obsidian";
+import { App, TFile } from "obsidian";
 
 export function trimFile(file: TFile): string {
 	return file.path.slice(0, -3);
