@@ -65,7 +65,7 @@ export default class Homepage extends Plugin {
 
 	setIcon(value: boolean): void {
 		if (value) {
-			this.addRibbonIcon("homepage", "Open homepage", this.openHomepage)
+			this.addRibbonIcon("homepage", "Open homepage", () => this.autoScroll())
 				.setAttribute("id", "nv-homepage-icon");
 		}
 		else {
@@ -98,11 +98,9 @@ export default class Homepage extends Plugin {
 	async launchPage() {
 		const mode = this.loaded ? this.settings.manualOpenMode : this.settings.openMode;
 		const nonextant = async () => !(await this.app.vault.adapter.exists(`${this.homepage}.md`)) && !this.workspacesMode();
-		const openHomepageLink = async (mode: Mode): Promise<void> => {
-			await this.app.workspace.openLinkText(
-				this.homepage, "", mode == Mode.Retain, { active: true }
-			);
-		}
+		const openLink = async (mode: Mode) => await this.app.workspace.openLinkText(
+			this.homepage, "", mode == Mode.Retain, { active: true }
+		);
 		
 		this.executing = true;
 		this.homepage = this.getHomepageName();
@@ -133,11 +131,11 @@ export default class Homepage extends Plugin {
 			this.app.workspace.detachLeavesOfType("kanban");
 		}
 		
-		await openHomepageLink(mode as Mode);
+		await openLink(mode as Mode);
 		
 		if (this.app.workspace.getActiveFile() == null) {
 			//hack to fix bug with opening link when homepage is already extant beforehand
-			await openHomepageLink(mode as Mode);
+			await openLink(mode as Mode);
 		}
 
 		await this.configureHomepage();
@@ -167,10 +165,23 @@ export default class Homepage extends Plugin {
 		this.reverting = true;
 		
 		const view = this.app.workspace.getActiveViewOfType(MarkdownView);
-		if (this.settings.pin && view) view.leaf.setPinned(true);			
-		if (this.settings.view == View.Default || !view) return;
-
 		const state = view.getState();
+		if (!view) return;
+
+		if (this.settings.autoScroll) {
+			const count = view.editor.lineCount();
+			
+			if (state.mode == "preview") {
+				view.previewMode.applyScroll(count - 4);
+			}
+			else {
+				view.editor.setCursor(count);
+				view.editor.focus();
+			}
+		}	
+		
+		if (this.settings.pin) view.leaf.setPinned(true);	
+		if (this.settings.view == View.Default) return;
 
 		switch(this.settings.view) {
 			case View.LivePreview:

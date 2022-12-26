@@ -31,6 +31,7 @@ export interface HomepageSettings {
 	revertView: boolean,
 	refreshDataview: boolean,
 	autoCreate: boolean,
+	autoScroll: boolean,
 	pin: boolean
 }
 
@@ -48,6 +49,7 @@ export const DEFAULT: HomepageSettings = {
 	revertView: true,
 	refreshDataview: false,
 	autoCreate: true,
+	autoScroll: false,
 	pin: false
 }
 
@@ -169,6 +171,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		);
 			
 		this.addToggle("Auto-create", "If the homepage doesn't exist, create a note with the specified name.", "autoCreate");
+		this.addToggle("Auto-scroll", "When opening the homepage, scroll to the bottom and focus on the last line.", "autoScroll");
 		this.addToggle("Pin", "Pin the homepage when opening.", "pin");
 		
 		if (getDataviewPlugin(this.plugin.app)) {
