@@ -137,42 +137,39 @@ export class HomepageSettingTab extends PluginSettingTab {
 		}
 
 		let ribbonSetting = this.addToggle(
-			"Display ribbon icon", "Show a little house on the ribbon, allowing you to quickly access the homepage.",
+			"Use ribbon icon", "Show a little house on the ribbon, allowing you to quickly access the homepage.",
 			"hasRibbonIcon",
 			(value) => this.plugin.setIcon(value),
 			true
 		);
-		
 		ribbonSetting.settingEl.setAttribute("style", "padding-top: 70px; border-top: none !important");
 
+		this.addHeading("Vault environment")
+		this.addDropdown(
+			"Opening method", "Determine how extant tabs and panes are affected on startup.", 
+			"openMode",
+			Mode
+		);
+		this.addDropdown(
+			"Manual opening method", "Determine how extant tabs and panes are affected when opening with commands or the ribbon button.", 
+			"manualOpenMode",
+			Mode
+		);
+		this.addToggle("Auto-create", "If the homepage doesn't exist, create a note with the specified name.", "autoCreate");
+		this.addToggle("Pin", "Pin the homepage when opening.", "pin");
+		
+		this.addHeading("Pane")
 		this.addDropdown(
 			"Homepage view", "Choose what view to open the homepage in.", 
 			"view",
 			View
 		);
-		
 		this.addToggle(
 			"Revert view on close", "When navigating away from the homepage, restore the default view.", 
 			"revertView",
 			(value) => this.plugin.setReversion(value)
 		);
-		
-		this.addDropdown(
-			"Opening method", "Determine how existing notes are affected on startup.", 
-			"openMode",
-			Mode
-		);
-		
-		this.addDropdown(
-			"Manual opening method", 
-			"Determine how existing notes are affected when opening with commands or the ribbon button.", 
-			"manualOpenMode",
-			Mode
-		);
-			
-		this.addToggle("Auto-create", "If the homepage doesn't exist, create a note with the specified name.", "autoCreate");
 		this.addToggle("Auto-scroll", "When opening the homepage, scroll to the bottom and focus on the last line.", "autoScroll");
-		this.addToggle("Pin", "Pin the homepage when opening.", "pin");
 		
 		if (getDataviewPlugin(this.plugin.app)) {
 			let refreshSetting = this.addToggle(
@@ -191,6 +188,12 @@ export class HomepageSettingTab extends PluginSettingTab {
 		}
 	}
 	
+	addHeading(name: string): Setting {
+		const heading = new Setting(this.containerEl).setHeading().setName(name);
+		heading.settingEl.addClass(HIDDEN);
+		return heading;
+	}
+	
 	addDropdown(name: string, desc: string, setting: string, source: object): Setting {
 		const dropdown = new Setting(this.containerEl)
 			.setName(name).setDesc(desc)
@@ -203,7 +206,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 					this.settings[setting] = option;
 					await this.plugin.saveSettings();
 				});
-			})
+			});
 		
 		dropdown.settingEl.addClass(HIDDEN);
 		return dropdown;
