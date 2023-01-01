@@ -65,7 +65,7 @@ export default class Homepage extends Plugin {
 
 	setIcon(value: boolean): void {
 		if (value) {
-			this.addRibbonIcon("homepage", "Open homepage", () => this.autoScroll())
+			this.addRibbonIcon("homepage", "Open homepage", this.openHomepage)
 				.setAttribute("id", "nv-homepage-icon");
 		}
 		else {
