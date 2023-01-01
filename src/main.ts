@@ -3,6 +3,7 @@ import { DEFAULT, Mode, View, HomepageSettings, HomepageSettingTab  } from "./se
 import { getDailynotesAutorun, getNewTabPagePlugin, getWorkspacePlugin, getDataviewPlugin, trimFile } from "./utils";
 
 const ICON: string = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5"><path d="M10.025 21H6v-7H3v-1.5L12 3l9 9.5V14h-3v7h-4v-7h-3.975v7Z" style="fill:none;stroke:currentColor;stroke-width:2px"/></svg>`
+const LEAF_TYPES: string[] = ["markdown", "canvas", "kanban"];
 
 export default class Homepage extends Plugin {
 	settings: HomepageSettings;
@@ -127,8 +128,7 @@ export default class Homepage extends Plugin {
 			}
 		}
 		else {
-			this.app.workspace.detachLeavesOfType("markdown");
-			this.app.workspace.detachLeavesOfType("kanban");
+			LEAF_TYPES.forEach(i => this.app.workspace.detachLeavesOfType(i));
 		}
 		
 		await openLink(mode as Mode);
@@ -152,9 +152,7 @@ export default class Homepage extends Plugin {
 	}
 
 	getOpenedHomepage(): WorkspaceLeaf {
-		let leaves = this.app.workspace.getLeavesOfType("markdown").concat(
-			this.app.workspace.getLeavesOfType("kanban")
-		);
+		let leaves = LEAF_TYPES.flatMap(i => this.app.workspace.getLeavesOfType(i));
 		return leaves.find(
 			leaf => trimFile((leaf.view as any).file) == this.homepage
 		);
@@ -165,8 +163,8 @@ export default class Homepage extends Plugin {
 		this.reverting = true;
 		
 		const view = this.app.workspace.getActiveViewOfType(MarkdownView);
-		const state = view.getState();
 		if (!view) return;
+		const state = view.getState();
 
 		if (this.settings.autoScroll) {
 			const count = view.editor.lineCount();

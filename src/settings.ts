@@ -84,14 +84,14 @@ export class HomepageSettingTab extends PluginSettingTab {
 		}
 
 		const suggestor = workspacesMode ? WorkspaceSuggest : FileSuggest;
-		const homepageDesc = `The name of the ${workspacesMode ? "workspace": "note"} to open on startup.`;
+		const homepageDesc = `The name of the ${workspacesMode ? "workspace": "note or canvas"} to open on startup.`;
 		const homepage = workspacesMode ? "workspace" : "defaultNote";
 
 		// only show the moment field if they're enabled and the workspace isn't, other show the regular entry field
 		if (this.plugin.settings.useMoment && !workspacesMode) {
 			let dateSetting = new Setting(this.containerEl)
 				.setName("Homepage format")
-				.setDesc("A valid Moment format specification determining the note to be opened on startup.")
+				.setDesc("A valid Moment format specification determining the note or canvas to be opened on startup.")
 				.addMomentFormat(text => text
 					.setDefaultFormat("YYYY-MM-DD")
 					.setValue(this.plugin.settings.momentFormat)
@@ -129,7 +129,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 
 		if (this.plugin.workspacePlugin?.enabled) {
 			this.addToggle(
-				"Use workspaces", "Open a workspace, instead of a note, as the homepage.",
+				"Use workspaces", "Open a workspace, instead of a note or canvas, as the homepage.",
 				"workspaceEnabled",
 				(_) => this.display(),
 				true
@@ -237,7 +237,7 @@ class FileSuggest extends TextInputSuggest<TFile> {
 
 		abstractFiles.forEach((file: TAbstractFile) => {
 			if (
-				file instanceof TFile && file.extension === "md" &&
+				file instanceof TFile && ["md", "canvas"].contains(file.extension) &&
 				file.path.toLowerCase().contains(inputLower)
 			) {
 				files.push(file);
@@ -248,11 +248,20 @@ class FileSuggest extends TextInputSuggest<TFile> {
 	}
 
 	renderSuggestion(file: TFile, el: HTMLElement) {
-		el.setText(trimFile(file));
+		if (file.extension == "md") {
+			el.setText(trimFile(file));
+		}
+		else {
+			el.setText(file.path.slice(0, -7))
+			el.insertAdjacentHTML(
+				"beforeend", 
+				`<div class="nav-file-tag" style="display:inline-block;vertical-align:middle">canvas</div>`
+			);
+		}
 	 }
 
 	selectSuggestion(file: TFile) {
-		this.inputEl.value = trimFile(file);
+		this.inputEl.value = file.extension == "md" ? trimFile(file) : file.path;
 		this.inputEl.trigger("input");
 		this.close();
 	}
