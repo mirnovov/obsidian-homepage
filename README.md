@@ -1,12 +1,12 @@
 <h1 align="center">Homepage</h1>
-<p align="center">Open a specified note upon launching <a href="https://obsidian.md">Obsidian</a>, instead of the most recent one.</p>
+<p align="center">Open a specified note, canvas, or workspace upon launching <a href="https://obsidian.md">Obsidian</a>, instead of the most recent one.</p>
 <br>
 
-* Choose **any note or workspace** in the vault to open. If a specified note doesn't exist, it is automatically created.
+* Choose **any note, canvas, or workspace** in the vault to open. If a specified note doesn't exist, it is automatically created.
 * Use [moment syntax](https://momentjs.com/docs/#/displaying/format/) to **set different homepages** for different  days, weeks, months or other time periods.
-* Use a variety of **opening methods** to decide what happens to any notes that were left open - keep them, replace the last note, or remove them all.
+* Use a variety of **opening methods** to decide what happens to any tabs that were left open - keep them, replace the last note, or remove them all.
 * Access the homepage layout **at any time** using the `Open homepage` command, or clicking the dedicated ribbon button.
-* Open notes in **any viewing mode** - Reading, Source, and Obsidian's new Live Preview mode.
+* View notes **any way you want** - use Reading, Source or Live Preview, and optionally pin your homepage or revert to your default view when you view another note.
 * Works effectively with **other plugins** such as [Dataview](https://github.com/blacksmithgu/obsidian-dataview), allowing advanced landing pages that keep tabs on every note.
 
 ### Installation

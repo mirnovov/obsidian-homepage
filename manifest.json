@@ -1,9 +1,9 @@
 {
 	"id": "homepage",
 	"name": "Homepage",
-	"version": "2.6",
+	"version": "2.7",
 	"minAppVersion": "0.12.0",
-	"description": "Open a specified note on startup.",
+	"description": "Open a specified note, canvas, or workspace on startup.",
 	"author": "novov",
 	"authorUrl": "https://novov.me",
 	"isDesktopOnly": false
