@@ -8,10 +8,10 @@ const LEAF_TYPES: string[] = ["markdown", "canvas", "kanban"];
 export default class Homepage extends Plugin {
 	settings: HomepageSettings;
 	workspacePlugin: any;
+	lastView: WeakRef<MarkdownView> = null;
 	
 	loaded: boolean = false;
 	executing: boolean = false;
-	reverting: boolean = false;
 	
 	homepage: string = "";
 
@@ -160,11 +160,14 @@ export default class Homepage extends Plugin {
 
 	async configureHomepage(): Promise<void> {
 		this.executing = false;
-		this.reverting = true;
 		
 		const view = this.app.workspace.getActiveViewOfType(MarkdownView);
 		if (!view) return;
 		const state = view.getState();
+		
+		if (this.settings.revertView) {
+			this.lastView = new WeakRef(view);
+		}
 
 		if (this.settings.autoScroll) {
 			const count = view.editor.lineCount();
@@ -197,12 +200,10 @@ export default class Homepage extends Plugin {
 	}
 	
 	revertView = async (): Promise<void> => {
-		if (!this.loaded || !this.reverting || trimFile(this.app.workspace.getActiveFile()) == this.homepage) {
-			return;
-		}
+		if (!this.loaded || this.lastView == null) return;
 		
-		const view = this.app.workspace.getActiveViewOfType(MarkdownView);
-		if (!view) return;
+		const view = this.lastView.deref();
+		if (!view || trimFile(view.file) == this.homepage) return;
 
 		const state = view.getState();
 		const config = (this.app.vault as any).config;
@@ -210,7 +211,7 @@ export default class Homepage extends Plugin {
 		state.mode = config.defaultViewMode;
 		state.source = !config.livePreview;
 		await view.leaf.setViewState({type: "markdown", state: state});
-		this.reverting = false;
+		this.lastView = null;
 	}
 
 	workspacesMode(): boolean {
