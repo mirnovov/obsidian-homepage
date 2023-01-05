@@ -1,6 +1,6 @@
 import { MarkdownView, Notice, Platform, Plugin, WorkspaceLeaf, addIcon, moment } from "obsidian";
 import { DEFAULT, Mode, View, HomepageSettings, HomepageSettingTab  } from "./settings";
-import { getDailynotesAutorun, getNewTabPagePlugin, getWorkspacePlugin, getDataviewPlugin, trimFile } from "./utils";
+import { getDailynotesAutorun, getNewTabPagePlugin, getWorkspacePlugin, getDataviewPlugin, trimFile, untrimName } from "./utils";
 
 const ICON: string = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5"><path d="M10.025 21H6v-7H3v-1.5L12 3l9 9.5V14h-3v7h-4v-7h-3.975v7Z" style="fill:none;stroke:currentColor;stroke-width:2px"/></svg>`
 const LEAF_TYPES: string[] = ["markdown", "canvas", "kanban"];
@@ -98,7 +98,7 @@ export default class Homepage extends Plugin {
 
 	async launchPage() {
 		const mode = this.loaded ? this.settings.manualOpenMode : this.settings.openMode;
-		const nonextant = async () => !(await this.app.vault.adapter.exists(`${this.homepage}.md`)) && !this.workspacesMode();
+		const nonextant = async () => !(await this.app.vault.adapter.exists(untrimName(this.homepage)));
 		const openLink = async (mode: Mode) => await this.app.workspace.openLinkText(
 			this.homepage, "", mode == Mode.Retain, { active: true }
 		);
