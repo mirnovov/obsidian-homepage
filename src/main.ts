@@ -119,15 +119,20 @@ export default class Homepage extends Plugin {
 		}
 		
 		if (mode != Mode.ReplaceAll) {
-			const alreadyOpened = this.getOpenedHomepage();
+			const alreadyOpened = this.getOpenedHomepages();
 
-			if (alreadyOpened !== undefined) {
-				this.app.workspace.setActiveLeaf(alreadyOpened);
+			if (alreadyOpened.length > 0) {
+				this.app.workspace.setActiveLeaf(alreadyOpened[0]);
 				await this.configureHomepage();
 				return;
 			}
 		}
 		else {
+			if (this.settings.pin) {
+				//hack to fix pin bug
+				this.getOpenedHomepages().forEach(h => h.setPinned(false));
+			}
+			
 			LEAF_TYPES.forEach(i => this.app.workspace.detachLeavesOfType(i));
 		}
 		
@@ -151,9 +156,9 @@ export default class Homepage extends Plugin {
 		return homepage
 	}
 
-	getOpenedHomepage(): WorkspaceLeaf {
+	getOpenedHomepages(): WorkspaceLeaf[] {
 		let leaves = LEAF_TYPES.flatMap(i => this.app.workspace.getLeavesOfType(i));
-		return leaves.find(
+		return leaves.filter(
 			leaf => trimFile((leaf.view as any).file) == this.homepage
 		);
 	}
