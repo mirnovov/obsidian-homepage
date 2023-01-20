@@ -165,9 +165,14 @@ export default class Homepage extends Plugin {
 
 	async configureHomepage(): Promise<void> {
 		this.executing = false;
-		
 		const view = this.app.workspace.getActiveViewOfType(MarkdownView);
-		if (!view) return;
+		
+		if (!view) {
+			//not ideal, but there is no canvas view type exposed afaik
+			if (this.settings.pin) this.app.workspace.activeLeaf.setPinned(true);	
+			return;	
+		}
+		
 		const state = view.getState();
 		
 		if (this.settings.revertView) {

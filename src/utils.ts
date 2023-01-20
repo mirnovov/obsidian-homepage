@@ -1,7 +1,7 @@
 import { App, TFile } from "obsidian";
 
 export function trimFile(file: TFile): string {
-	return file.path.slice(0, -3);
+	return file.extension == "md" ? file.path.slice(0, -3): file.path;
 }
 
 export function untrimName(name: string): string {

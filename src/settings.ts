@@ -252,6 +252,7 @@ class FileSuggest extends TextInputSuggest<TFile> {
 			el.setText(trimFile(file));
 		}
 		else {
+			//we don't use trimFile here as the extension isn't displayed here
 			el.setText(file.path.slice(0, -7))
 			el.insertAdjacentHTML(
 				"beforeend", 
@@ -261,7 +262,7 @@ class FileSuggest extends TextInputSuggest<TFile> {
 	 }
 
 	selectSuggestion(file: TFile) {
-		this.inputEl.value = file.extension == "md" ? trimFile(file) : file.path;
+		this.inputEl.value = trimFile(file);
 		this.inputEl.trigger("input");
 		this.close();
 	}
