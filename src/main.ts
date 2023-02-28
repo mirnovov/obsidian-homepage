@@ -32,7 +32,7 @@ export default class Homepage extends Plugin {
 				}; 
 			}
 			
-			if (activeInitially) await this.openHomepage();
+			if (activeInitially && this.settings.openOnStartup) await this.openHomepage();
 			this.loaded = true;
 		});
 

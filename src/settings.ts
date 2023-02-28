@@ -24,6 +24,7 @@ export interface HomepageSettings {
 	momentFormat: string,
 	workspace: string,
 	workspaceEnabled: boolean,
+	openOnStartup: boolean,
 	hasRibbonIcon: boolean,
 	openMode: string,
 	manualOpenMode: string,
@@ -42,6 +43,7 @@ export const DEFAULT: HomepageSettings = {
 	momentFormat: "YYYY-MM-DD",
 	workspace: "Home",
 	workspaceEnabled: false,
+	openOnStartup: true,
 	hasRibbonIcon: true,
 	openMode: Mode.ReplaceAll,
 	manualOpenMode: Mode.Retain,
@@ -84,14 +86,14 @@ export class HomepageSettingTab extends PluginSettingTab {
 		}
 
 		const suggestor = workspacesMode ? WorkspaceSuggest : FileSuggest;
-		const homepageDesc = `The name of the ${workspacesMode ? "workspace": "note or canvas"} to open on startup.`;
+		const homepageDesc = `The name of the ${workspacesMode ? "workspace": "note or canvas"} to open.`;
 		const homepage = workspacesMode ? "workspace" : "defaultNote";
 
 		// only show the moment field if they're enabled and the workspace isn't, other show the regular entry field
 		if (this.plugin.settings.useMoment && !workspacesMode) {
 			let dateSetting = new Setting(this.containerEl)
 				.setName("Homepage format")
-				.setDesc("A valid Moment format specification determining the note or canvas to be opened on startup.")
+				.setDesc("A valid Moment format specification determining the note or canvas to open.")
 				.addMomentFormat(text => text
 					.setDefaultFormat("YYYY-MM-DD")
 					.setValue(this.plugin.settings.momentFormat)
@@ -135,17 +137,22 @@ export class HomepageSettingTab extends PluginSettingTab {
 				true
 			);
 		}
-
-		let ribbonSetting = this.addToggle(
+		
+		this.addToggle(
+			"Open on startup", "When launching Obsidian, open the homepage.",
+			"openOnStartup",
+			(_) => this.display(),
+			true
+		).settingEl.setAttribute("style", "padding-top: 30px; border-top: none !important");
+		this.addToggle(
 			"Use ribbon icon", "Show a little house on the ribbon, allowing you to quickly access the homepage.",
 			"hasRibbonIcon",
 			(value) => this.plugin.setIcon(value),
 			true
 		);
-		ribbonSetting.settingEl.setAttribute("style", "padding-top: 70px; border-top: none !important");
 
-		this.addHeading("Vault environment")
-		this.addDropdown(
+		this.addHeading("Vault environment");
+		let openingSetting = this.addDropdown(
 			"Opening method", "Determine how extant tabs and panes are affected on startup.", 
 			"openMode",
 			Mode
@@ -158,7 +165,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		this.addToggle("Auto-create", "If the homepage doesn't exist, create a note with the specified name.", "autoCreate");
 		this.addToggle("Pin", "Pin the homepage when opening.", "pin");
 		
-		this.addHeading("Pane")
+		this.addHeading("Pane");
 		this.addDropdown(
 			"Homepage view", "Choose what view to open the homepage in.", 
 			"view",
@@ -172,20 +179,19 @@ export class HomepageSettingTab extends PluginSettingTab {
 		this.addToggle("Auto-scroll", "When opening the homepage, scroll to the bottom and focus on the last line.", "autoScroll");
 		
 		if (getDataviewPlugin(this.plugin.app)) {
-			let refreshSetting = this.addToggle(
+			this.addToggle(
 				"Refresh Dataview", "Always attempt to reload Dataview views when opening the homepage.", "refreshDataview"
-			);
-
-			refreshSetting.descEl.createDiv({
+			).descEl.createDiv({
 				text: "Requires Dataview auto-refresh to be enabled.", attr: {class: "mod-warning"}
 			});
 		}
 		
-		if (workspacesMode) {
-			Array.from(document.getElementsByClassName(HIDDEN)).forEach(
-				s => s.setAttribute("style", "opacity: .5; pointer-events: none !important")
-			);
-		}
+		if (workspacesMode) Array.from(document.getElementsByClassName(HIDDEN)).forEach(this.disableSetting);
+		if (!this.settings.openOnStartup) this.disableSetting(openingSetting.settingEl);
+	}
+	
+	disableSetting(setting: Element): void {
+		setting.setAttribute("style", "opacity: .5; pointer-events: none !important");
 	}
 	
 	addHeading(name: string): Setting {
