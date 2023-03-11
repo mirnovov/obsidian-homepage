@@ -106,11 +106,7 @@ export default class Homepage extends Plugin {
 		this.executing = true;
 		this.homepage = this.getHomepageName();
 
-		if (getDailynotesAutorun(this.app)) {
-			new Notice(
-				"Daily Notes' 'Open daily note on startup' setting is not compatible" +
-				"  with Homepage. Disable one of the conflicting plugins."
-			);
+		if (getDailynotesAutorun(this.app) && !this.loaded) {
 			return;
 		}
 		else if (!this.settings.autoCreate && await nonextant()) {

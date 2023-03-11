@@ -76,14 +76,8 @@ export class HomepageSettingTab extends PluginSettingTab {
 	
 	display(): void {
 		const workspacesMode = this.plugin.workspacesMode();
+		const dailynotesAutorun = getDailynotesAutorun(this.app);
 		this.containerEl.empty();
-		
-		if (getDailynotesAutorun(this.app)) {
-			this.containerEl.insertAdjacentHTML("afterbegin",
-				"<div class='mod-warning' style='margin-bottom: 20px'>Daily Notes' 'Open daily note on startup'" +
-				" setting is not compatible with this plugin, so functionality has been disabled.</div>"
-			);
-		}
 
 		const suggestor = workspacesMode ? WorkspaceSuggest : FileSuggest;
 		const homepageDesc = `The name of the ${workspacesMode ? "workspace": "note or canvas"} to open.`;
@@ -138,12 +132,22 @@ export class HomepageSettingTab extends PluginSettingTab {
 			);
 		}
 		
-		this.addToggle(
+		let startupSetting = this.addToggle(
 			"Open on startup", "When launching Obsidian, open the homepage.",
 			"openOnStartup",
 			(_) => this.display(),
 			true
-		).settingEl.setAttribute("style", "padding-top: 30px; border-top: none !important");
+		);
+		
+		if (dailynotesAutorun) {
+			startupSetting.descEl.createDiv({
+				text: `This setting has been disabled, as it isn't compatible with Daily Notes' "Open daily note on startup" functionality. To use it, disable the Daily Notes setting.`, 
+				attr: {class: "mod-warning"}
+			});
+			this.disableSetting(startupSetting.settingEl);
+		}
+		startupSetting.settingEl.style.cssText += "padding-top: 30px; border-top: none !important";
+		
 		this.addToggle(
 			"Use ribbon icon", "Show a little house on the ribbon, allowing you to quickly access the homepage.",
 			"hasRibbonIcon",
@@ -187,11 +191,11 @@ export class HomepageSettingTab extends PluginSettingTab {
 		}
 		
 		if (workspacesMode) Array.from(document.getElementsByClassName(HIDDEN)).forEach(this.disableSetting);
-		if (!this.settings.openOnStartup) this.disableSetting(openingSetting.settingEl);
+		if (!this.settings.openOnStartup || dailynotesAutorun) this.disableSetting(openingSetting.settingEl);
 	}
 	
 	disableSetting(setting: Element): void {
-		setting.setAttribute("style", "opacity: .5; pointer-events: none !important");
+		setting.setAttribute("style", "opacity: .5; pointer-events: none !important;");
 	}
 	
 	addHeading(name: string): Setting {
