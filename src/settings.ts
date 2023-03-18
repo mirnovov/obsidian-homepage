@@ -89,10 +89,9 @@ export class HomepageSettingTab extends PluginSettingTab {
 			
 			dateSetting.descEl.innerHTML += 
 				`A valid Moment format specification determining the note or canvas to open.<br>
-				For more syntax, refer to the
-				<a href="https://momentjs.com/docs/#/displaying/format/" target="_blank" rel="noopener">
-				Moment formatting reference</a>.
-				<br/> Your current syntax looks like: `;
+				Surround words in <code style="padding:0">[brackets]</code> to include them;
+				see the <a href="https://momentjs.com/docs/#/displaying/format/" target="_blank" rel="noopener"> 
+				reference</a> for syntax details.<br> Currently, your specification will produce: `;
 			
 			const sample = dateSetting.descEl.createEl("b", {attr: {class: "u-pop"}});
 			
