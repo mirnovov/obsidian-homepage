@@ -85,22 +85,26 @@ export class HomepageSettingTab extends PluginSettingTab {
 
 		// only show the moment field if they're enabled and the workspace isn't, other show the regular entry field
 		if (this.plugin.settings.useMoment && !workspacesMode) {
-			let dateSetting = new Setting(this.containerEl)
-				.setName("Homepage format")
-				.setDesc("A valid Moment format specification determining the note or canvas to open.")
-				.addMomentFormat(text => text
-					.setDefaultFormat("YYYY-MM-DD")
-					.setValue(this.plugin.settings.momentFormat)
-					.onChange(async value => {
-						this.plugin.settings.momentFormat = value;
-						await this.plugin.saveSettings();
-					})
-				);
+			const dateSetting = new Setting(this.containerEl).setName("Homepage format");
 			
-			dateSetting.descEl.createEl("br");	
-			dateSetting.descEl.createEl("a", {
-				text: "Moment formatting info", attr: {href: "https://momentjs.com/docs/#/displaying/format/"}
-			});
+			dateSetting.descEl.innerHTML += 
+				`A valid Moment format specification determining the note or canvas to open.<br>
+				For more syntax, refer to the
+				<a href="https://momentjs.com/docs/#/displaying/format/" target="_blank" rel="noopener">
+				Moment formatting reference</a>.
+				<br/> Your current syntax looks like: `;
+			
+			const sample = dateSetting.descEl.createEl("b", {attr: {class: "u-pop"}});
+			
+			dateSetting.addMomentFormat(text => text
+				.setDefaultFormat("YYYY-MM-DD")
+				.setValue(this.plugin.settings.momentFormat)
+				.onChange(async value => {
+					this.plugin.settings.momentFormat = value;
+					await this.plugin.saveSettings();
+				})
+				.setSampleEl(sample)
+			);
 		} 
 		else {
 			new Setting(this.containerEl)
