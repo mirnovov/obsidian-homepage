@@ -171,7 +171,7 @@ export default class Homepage extends Plugin {
 		
 		const state = view.getState();
 		
-		if (this.settings.revertView) {
+		if (this.settings.revertView && this.loaded) {
 			this.lastView = new WeakRef(view);
 		}
 
@@ -214,6 +214,7 @@ export default class Homepage extends Plugin {
 		const state = view.getState();
 		const config = (this.app.vault as any).config;
 		
+		console.log(state.mode, state.source);
 		state.mode = config.defaultViewMode;
 		state.source = !config.livePreview;
 		await view.leaf.setViewState({type: "markdown", state: state});
