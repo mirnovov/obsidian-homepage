@@ -1,67 +1,54 @@
 import { App, PluginSettingTab, Setting, normalizePath } from "obsidian";
-import Homepage from "./main";
+import HomepagePlugin from "./main";
+import { HomepageData, Kind, Mode, View } from "./homepage";
 import { FileSuggest, WorkspaceSuggest } from "./suggest";
 import { getDailynotesAutorun, getDataviewPlugin } from "./utils";
 
-export enum Mode {
-	ReplaceAll = "Replace all open notes",
-	ReplaceLast = "Replace last note",
-	Retain = "Keep open notes"
-}
-
-export enum View {
-	Default = "Default view",
-	Reading = "Reading view",
-	Source = "Editing view (Source)",
-	LivePreview = "Editing view (Live Preview)"
-}
+type HomepageObject = { [key: string | symbol]: HomepageData }
 
 export interface HomepageSettings {
-	[member: string]: any,
 	version: number,
-	defaultNote: string,
-	useMoment: boolean,
-	momentFormat: string,
-	workspace: string,
-	workspaceEnabled: boolean,
-	openOnStartup: boolean,
-	hasRibbonIcon: boolean,
-	openMode: string,
-	manualOpenMode: string,
-	view: string,
-	revertView: boolean,
-	refreshDataview: boolean,
-	autoCreate: boolean,
-	autoScroll: boolean,
-	pin: boolean
+	homepages: HomepageObject,
+	default: string
 }
 
-export const DEFAULT: HomepageSettings = {
-	version: 2,
-	defaultNote: "Home",
-	useMoment: false,
-	momentFormat: "YYYY-MM-DD",
-	workspace: "Home",
-	workspaceEnabled: false,
-	openOnStartup: true,
-	hasRibbonIcon: true,
-	openMode: Mode.ReplaceAll,
-	manualOpenMode: Mode.Retain,
-	view: View.Default,
-	revertView: true,
-	refreshDataview: false,
-	autoCreate: true,
-	autoScroll: false,
-	pin: false
+export const DEFAULT_SETTINGS: HomepageSettings = {
+	version: 3,
+	homepages: {
+		"Main Homepage": {
+			value: "Home",
+			kind: Kind.File,
+			openOnStartup: true,
+			hasRibbonIcon: true,
+			openMode: Mode.ReplaceAll,
+			manualOpenMode: Mode.Retain,
+			view: View.Default,
+			revertView: true,
+			refreshDataview: false,
+			autoCreate: true,
+			autoScroll: false,
+			pin: false
+		}
+	},
+	default: "Default"
 }
 
-export const HIDDEN: string = "nv-workspace-hidden";
+export const DEFAULT_NAME: string = "Main Homepage"
+export const DEFAULT_DATA: HomepageData = DEFAULT_SETTINGS.homepages[DEFAULT_NAME];
+
+const HIDDEN: string = "nv-workspace-hidden";
+const MOMENT_DESC: string = 
+	`A valid Moment format specification determining the note or canvas to open.<br>
+	Surround words in <code style="padding:0">[brackets]</code> to include them;
+	see the <a href="https://momentjs.com/docs/#/displaying/format/" target="_blank" rel="noopener"> 
+	reference</a> for syntax details.<br> Currently, your specification will produce: `;
+
 
 export class HomepageSettingTab extends PluginSettingTab {
-	plugin: Homepage;
+	plugin: HomepagePlugin;
 	settings: HomepageSettings;
 
-	constructor(app: App, plugin: Homepage) {
+	constructor(app: App, plugin: HomepagePlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
 		this.settings = plugin.settings;
@@ -74,33 +61,27 @@ export class HomepageSettingTab extends PluginSettingTab {
 		return normalizePath(value);
 	}
 	
+	
 	display(): void {
-		const workspacesMode = this.plugin.workspacesMode();
+		const workspacesMode = this.plugin.homepage.workspacesMode();
 		const dailynotesAutorun = getDailynotesAutorun(this.app);
 		this.containerEl.empty();
 
 		const suggestor = workspacesMode ? WorkspaceSuggest : FileSuggest;
 		const homepageDesc = `The name of the ${workspacesMode ? "workspace": "note or canvas"} to open.`;
-		const homepage = workspacesMode ? "workspace" : "defaultNote";
 
-		// only show the moment field if they're enabled and the workspace isn't, other show the regular entry field
-		if (this.plugin.settings.useMoment && !workspacesMode) {
+		if (this.plugin.homepage.data.kind == Kind.MomentDate) {
 			const dateSetting = new Setting(this.containerEl).setName("Homepage format");
-			
-			dateSetting.descEl.innerHTML += 
-				`A valid Moment format specification determining the note or canvas to open.<br>
-				Surround words in <code style="padding:0">[brackets]</code> to include them;
-				see the <a href="https://momentjs.com/docs/#/displaying/format/" target="_blank" rel="noopener"> 
-				reference</a> for syntax details.<br> Currently, your specification will produce: `;
+			dateSetting.descEl.innerHTML += MOMENT_DESC;
 			
 			const sample = dateSetting.descEl.createEl("b", {attr: {class: "u-pop"}});
 			
 			dateSetting.addMomentFormat(text => text
 				.setDefaultFormat("YYYY-MM-DD")
-				.setValue(this.plugin.settings.momentFormat)
+				.setValue(this.plugin.homepage.data.value)
 				.onChange(async value => {
-					this.plugin.settings.momentFormat = value;
-					await this.plugin.saveSettings();
+					this.plugin.homepage.data.value = value;
+					await this.plugin.homepage.save();
 				})
 				.setSampleEl(sample)
 			);
@@ -111,25 +92,25 @@ export class HomepageSettingTab extends PluginSettingTab {
 				.setDesc(homepageDesc)
 				.addText(text => {
 					new suggestor(this.app, text.inputEl);
-					text.setPlaceholder(DEFAULT[homepage])
-						.setValue(DEFAULT[homepage] == this.settings[homepage] ? "" : this.settings[homepage])
+					text.setPlaceholder(DEFAULT_DATA.value)
+						.setValue(DEFAULT_DATA.value == this.plugin.homepage.data.value ? "" : this.plugin.homepage.data.value)
 						.onChange(async (value) => {
-							this.settings[homepage] = this.sanitiseNote(value) || DEFAULT[homepage];
-							await this.plugin.saveSettings();
+							this.plugin.homepage.data.value = this.sanitiseNote(value) || DEFAULT_DATA.value;
+							await this.plugin.homepage.save();
 						});
 				});
 		}
 
-		this.addToggle(
+		this.addKindToggle(
 			"Use date formatting", "Open the homepage using Moment date syntax. This allows opening different homepages at different times or dates.",
-			"useMoment",
+			Kind.MomentDate,
 			(_) => this.display()
 		);
 
 		if (this.plugin.workspacePlugin?.enabled) {
-			this.addToggle(
+			this.addKindToggle(
 				"Use workspaces", "Open a workspace, instead of a note or canvas, as the homepage.",
-				"workspaceEnabled",
+				Kind.Workspace,
 				(_) => this.display(),
 				true
 			);
@@ -181,7 +162,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		this.addToggle(
 			"Revert view on close", "When navigating away from the homepage, restore the default view.", 
 			"revertView",
-			(value) => this.plugin.setReversion(value)
+			(value) => this.plugin.homepage.setReversion(value)
 		);
 		this.addToggle("Auto-scroll", "When opening the homepage, scroll to the bottom and focus on the last line.", "autoScroll");
 		
@@ -194,7 +175,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		}
 		
 		if (workspacesMode) Array.from(document.getElementsByClassName(HIDDEN)).forEach(this.disableSetting);
-		if (!this.settings.openOnStartup || dailynotesAutorun) this.disableSetting(openingSetting.settingEl);
+		if (!this.plugin.homepage.data.openOnStartup || dailynotesAutorun) this.disableSetting(openingSetting.settingEl);
 	}
 	
 	disableSetting(setting: Element): void {
@@ -214,25 +195,41 @@ export class HomepageSettingTab extends PluginSettingTab {
 				for (let key of Object.values(source)) {
 					dropdown.addOption(key, key);
 				}
-				dropdown.setValue(this.settings[setting]);
+				dropdown.setValue(this.plugin.homepage.data[setting]);
 				dropdown.onChange(async option => {
-					this.settings[setting] = option;
-					await this.plugin.saveSettings();
+					this.plugin.homepage.data[setting] = option;
+					await this.plugin.homepage.save();
 				});
 			});
 		
 		dropdown.settingEl.addClass(HIDDEN);
 		return dropdown;
 	}
-
+	
 	addToggle(name: string, desc: string, setting: string, callback?: (v: any) => any, workspaces: boolean = false): Setting {
 		const toggle = new Setting(this.containerEl)
 			.setName(name).setDesc(desc)
 			.addToggle(toggle => toggle
-				.setValue(this.settings[setting])
+				.setValue(this.plugin.homepage.data[setting])
 				.onChange(async value => {
-					this.settings[setting] = value;
-					await this.plugin.saveSettings();
+					this.plugin.homepage.data[setting] = value;
+					await this.plugin.homepage.save();
+					if (callback) callback(value);
+				})
+			);
+		
+		if (!workspaces) toggle.settingEl.addClass(HIDDEN);
+		return toggle;
+	}
+
+	addKindToggle(name: string, desc: string, kind: string, callback?: (v: any) => any, workspaces: boolean = false): Setting {
+		const toggle = new Setting(this.containerEl)
+			.setName(name).setDesc(desc)
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.homepage.data.kind == kind)
+				.onChange(async value => {
+					this.plugin.homepage.data.kind = value ? kind : Kind.File;
+					await this.plugin.homepage.save();
 					if (callback) callback(value);
 				})
 			);
