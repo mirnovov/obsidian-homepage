@@ -194,7 +194,7 @@ export class Homepage {
 
 	
 	workspacesMode(): boolean {
-		return this.plugin.workspacePlugin?.enabled && this.data.workspaceEnabled;
+		return this.plugin.workspacePlugin?.enabled && this.data.kind == Kind.Workspace;
 	}
 	
 	revertView = async (): Promise<void> => {

@@ -50,7 +50,7 @@ export default class HomepagePlugin extends Plugin {
 		console.log(
 			`Homepage: ${this.homepage.computeValue()} `+
 			`(method: ${this.homepage.data.openMode}, view: ${this.homepage.data.view}, `+
-			`workspaces: ${this.homepage.data.workspaceEnabled})`
+			`kind: ${this.homepage.data.kind})`
 		);
 	}
 	
