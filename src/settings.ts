@@ -61,12 +61,10 @@ export class HomepageSettingTab extends PluginSettingTab {
 		const dailynotesAutorun = getDailynotesAutorun(this.app);
 		
 		const descContainer = document.createElement("article");
-		const infoContainer = document.createElement("article");
 		const suggestor = workspacesMode ? WorkspaceSuggest : FileSuggest;
 
 		this.containerEl.empty();
 		descContainer.id = "nv-desc";
-		infoContainer.id = "nv-info";
 		
 		let mainSetting = new Setting(this.containerEl)
 			.setName("Homepage")
@@ -85,28 +83,24 @@ export class HomepageSettingTab extends PluginSettingTab {
 		
 		mainSetting.settingEl.id = "nv-main-setting";
 		mainSetting.settingEl.append(descContainer);
-		mainSetting.settingEl.append(infoContainer);
 
 		
 		switch (this.plugin.homepage.data.kind) {
 			case Kind.File:
 				descContainer.innerHTML = `Enter a note or canvas to use.`;
-				infoContainer.innerHTML = ``;
 				break;
 			case Kind.Workspace:
 				descContainer.innerHTML = `Enter an Obsidian workspace to use.`;
-				infoContainer.innerHTML = ``;
 				break;
 			case Kind.MomentDate:
 				descContainer.innerHTML = 
-				`Enter a note or canvas to use based on <a href="https://momentjs.com/docs/#/displaying/format/" target="_blank" rel="noopener">Moment date formatting</a>.`;
-				infoContainer.innerHTML = `This is separate from Daily or Periodic Notes, but can be set so it corresponds to the same files. Surround words in <code style="padding:0">[brackets]</code> to include them unmodified.
-				<br> Currently, your specification will produce: `;
+				`Enter a note or canvas to use based on <a href="https://momentjs.com/docs/#/displaying/format/" target="_blank" rel="noopener">Moment date formatting</a>.<small>This is separate from Daily or Periodic Notes, but can be set so it corresponds to the same files. Surround words in <code style="padding:0">[brackets]</code> to include them unmodified.
+				<br> Currently, your specification will produce: </small>`;
 				break;
 		}
 		
 		if (this.plugin.homepage.data.kind == Kind.MomentDate) {
-			const sample = infoContainer.createEl("b", {attr: {class: "u-pop"}});
+			const sample = descContainer.lastChild.createEl("b", {attr: {class: "u-pop"}});
 			
 			mainSetting.addMomentFormat(text => text
 				.setDefaultFormat("YYYY-MM-DD")

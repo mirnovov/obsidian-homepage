@@ -16,6 +16,7 @@
 
 #nv-main-setting .setting-item-control input, #nv-main-setting .setting-item-control select {
 	font-size: var(--font-ui-medium);
+	font-weight: 600;
 }
 
 #nv-main-setting .setting-item-control select {
@@ -40,7 +41,9 @@
 	padding: 10px 0 0;
 }
 
-#nv-main-setting #nv-info {
+#nv-main-setting #nv-desc small {
+	display: block;
+	font-weight: 400;
 	color: var(--text-muted);
 	font-size: calc(var(--font-ui-smaller) * 0.9);
 	padding: 5px 0 0;
