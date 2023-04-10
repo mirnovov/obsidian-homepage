@@ -37,12 +37,6 @@ export const DEFAULT_NAME: string = "Main Homepage"
 export const DEFAULT_DATA: HomepageData = DEFAULT_SETTINGS.homepages[DEFAULT_NAME];
 
 const HIDDEN: string = "nv-workspace-hidden";
-const MOMENT_DESC: string = 
-	`A valid Moment format specification determining the note or canvas to open.<br>
-	Surround words in <code style="padding:0">[brackets]</code> to include them;
-	see the <a href="https://momentjs.com/docs/#/displaying/format/" target="_blank" rel="noopener"> 
-	reference</a> for syntax details.<br> Currently, your specification will produce: `;
-
 
 export class HomepageSettingTab extends PluginSettingTab {
 	plugin: HomepagePlugin;
@@ -65,18 +59,56 @@ export class HomepageSettingTab extends PluginSettingTab {
 	display(): void {
 		const workspacesMode = this.plugin.homepage.workspacesMode();
 		const dailynotesAutorun = getDailynotesAutorun(this.app);
-		this.containerEl.empty();
-
+		
+		const descContainer = document.createElement("article");
+		const infoContainer = document.createElement("article");
 		const suggestor = workspacesMode ? WorkspaceSuggest : FileSuggest;
-		const homepageDesc = `The name of the ${workspacesMode ? "workspace": "note or canvas"} to open.`;
 
+		this.containerEl.empty();
+		descContainer.id = "nv-desc";
+		infoContainer.id = "nv-info";
+		
+		let mainSetting = new Setting(this.containerEl)
+			.setName("Homepage")
+			.addDropdown(async dropdown => {
+				for (let key of Object.values(Kind)) {
+					if (key == Kind.Workspace && !this.plugin.workspacePlugin?.enabled) continue;
+					dropdown.addOption(key, key);
+				}
+				dropdown.setValue(this.plugin.homepage.data.kind);
+				dropdown.onChange(async option => {
+					this.plugin.homepage.data.kind = option;
+					await this.plugin.homepage.save();
+					this.display();
+				});
+			});
+		
+		mainSetting.settingEl.id = "nv-main-setting";
+		mainSetting.settingEl.append(descContainer);
+		mainSetting.settingEl.append(infoContainer);
+
+		
+		switch (this.plugin.homepage.data.kind) {
+			case Kind.File:
+				descContainer.innerHTML = `Enter a note or canvas to use.`;
+				infoContainer.innerHTML = ``;
+				break;
+			case Kind.Workspace:
+				descContainer.innerHTML = `Enter an Obsidian workspace to use.`;
+				infoContainer.innerHTML = ``;
+				break;
+			case Kind.MomentDate:
+				descContainer.innerHTML = 
+				`Enter a note or canvas to use based on <a href="https://momentjs.com/docs/#/displaying/format/" target="_blank" rel="noopener">Moment date formatting</a>.`;
+				infoContainer.innerHTML = `This is separate from Daily or Periodic Notes, but can be set so it corresponds to the same files. Surround words in <code style="padding:0">[brackets]</code> to include them unmodified.
+				<br> Currently, your specification will produce: `;
+				break;
+		}
+		
 		if (this.plugin.homepage.data.kind == Kind.MomentDate) {
-			const dateSetting = new Setting(this.containerEl).setName("Homepage format");
-			dateSetting.descEl.innerHTML += MOMENT_DESC;
+			const sample = infoContainer.createEl("b", {attr: {class: "u-pop"}});
 			
-			const sample = dateSetting.descEl.createEl("b", {attr: {class: "u-pop"}});
-			
-			dateSetting.addMomentFormat(text => text
+			mainSetting.addMomentFormat(text => text
 				.setDefaultFormat("YYYY-MM-DD")
 				.setValue(this.plugin.homepage.data.value)
 				.onChange(async value => {
@@ -87,35 +119,17 @@ export class HomepageSettingTab extends PluginSettingTab {
 			);
 		} 
 		else {
-			new Setting(this.containerEl)
-				.setName("Homepage")
-				.setDesc(homepageDesc)
-				.addText(text => {
-					new suggestor(this.app, text.inputEl);
-					text.setPlaceholder(DEFAULT_DATA.value)
-						.setValue(DEFAULT_DATA.value == this.plugin.homepage.data.value ? "" : this.plugin.homepage.data.value)
-						.onChange(async (value) => {
-							this.plugin.homepage.data.value = this.sanitiseNote(value) || DEFAULT_DATA.value;
-							await this.plugin.homepage.save();
-						});
-				});
+			mainSetting.addText(text => {
+				new suggestor(this.app, text.inputEl);
+				text.setPlaceholder(DEFAULT_DATA.value)
+					.setValue(DEFAULT_DATA.value == this.plugin.homepage.data.value ? "" : this.plugin.homepage.data.value)
+					.onChange(async (value) => {
+						this.plugin.homepage.data.value = this.sanitiseNote(value) || DEFAULT_DATA.value;
+						await this.plugin.homepage.save();
+					});
+			});
 		}
 
-		this.addKindToggle(
-			"Use date formatting", "Open the homepage using Moment date syntax. This allows opening different homepages at different times or dates.",
-			Kind.MomentDate,
-			(_) => this.display()
-		);
-
-		if (this.plugin.workspacePlugin?.enabled) {
-			this.addKindToggle(
-				"Use workspaces", "Open a workspace, instead of a note or canvas, as the homepage.",
-				Kind.Workspace,
-				(_) => this.display(),
-				true
-			);
-		}
-		
 		let startupSetting = this.addToggle(
 			"Open on startup", "When launching Obsidian, open the homepage.",
 			"openOnStartup",
@@ -179,7 +193,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 	}
 	
 	disableSetting(setting: Element): void {
-		setting.setAttribute("style", "opacity: .5; pointer-events: none !important;");
+		setting.setAttribute("nv-greyed", "");
 	}
 	
 	addHeading(name: string): Setting {
@@ -188,7 +202,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		return heading;
 	}
 	
-	addDropdown(name: string, desc: string, setting: string, source: object): Setting {
+	addDropdown(name: string, desc: string, setting: string, source: object, callback?: (v: any) => any): Setting {
 		const dropdown = new Setting(this.containerEl)
 			.setName(name).setDesc(desc)
 			.addDropdown(async dropdown => {
@@ -199,6 +213,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 				dropdown.onChange(async option => {
 					this.plugin.homepage.data[setting] = option;
 					await this.plugin.homepage.save();
+					if (callback) callback(option);
 				});
 			});
 		

@@ -18,7 +18,7 @@ export interface HomepageData {
 	autoCreate: boolean,
 	autoScroll: boolean,
 	pin: boolean
-}
+} 
 
 export enum Mode {
 	ReplaceAll = "Replace all open notes",
