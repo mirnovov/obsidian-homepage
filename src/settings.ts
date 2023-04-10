@@ -1,6 +1,6 @@
 import { App, PluginSettingTab, Setting, normalizePath } from "obsidian";
 import HomepagePlugin from "./main";
-import { HomepageData, Kind, Mode, View } from "./homepage";
+import { DEFAULT, HomepageData, Kind, Mode, View } from "./homepage";
 import { FileSuggest, WorkspaceSuggest } from "./suggest";
 import { getDailynotesAutorun, getDataviewPlugin } from "./utils";
 
@@ -9,7 +9,7 @@ type HomepageObject = { [key: string | symbol]: HomepageData }
 export interface HomepageSettings {
 	version: number,
 	homepages: HomepageObject,
-	default: string
+	separateMobile: boolean
 }
 
 export const DEFAULT_SETTINGS: HomepageSettings = {
@@ -30,12 +30,10 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
 			pin: false
 		}
 	},
-	default: "Default"
+	separateMobile: false
 }
 
-export const DEFAULT_NAME: string = "Main Homepage"
-export const DEFAULT_DATA: HomepageData = DEFAULT_SETTINGS.homepages[DEFAULT_NAME];
-
+export const DEFAULT_DATA: HomepageData = DEFAULT_SETTINGS.homepages[DEFAULT];
 const HIDDEN: string = "nv-workspace-hidden";
 
 export class HomepageSettingTab extends PluginSettingTab {
@@ -55,7 +53,6 @@ export class HomepageSettingTab extends PluginSettingTab {
 		return normalizePath(value);
 	}
 	
-	
 	display(): void {
 		const workspacesMode = this.plugin.homepage.workspacesMode();
 		const dailynotesAutorun = getDailynotesAutorun(this.app);
@@ -66,7 +63,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		this.containerEl.empty();
 		descContainer.id = "nv-desc";
 		
-		let mainSetting = new Setting(this.containerEl)
+		const mainSetting = new Setting(this.containerEl)
 			.setName("Homepage")
 			.addDropdown(async dropdown => {
 				for (let key of Object.values(Kind)) {
@@ -83,7 +80,6 @@ export class HomepageSettingTab extends PluginSettingTab {
 		
 		mainSetting.settingEl.id = "nv-main-setting";
 		mainSetting.settingEl.append(descContainer);
-
 		
 		switch (this.plugin.homepage.data.kind) {
 			case Kind.File:
@@ -116,14 +112,14 @@ export class HomepageSettingTab extends PluginSettingTab {
 			mainSetting.addText(text => {
 				new suggestor(this.app, text.inputEl);
 				text.setPlaceholder(DEFAULT_DATA.value)
-					.setValue(DEFAULT_DATA.value == this.plugin.homepage.data.value ? "" : this.plugin.homepage.data.value)
-					.onChange(async (value) => {
+					text.setValue(DEFAULT_DATA.value == this.plugin.homepage.data.value ? "" : this.plugin.homepage.data.value)
+					text.onChange(async (value) => {
 						this.plugin.homepage.data.value = this.sanitiseNote(value) || DEFAULT_DATA.value;
 						await this.plugin.homepage.save();
 					});
 			});
 		}
-
+		
 		let startupSetting = this.addToggle(
 			"Open on startup", "When launching Obsidian, open the homepage.",
 			"openOnStartup",
@@ -146,6 +142,19 @@ export class HomepageSettingTab extends PluginSettingTab {
 			(value) => this.plugin.setIcon(value),
 			true
 		);
+		
+		new Setting(this.containerEl)
+			.setName("Separate mobile homepage")
+			.setDesc("For mobile devices, store the homepage and its settings separately.")
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.separateMobile)
+				.onChange(async value => {
+					this.plugin.settings.separateMobile = value;
+					this.plugin.homepage = this.plugin.getHomepage();
+					await this.plugin.saveSettings();
+					this.display();
+				})
+			);
 
 		this.addHeading("Vault environment");
 		let openingSetting = this.addDropdown(
@@ -222,22 +231,6 @@ export class HomepageSettingTab extends PluginSettingTab {
 				.setValue(this.plugin.homepage.data[setting])
 				.onChange(async value => {
 					this.plugin.homepage.data[setting] = value;
-					await this.plugin.homepage.save();
-					if (callback) callback(value);
-				})
-			);
-		
-		if (!workspaces) toggle.settingEl.addClass(HIDDEN);
-		return toggle;
-	}
-
-	addKindToggle(name: string, desc: string, kind: string, callback?: (v: any) => any, workspaces: boolean = false): Setting {
-		const toggle = new Setting(this.containerEl)
-			.setName(name).setDesc(desc)
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.homepage.data.kind == kind)
-				.onChange(async value => {
-					this.plugin.homepage.data.kind = value ? kind : Kind.File;
 					await this.plugin.homepage.save();
 					if (callback) callback(value);
 				})

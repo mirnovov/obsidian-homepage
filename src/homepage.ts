@@ -4,6 +4,9 @@ import { getDailynotesAutorun, getDataviewPlugin, trimFile, untrimName } from ".
 
 const LEAF_TYPES: string[] = ["markdown", "canvas", "kanban"];
 
+export const DEFAULT: string = "Main Homepage";
+export const MOBILE: string = "Mobile Homepage";
+
 export interface HomepageData {
 	[member: string]: any,
 	value: string,
@@ -40,19 +43,19 @@ export enum Kind {
 }
 
 export class Homepage {
-	app: App;
 	plugin: HomepagePlugin;
+	app: App;
 	data: HomepageData;
 	
 	name: string;
 	lastView: WeakRef<MarkdownView> = null;
 	computedValue: string;
 	
-	constructor(name: string, app: App, plugin: HomepagePlugin, data: HomepageData) {
+	constructor(name: string, plugin: HomepagePlugin) {
 		this.name = name;
-		this.app = app;
 		this.plugin = plugin;
-		this.data = data;
+		this.app = plugin.app;
+		this.data = plugin.settings.homepages[name];
 	}
 	
 	async setReversion(value: boolean): Promise<void> {
@@ -64,7 +67,7 @@ export class Homepage {
 		}
 	}
 	
-	open = async (): Promise<void> => {
+	async open(): Promise<void> {
 		this.workspacesMode() ? await this.launchWorkspace() : await this.launchPage();
 	}
 	
@@ -189,9 +192,8 @@ export class Homepage {
 	
 	async save(): Promise<void> {
 		this.plugin.settings.homepages[this.name] = this.data; 
-		await this.plugin.saveData(this.plugin.settings);
+		await this.plugin.saveSettings();
 	}
-
 	
 	workspacesMode(): boolean {
 		return this.plugin.workspacePlugin?.enabled && this.data.kind == Kind.Workspace;

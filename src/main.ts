@@ -1,6 +1,6 @@
-import { Plugin, addIcon } from "obsidian";
-import { DEFAULT_SETTINGS, DEFAULT_NAME, HomepageSettings, HomepageSettingTab } from "./settings";
-import { Homepage, Kind } from "./homepage";
+import { Platform, Plugin, addIcon } from "obsidian";
+import { DEFAULT_SETTINGS, HomepageSettings, HomepageSettingTab } from "./settings";
+import { DEFAULT, MOBILE, Homepage, Kind } from "./homepage";
 import { getNewTabPagePlugin, getWorkspacePlugin } from "./utils";
 
 const ICON: string = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5"><path d="M10.025 21H6v-7H3v-1.5L12 3l9 9.5V14h-3v7h-4v-7h-3.975v7Z" style="fill:none;stroke:currentColor;stroke-width:2px"/></svg>`
@@ -18,7 +18,7 @@ export default class HomepagePlugin extends Plugin {
 		let activeInitially = document.body.querySelector(".progress-bar") !== null;
 		
 		this.settings = await this.loadSettings();
-		this.homepage = new Homepage(DEFAULT_NAME, this.app, this, this.settings.homepages[DEFAULT_NAME]);
+		this.homepage = this.getHomepage();
 		this.workspacePlugin = getWorkspacePlugin(this.app);
 
 		this.app.workspace.onLayoutReady(async () => {
@@ -44,7 +44,7 @@ export default class HomepagePlugin extends Plugin {
 		this.addCommand({
 			id: "open-homepage",
 			name: "Open homepage",
-			callback: this.homepage.open,
+			callback: () => this.homepage.open(),
 		});
 
 		console.log(
@@ -60,6 +60,17 @@ export default class HomepagePlugin extends Plugin {
 		ntp.checkForNewTab = ntp._checkForNewTab;
 	}
 	
+	getHomepage(): Homepage {
+		if (this.settings.separateMobile && Platform.isMobile) {
+			if (!(MOBILE in this.settings.homepages)) {
+				this.settings.homepages[MOBILE] = { ...this.settings.homepages[DEFAULT] };
+			}
+			
+			return new Homepage(MOBILE, this);
+		}
+		return new Homepage(DEFAULT, this);
+	}
+	
 	async loadSettings(): Promise<HomepageSettings> {
 		let settingsData: any = await this.loadData();
 		
@@ -70,7 +81,7 @@ export default class HomepagePlugin extends Plugin {
 			let settings: HomepageSettings = {
 				version: 3,
 				homepages: {},
-				default: "Default"
+				separateMobile: false
 			}
 			
 			let data = settingsData;
@@ -93,16 +104,20 @@ export default class HomepagePlugin extends Plugin {
 			delete data.defaultNote;
 			delete data.useMoment;
 			delete data.workspaceEnabled;
-			settings.homepages[DEFAULT_NAME] = data;
+			settings.homepages[DEFAULT] = data;
 			
 			console.log(settings);
 			return settings;
 		}
 	}
+	
+	async saveSettings(): Promise<void> {
+		await this.saveData(this.settings);
+	}
 
 	setIcon(value: boolean): void {
 		if (value) {
-			this.addRibbonIcon("homepage", "Open homepage", this.homepage.open)
+			this.addRibbonIcon("homepage", "Open homepage", () => this.homepage.open())
 				.setAttribute("id", "nv-homepage-icon");
 		}
 		else {
