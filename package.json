@@ -17,7 +17,8 @@
 	"devDependencies": {
 		"@types/node": "^16.11.1",
 		"esbuild": "0.13.8",
-		"obsidian": "^0.12.0",
+		"esbuild-copy-static-files": "^0.1.0",
+		"obsidian": "^1.1.1",
 		"tslib": "^2.3.0",
 		"typescript": "^4.3.5"
 	}
