@@ -1,4 +1,5 @@
 import { App, TFile } from "obsidian";
+import HomepagePlugin from "./main";
 
 export function trimFile(file: TFile): string {
 	return file.extension == "md" ? file.path.slice(0, -3): file.path;
@@ -12,19 +13,21 @@ export function wrapAround(value: number, size: number): number {
 	return ((value % size) + size) % size;
 };
 
-export function getDailynotesAutorun(app: App): any { 
-	let dailyNotes = (app as any).internalPlugins.getPluginById("daily-notes");
+export function getDailynotesAutorun(plugin: HomepagePlugin): any { 
+	const dailyNotes = plugin.internalPlugins["daily-notes"];
 	return dailyNotes?.enabled && dailyNotes?.instance.options.autorun; 
 };
 
-export function getDataviewPlugin(app: App): any {
-	return (app as any).plugins.plugins.dataview;
+export function randomFile(app: App): string {
+	const files = app.vault.getFiles().filter(
+		(f: TFile) => ["md", "canvas"].contains(f.extension)
+	);
+	
+	if (files.length) {
+		const indice = Math.floor(Math.random() * files.length);
+		return trimFile(files[indice]);
+	}
+
+	return undefined;
 }
 
-export function getWorkspacePlugin(app: App): any { 
-	return (app as any).internalPlugins.plugins.workspaces; 
-};
-
-export function getNewTabPagePlugin(app: App): any {
-	return (app as any).plugins.plugins["new-tab-default-page"];
-}

@@ -1,28 +1,29 @@
 import { Platform, Plugin, addIcon } from "obsidian";
 import { DEFAULT_SETTINGS, HomepageSettings, HomepageSettingTab } from "./settings";
 import { DEFAULT, MOBILE, Homepage, Kind } from "./homepage";
-import { getNewTabPagePlugin, getWorkspacePlugin } from "./utils";
 
 const ICON: string = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5"><path d="M10.025 21H6v-7H3v-1.5L12 3l9 9.5V14h-3v7h-4v-7h-3.975v7Z" style="fill:none;stroke:currentColor;stroke-width:2px"/></svg>`
 
 export default class HomepagePlugin extends Plugin {
 	settings: HomepageSettings;
-	workspacePlugin: any;
+	internalPlugins: any;
+	communityPlugins: any;
 	
 	loaded: boolean = false;
 	executing: boolean = false;
 	
 	homepage: Homepage;
-
+	
 	async onload(): Promise<void> {
 		let activeInitially = document.body.querySelector(".progress-bar") !== null;
 		
 		this.settings = await this.loadSettings();
+		this.internalPlugins = (this.app as any).internalPlugins.plugins;
+		this.communityPlugins = (this.app as any).plugins.plugins;
 		this.homepage = this.getHomepage();
-		this.workspacePlugin = getWorkspacePlugin(this.app);
-
+		
 		this.app.workspace.onLayoutReady(async () => {
-			let ntp = getNewTabPagePlugin(this.app);
+			let ntp = this.communityPlugins["new-tab-default-page"];
 
 			if (ntp) {
 				ntp._checkForNewTab = ntp.checkForNewTab;
@@ -55,7 +56,7 @@ export default class HomepagePlugin extends Plugin {
 	}
 	
 	async onunload(): Promise<void> {
-		let ntp = getNewTabPagePlugin(this.app);
+		let ntp = this.communityPlugins["new-tab-default-page"];
 		if (!ntp) return;
 		ntp.checkForNewTab = ntp._checkForNewTab;
 	}
@@ -106,7 +107,6 @@ export default class HomepagePlugin extends Plugin {
 			delete data.workspaceEnabled;
 			settings.homepages[DEFAULT] = data;
 			
-			console.log(settings);
 			return settings;
 		}
 	}
@@ -126,6 +126,17 @@ export default class HomepagePlugin extends Plugin {
 		}
 		else {
 			document.getElementById("nv-homepage-icon")?.remove();
+		}
+	}
+	
+	hasRequiredPlugin(kind: Kind): boolean {
+		switch (kind) {
+			case Kind.DailyNote:
+				return this.internalPlugins["daily-notes"]?.enabled;
+			case Kind.Workspace:
+				return this.internalPlugins["workspaces"]?.enabled;
+			default:
+				return true;
 		}
 	}
 }

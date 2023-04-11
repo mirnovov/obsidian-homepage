@@ -10,8 +10,6 @@ const outDir = dirname(outPath);
 
 if (!fs.existsSync(outDir)) fs.mkdirSync(outDir);
 
-console.log(outDir);
-
 esbuild.build({
 	entryPoints: ["src/main.ts"],
 	bundle: true,

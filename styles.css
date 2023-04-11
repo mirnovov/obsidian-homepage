@@ -30,6 +30,10 @@
 	padding: var(--size-4-5) var(--size-4-4);
 }
 
+#nv-main-setting .setting-item-control input[disabled] {
+	opacity: 0.3;
+}
+
 #nv-main-setting #nv-desc, #nv-main-setting #nv-info {
 	flex-basis: 100%;
 }

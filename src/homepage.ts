@@ -1,6 +1,6 @@
 import { App, MarkdownView, Notice, WorkspaceLeaf, moment } from "obsidian";
 import HomepagePlugin from "./main";
-import { getDailynotesAutorun, getDataviewPlugin, trimFile, untrimName } from "./utils";
+import { getDailynotesAutorun, randomFile, trimFile, untrimName } from "./utils";
 
 const LEAF_TYPES: string[] = ["markdown", "canvas", "kanban"];
 
@@ -39,7 +39,9 @@ export enum View {
 export enum Kind {
 	File = "File",
 	Workspace = "Workspace",
-	MomentDate = "Date-dependent file"
+	MomentDate = "Date-dependent file",
+	Random = "Random file",
+	DailyNote = "Daily Note"
 }
 
 export class Homepage {
@@ -68,7 +70,10 @@ export class Homepage {
 	}
 	
 	async open(alternate: boolean = false): Promise<void> {
-		if (this.workspacesMode()) {
+		if (!this.plugin.hasRequiredPlugin(this.data.kind as Kind)) {
+			new Notice("Homepage cannot be opened due to plugin unavailablity.");
+		}
+		else if (this.data.kind == Kind.Workspace) {
 			await this.launchWorkspace();
 			return;
 		}
@@ -80,19 +85,21 @@ export class Homepage {
 	}
 	
 	async launchWorkspace() {
-		if(!(this.data.value in this.plugin.workspacePlugin?.instance.workspaces)) {
+		let workspacePlugin = this.plugin.internalPlugins.workspaces?.instance;
+		
+		if(!(this.data.value in workspacePlugin.workspaces)) {
 			new Notice(`Cannot find the workspace "${this.data.value}" to use as the homepage.`);
 			return;
 		}
 		
-		this.plugin.workspacePlugin.instance.loadWorkspace(this.computedValue);
+		workspacePlugin.loadWorkspace(this.computedValue);
 	}
 	
 	async launchPage(mode: Mode) {
 		this.computedValue = this.computeValue();
 		this.plugin.executing = true;
 		
-		if (getDailynotesAutorun(this.app) && !this.plugin.loaded) {
+		if (getDailynotesAutorun(this.plugin) && !this.plugin.loaded) {
 			return;
 		}
 		else if (!this.data.autoCreate && await this.isNonextant()) {
@@ -182,7 +189,10 @@ export class Homepage {
 		}
 	
 		await view.leaf.setViewState({type: "markdown", state: state});
-		if (this.plugin.loaded && this.data.refreshDataview) { getDataviewPlugin(this.app)?.index.touch(); }
+		
+		if (this.plugin.loaded && this.data.refreshDataview) { 
+			this.plugin.communityPlugins.dataview?.index.touch();
+		}
 	}
 	
 	getOpened(): WorkspaceLeaf[] {
@@ -194,9 +204,21 @@ export class Homepage {
 	
 	computeValue(): string {
 		let val = this.data.value;
+		let dailyNotes, format;
 	
-		if (this.data.kind == Kind.MomentDate) {
-			val = moment().format(this.data.value);
+		switch (this.data.kind) {
+			case Kind.MomentDate:
+				val = moment().format(this.data.value);
+				break;
+			case Kind.Random:
+				const file = randomFile(this.app);
+				if (file) val = file;
+				break;
+			case Kind.DailyNote:
+				dailyNotes = this.plugin.internalPlugins["daily-notes"];
+				format = dailyNotes.instance.options.format;
+				val = moment().format(format || "YYYY-MM-DD");
+				break;
 		}
 	
 		return val
@@ -205,10 +227,6 @@ export class Homepage {
 	async save(): Promise<void> {
 		this.plugin.settings.homepages[this.name] = this.data; 
 		await this.plugin.saveSettings();
-	}
-	
-	workspacesMode(): boolean {
-		return this.plugin.workspacePlugin?.enabled && this.data.kind == Kind.Workspace;
 	}
 	
 	revertView = async (): Promise<void> => {
@@ -226,4 +244,5 @@ export class Homepage {
 		await view.leaf.setViewState({type: "markdown", state: state});
 		this.lastView = null;
 	}
+	
 }

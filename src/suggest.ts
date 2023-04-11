@@ -1,6 +1,6 @@
 import { App, ISuggestOwner, Scope, TAbstractFile, TFile } from "obsidian";
 import { createPopper, Instance as PopperInstance } from "@popperjs/core";
-import { getWorkspacePlugin, trimFile, wrapAround } from "./utils";
+import { trimFile, wrapAround } from "./utils";
 
 class Suggest<T> {
 	private owner: ISuggestOwner<T>;
@@ -222,7 +222,7 @@ export class FileSuggest extends TextInputSuggest<TFile> {
 
 export class WorkspaceSuggest extends TextInputSuggest<string> {
 	getSuggestions(inputStr: string): string[] {
-		const workspaces = Object.keys(getWorkspacePlugin(this.app)?.instance.workspaces);
+		const workspaces = Object.keys((this.app as any).plugins.workspaces?.instance.workspaces);
 		const inputLower = inputStr.toLowerCase();
 
 		return workspaces.filter((workspace: string) => workspace.toLowerCase().contains(inputLower));

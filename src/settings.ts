@@ -2,7 +2,7 @@ import { App, PluginSettingTab, Setting, normalizePath } from "obsidian";
 import HomepagePlugin from "./main";
 import { DEFAULT, HomepageData, Kind, Mode, View } from "./homepage";
 import { FileSuggest, WorkspaceSuggest } from "./suggest";
-import { getDailynotesAutorun, getDataviewPlugin } from "./utils";
+import { getDailynotesAutorun } from "./utils";
 
 type HomepageObject = { [key: string | symbol]: HomepageData }
 
@@ -15,7 +15,7 @@ export interface HomepageSettings {
 export const DEFAULT_SETTINGS: HomepageSettings = {
 	version: 3,
 	homepages: {
-		"Main Homepage": {
+		[DEFAULT]: {
 			value: "Home",
 			kind: Kind.File,
 			openOnStartup: true,
@@ -34,7 +34,9 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
 }
 
 export const DEFAULT_DATA: HomepageData = DEFAULT_SETTINGS.homepages[DEFAULT];
+
 const HIDDEN: string = "nv-workspace-hidden";
+const UNCHANGEABLE: Kind[] = [Kind.Random, Kind.DailyNote, Kind.WeeklyNote, Kind.MonthlyNote];
 
 export class HomepageSettingTab extends PluginSettingTab {
 	plugin: HomepagePlugin;
@@ -54,11 +56,11 @@ export class HomepageSettingTab extends PluginSettingTab {
 	}
 	
 	display(): void {
-		const workspacesMode = this.plugin.homepage.workspacesMode();
-		const dailynotesAutorun = getDailynotesAutorun(this.app);
+		const hasWorkspaces = this.plugin.homepage.data.kind == Kind.Workspace;
+		const dailynotesAutorun = getDailynotesAutorun(this.plugin);
 		
 		const descContainer = document.createElement("article");
-		const suggestor = workspacesMode ? WorkspaceSuggest : FileSuggest;
+		const suggestor = hasWorkspaces ? WorkspaceSuggest : FileSuggest;
 
 		this.containerEl.empty();
 		descContainer.id = "nv-desc";
@@ -67,7 +69,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 			.setName("Homepage")
 			.addDropdown(async dropdown => {
 				for (let key of Object.values(Kind)) {
-					if (key == Kind.Workspace && !this.plugin.workspacePlugin?.enabled) continue;
+					if (!this.plugin.hasRequiredPlugin(key)) continue;
 					dropdown.addOption(key, key);
 				}
 				dropdown.setValue(this.plugin.homepage.data.kind);
@@ -93,6 +95,12 @@ export class HomepageSettingTab extends PluginSettingTab {
 				`Enter a note or canvas to use based on <a href="https://momentjs.com/docs/#/displaying/format/" target="_blank" rel="noopener">Moment date formatting</a>.<small>This is separate from Daily or Periodic Notes, but can be set so it corresponds to the same files. Surround words in <code style="padding:0">[brackets]</code> to include them unmodified.
 				<br> Currently, your specification will produce: </small>`;
 				break;
+			case Kind.Random:
+				descContainer.innerHTML = `A random note or canvas from your Obsidian folder will be selected.`;
+				break;
+			case Kind.DailyNote:
+				descContainer.innerHTML = `Your Daily Note will be used.`;
+				break;
 		}
 		
 		if (this.plugin.homepage.data.kind == Kind.MomentDate) {
@@ -108,6 +116,11 @@ export class HomepageSettingTab extends PluginSettingTab {
 				.setSampleEl(sample)
 			);
 		} 
+		else if (UNCHANGEABLE.includes(this.plugin.homepage.data.kind as Kind)) {
+			mainSetting.addText(text => {
+				text.setDisabled(true);
+			});
+		}
 		else {
 			mainSetting.addText(text => {
 				new suggestor(this.app, text.inputEl);
@@ -183,7 +196,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		);
 		this.addToggle("Auto-scroll", "When opening the homepage, scroll to the bottom and focus on the last line.", "autoScroll");
 		
-		if (getDataviewPlugin(this.plugin.app)) {
+		if ("dataview" in this.plugin.communityPlugins) {
 			this.addToggle(
 				"Refresh Dataview", "Always attempt to reload Dataview views when opening the homepage.", "refreshDataview"
 			).descEl.createDiv({
@@ -191,7 +204,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 			});
 		}
 		
-		if (workspacesMode) Array.from(document.getElementsByClassName(HIDDEN)).forEach(this.disableSetting);
+		if (hasWorkspaces) Array.from(document.getElementsByClassName(HIDDEN)).forEach(this.disableSetting);
 		if (!this.plugin.homepage.data.openOnStartup || dailynotesAutorun) this.disableSetting(openingSetting.settingEl);
 	}
 	
