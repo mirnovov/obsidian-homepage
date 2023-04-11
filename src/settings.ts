@@ -36,7 +36,7 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
 export const DEFAULT_DATA: HomepageData = DEFAULT_SETTINGS.homepages[DEFAULT];
 
 const HIDDEN: string = "nv-workspace-hidden";
-const UNCHANGEABLE: Kind[] = [Kind.Random, Kind.DailyNote, Kind.WeeklyNote, Kind.MonthlyNote];
+const UNCHANGEABLE: Kind[] = [Kind.Random, Kind.DailyNote];
 
 export class HomepageSettingTab extends PluginSettingTab {
 	plugin: HomepagePlugin;
@@ -92,7 +92,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 				break;
 			case Kind.MomentDate:
 				descContainer.innerHTML = 
-				`Enter a note or canvas to use based on <a href="https://momentjs.com/docs/#/displaying/format/" target="_blank" rel="noopener">Moment date formatting</a>.<small>This is separate from Daily or Periodic Notes, but can be set so it corresponds to the same files. Surround words in <code style="padding:0">[brackets]</code> to include them unmodified.
+				`Enter a note or canvas to use based on <a href="https://momentjs.com/docs/#/displaying/format/" target="_blank" rel="noopener">Moment date formatting</a>.<small>This is separate from Daily or Periodic Notes, but can be set so it corresponds to the same files. Surround words in <code>[brackets]</code> to include them unmodified.
 				<br> Currently, your specification will produce: </small>`;
 				break;
 			case Kind.Random:
@@ -147,7 +147,6 @@ export class HomepageSettingTab extends PluginSettingTab {
 			});
 			this.disableSetting(startupSetting.settingEl);
 		}
-		startupSetting.settingEl.style.cssText += "padding-top: 30px; border-top: none !important";
 		
 		this.addToggle(
 			"Use ribbon icon", "Show a little house on the ribbon, allowing you to quickly access the homepage.",
