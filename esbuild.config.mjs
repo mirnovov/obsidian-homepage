@@ -1,6 +1,6 @@
 import esbuild from "esbuild";
 import process from "process";
-import copyStaticFiles from "esbuild-copy-static-files";
+import copy from "esbuild-plugin-copy";
 import fs from "fs";
 import { dirname } from "path";
 
@@ -9,6 +9,8 @@ const outPath = (process.argv[2] != undefined && !prod) ? process.argv[2] : "./o
 const outDir = dirname(outPath);
 
 if (!fs.existsSync(outDir)) fs.mkdirSync(outDir);
+
+console.log(outDir);
 
 esbuild.build({
 	entryPoints: ["src/main.ts"],
@@ -22,12 +24,13 @@ esbuild.build({
 	treeShaking: true,
 	outfile: outPath,
 	plugins: [
-		copyStaticFiles({
-			src: "./static",
-			dest: outDir,
-			dereference: false,
-			preserveTimestamps: false,
-			recursive: false
+		copy({
+			resolveFrom: "cwd",
+			assets: [
+				{ from: "./styles.css", to: `${outDir}/styles.css` },
+				{ from: "./manifest.json", to: `${outDir}/manifest.json` }
+			],
+			watch: !prod
 		})
 	]
 }).catch(e => { throw e });
