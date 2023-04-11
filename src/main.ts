@@ -117,8 +117,12 @@ export default class HomepagePlugin extends Plugin {
 
 	setIcon(value: boolean): void {
 		if (value) {
-			this.addRibbonIcon("homepage", "Open homepage", () => this.homepage.open())
-				.setAttribute("id", "nv-homepage-icon");
+			this.addRibbonIcon(
+				"homepage", 
+				"Open homepage", 
+				e => this.homepage.open(e.button == 2)
+			)
+			.setAttribute("id", "nv-homepage-icon");
 		}
 		else {
 			document.getElementById("nv-homepage-icon")?.remove();

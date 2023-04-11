@@ -67,8 +67,16 @@ export class Homepage {
 		}
 	}
 	
-	async open(): Promise<void> {
-		this.workspacesMode() ? await this.launchWorkspace() : await this.launchPage();
+	async open(alternate: boolean = false): Promise<void> {
+		if (this.workspacesMode()) {
+			await this.launchWorkspace();
+			return;
+		}
+		
+		let mode = this.plugin.loaded ? this.data.manualOpenMode : this.data.openMode;
+		if (alternate) mode = Mode.Retain;
+		
+		await this.launchPage(mode as Mode);
 	}
 	
 	async launchWorkspace() {
@@ -80,21 +88,14 @@ export class Homepage {
 		this.plugin.workspacePlugin.instance.loadWorkspace(this.computedValue);
 	}
 	
-	async launchPage() {
+	async launchPage(mode: Mode) {
 		this.computedValue = this.computeValue();
 		this.plugin.executing = true;
 		
-		const mode = this.plugin.loaded ? this.data.manualOpenMode : this.data.openMode;
-		const nonextant = async () => !(await this.app.vault.adapter.exists(untrimName(this.computedValue)));
-		const openLink = async (mode: Mode) => await this.app.workspace.openLinkText(
-			this.computedValue, "", mode == Mode.Retain, { active: true }
-		);
-		
-	
 		if (getDailynotesAutorun(this.app) && !this.plugin.loaded) {
 			return;
 		}
-		else if (!this.data.autoCreate && await nonextant()) {
+		else if (!this.data.autoCreate && await this.isNonextant()) {
 			new Notice(`Homepage "${this.computedValue}" does not exist.`);
 			return;
 		}
@@ -117,14 +118,25 @@ export class Homepage {
 			LEAF_TYPES.forEach(i => this.app.workspace.detachLeavesOfType(i));
 		}
 		
-		await openLink(mode as Mode);
+		await this.openLink(mode as Mode);
 		
 		if (this.app.workspace.getActiveFile() == null) {
 			//hack to fix bug with opening link when homepage is already extant beforehand
-			await openLink(mode as Mode);
+			await this.openLink(mode as Mode);
 		}
 	
 		await this.configure();
+	}
+		
+	async isNonextant(): Promise<boolean> {
+		let name = untrimName(this.computedValue);
+		return !(await this.app.vault.adapter.exists(name));
+	} 
+	
+	async openLink(mode: Mode): Promise<void> {
+		await this.app.workspace.openLinkText(
+			this.computedValue, "", mode == Mode.Retain, { active: true }
+		);
 	}
 	
 	async configure(): Promise<void> {
