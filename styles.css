@@ -102,3 +102,17 @@
 	padding-top: 20px; 
 	border-top: none !important;
 }
+
+.is-phone #nv-main-setting .setting-item-control {
+	flex-wrap: wrap;
+	justify-content: flex-start;
+}
+
+.is-phone #nv-main-setting .setting-item-control select {
+	width: auto;
+	max-width: auto;
+}
+
+.is-phone .nv-command-pill button, .is-phone .nv-command-add-button {
+	width: auto;
+}
