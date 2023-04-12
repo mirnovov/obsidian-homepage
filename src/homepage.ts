@@ -1,4 +1,4 @@
-import { App, MarkdownView, Notice, WorkspaceLeaf, moment } from "obsidian";
+import { App, MarkdownView, Notice, View as OView, WorkspaceLeaf, moment } from "obsidian";
 import HomepagePlugin from "./main";
 import { getDailynotesAutorun, randomFile, trimFile, untrimName } from "./utils";
 
@@ -125,19 +125,24 @@ export class Homepage {
 			}
 		}
 		else {
-			if (this.data.pin) {
-				//hack to fix pin bug
-				this.getOpened().forEach(h => h.setPinned(false));
-			}
-			
 			LEAF_TYPES.forEach(i => this.app.workspace.detachLeavesOfType(i));
 		}
 		
-		await this.openLink(mode as Mode);
+		if (mode != Mode.Retain) {
+			//hack to fix pin bug
+			this.app.workspace.getActiveViewOfType(OView).leaf.setPinned(false);
+		}
 		
-		if (this.app.workspace.getActiveFile() == null) {
-			//hack to fix bug with opening link when homepage is already extant beforehand
-			await this.openLink(mode as Mode);
+		do {
+			await this.app.workspace.openLinkText(
+				this.computedValue, "", mode == Mode.Retain, { active: true }
+			);
+		}
+		//hack to fix bug with opening link when homepage is already extant beforehand
+		while (this.app.workspace.getActiveFile() == null);
+		
+		if (mode == Mode.ReplaceAll) {
+			this.app.workspace.detachLeavesOfType("empty");
 		}
 	
 		await this.configure();
@@ -148,19 +153,15 @@ export class Homepage {
 		return !(await this.app.vault.adapter.exists(name));
 	} 
 	
-	async openLink(mode: Mode): Promise<void> {
-		await this.app.workspace.openLinkText(
-			this.computedValue, "", mode == Mode.Retain, { active: true }
-		);
-	}
-	
 	async configure(): Promise<void> {
 		this.plugin.executing = false;
 		const view = this.app.workspace.getActiveViewOfType(MarkdownView);
 		
 		if (!view) {
-			//not ideal, but there is no canvas view type exposed afaik
-			if (this.data.pin) this.app.workspace.activeLeaf.setPinned(true);	
+			//for canvas, kanban
+			if (this.data.pin) {
+				this.app.workspace.getActiveViewOfType(OView).leaf.setPinned(true);	
+			}
 			return;	
 		}
 		
