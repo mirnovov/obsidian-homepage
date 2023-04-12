@@ -1,7 +1,7 @@
-import { App, PluginSettingTab, Setting, normalizePath } from "obsidian";
+import { App, ButtonComponent, PluginSettingTab, Setting, normalizePath } from "obsidian";
 import HomepagePlugin from "./main";
 import { DEFAULT, HomepageData, Kind, Mode, View } from "./homepage";
-import { FileSuggest, WorkspaceSuggest } from "./suggest";
+import { CommandSuggestModal, FileSuggest, WorkspaceSuggest } from "./suggest";
 import { getDailynotesAutorun } from "./utils";
 
 type HomepageObject = { [key: string | symbol]: HomepageData }
@@ -27,7 +27,8 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
 			refreshDataview: false,
 			autoCreate: true,
 			autoScroll: false,
-			pin: false
+			pin: false,
+			commands: []
 		}
 	},
 	separateMobile: false
@@ -41,6 +42,8 @@ const UNCHANGEABLE: Kind[] = [Kind.Random, Kind.DailyNote];
 export class HomepageSettingTab extends PluginSettingTab {
 	plugin: HomepagePlugin;
 	settings: HomepageSettings;
+	
+	commandBox: HTMLElement;
 
 	constructor(app: App, plugin: HomepagePlugin) {
 		super(app, plugin);
@@ -167,7 +170,15 @@ export class HomepageSettingTab extends PluginSettingTab {
 					this.display();
 				})
 			);
-
+					
+		this.addHeading("Commands");
+		this.containerEl.createDiv({ 
+			cls: "nv-command-desc setting-item-description", 
+			text: "Select commands that will be executed when opening the homepage." }
+		);
+		this.commandBox = this.containerEl.createDiv({ cls: "nv-command-box" });
+		this.updateCommandBox();
+		
 		this.addHeading("Vault environment");
 		let openingSetting = this.addDropdown(
 			"Opening method", "Determine how extant tabs and panes are affected on startup.", 
@@ -251,4 +262,32 @@ export class HomepageSettingTab extends PluginSettingTab {
 		if (!workspaces) toggle.settingEl.addClass(HIDDEN);
 		return toggle;
 	}
+	
+	updateCommandBox(): void {
+		this.commandBox.innerHTML = "";
+		
+		for (const [index, id] of this.plugin.homepage.data.commands.entries()) {
+			const command = (this.app as any).commands.findCommand(id);
+			if (!command) continue;
+			
+			let pill = this.commandBox.createDiv({ cls: "nv-command-pill", text: command.name });
+			
+			new ButtonComponent(pill)
+				.setIcon("trash-2")
+				.setClass("clickable-icon")
+				.onClick(() => {
+					this.plugin.homepage.data.commands.splice(index, 1);
+					this.plugin.homepage.save();
+					this.updateCommandBox();
+				});
+		}
+		
+		new ButtonComponent(this.commandBox)
+			.setClass("nv-command-add-button")
+			.setButtonText("Add...")
+			.onClick(() => {
+				const modal = new CommandSuggestModal(this);
+				modal.open();
+			});
+	} 
 }

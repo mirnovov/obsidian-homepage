@@ -1,5 +1,7 @@
-import { App, ISuggestOwner, Scope, TAbstractFile, TFile } from "obsidian";
+import { App, FuzzySuggestModal, ISuggestOwner, Notice, Scope, TAbstractFile, TFile } from "obsidian";
 import { createPopper, Instance as PopperInstance } from "@popperjs/core";
+import { Homepage } from "./homepage";
+import { HomepageSettingTab } from "./settings"; 
 import { trimFile, wrapAround } from "./utils";
 
 class Suggest<T> {
@@ -236,5 +238,40 @@ export class WorkspaceSuggest extends TextInputSuggest<string> {
 		this.inputEl.value = workspace;
 		this.inputEl.trigger("input");
 		this.close();
+	}
+}
+
+export class CommandSuggestModal extends FuzzySuggestModal<Object> {
+	app: App
+	homepage: Homepage;
+	tab: HomepageSettingTab;
+
+	constructor(tab: HomepageSettingTab) {
+		super(tab.plugin.app);
+		
+		this.homepage = tab.plugin.homepage;
+		this.tab = tab;
+	}
+
+	getItems(): Object[] {
+		return Object.values((this.app as any).commands.commands);
+	}
+
+	getItemText(item: Object): string {
+		return (item as any).name;
+	}
+
+	onChooseItem(item: Object) {
+		if ((item as any).id === "homepage:open-homepage") {
+			new Notice("Really?");
+			return;
+		}
+		else if (!this.homepage.data.commands) {
+			this.homepage.data.commands = [];
+		}
+		
+		this.homepage.data.commands.push((item as any).id);
+		this.homepage.save();
+		this.tab.updateCommandBox();
 	}
 }

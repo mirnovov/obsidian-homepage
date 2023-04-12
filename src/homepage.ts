@@ -20,7 +20,8 @@ export interface HomepageData {
 	refreshDataview: boolean,
 	autoCreate: boolean,
 	autoScroll: boolean,
-	pin: boolean
+	pin: boolean,
+	commands: string[]
 } 
 
 export enum Mode {
@@ -72,16 +73,23 @@ export class Homepage {
 	async open(alternate: boolean = false): Promise<void> {
 		if (!this.plugin.hasRequiredPlugin(this.data.kind as Kind)) {
 			new Notice("Homepage cannot be opened due to plugin unavailablity.");
+			return;
 		}
 		else if (this.data.kind == Kind.Workspace) {
 			await this.launchWorkspace();
-			return;
+		}
+		else {
+			let mode = this.plugin.loaded ? this.data.manualOpenMode : this.data.openMode;
+			if (alternate) mode = Mode.Retain;
+			
+			await this.launchPage(mode as Mode);
 		}
 		
-		let mode = this.plugin.loaded ? this.data.manualOpenMode : this.data.openMode;
-		if (alternate) mode = Mode.Retain;
-		
-		await this.launchPage(mode as Mode);
+		if (!this.data.commands) return;
+				
+		for (let command of this.data.commands) {
+			(this.app as any).commands.executeCommandById(command);
+		}
 	}
 	
 	async launchWorkspace() {

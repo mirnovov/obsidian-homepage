@@ -59,7 +59,46 @@
 	padding: 5px 0 0;
 }
 
-#nv-main-setting + .setting-item {
+.nv-command-desc {
+	padding: 1.2em 0 0;
+	border-top: 1px solid var(--background-modifier-border);
+}
+
+.nv-command-box {
+	margin: 1em 0 1.75em;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	align-items: center;
+}
+
+.nv-command-pill {
+	background-color: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border-hover);
+	border-radius: var(--radius-s);
+	font-size: var(--font-ui-small);
+	padding: var(--size-2-1) var(--size-2-3);
+}
+
+.nv-command-pill button {
+	display: inline-block;
+	padding: 0;
+	margin: 0 0 0 var(--size-2-3);
+	vertical-align: bottom;
+}
+
+.nv-command-pill button svg {
+	height: 1em;
+	width: 1em;
+}
+
+.nv-command-add-button {
+	font-size: var(--font-ui-small);
+	padding: var(--size-2-2) var(--size-4-2);
+	height: auto;
+}
+
+#nv-main-setting + .setting-item, .nv-command-desc + .setting-item {
 	padding-top: 20px; 
 	border-top: none !important;
 }
