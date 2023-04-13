@@ -1,7 +1,7 @@
 import { App, ButtonComponent, PluginSettingTab, Setting, normalizePath } from "obsidian";
 import HomepagePlugin from "./main";
 import { DEFAULT, HomepageData, Kind, Mode, View } from "./homepage";
-import { CommandSuggestModal, FileSuggest, WorkspaceSuggest } from "./suggest";
+import { CommandSuggestModal, FileSuggest, WorkspaceSuggest } from "./ui";
 import { getDailynotesAutorun } from "./utils";
 
 type HomepageObject = { [key: string | symbol]: HomepageData }
@@ -35,8 +35,6 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
 }
 
 export const DEFAULT_DATA: HomepageData = DEFAULT_SETTINGS.homepages[DEFAULT];
-
-const HIDDEN: string = "nv-workspace-hidden";
 const UNCHANGEABLE: Kind[] = [Kind.Random, Kind.DailyNote];
 
 export class HomepageSettingTab extends PluginSettingTab {
@@ -44,6 +42,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 	settings: HomepageSettings;
 	
 	commandBox: HTMLElement;
+	workspaceHidden: HTMLElement[] = [];
 
 	constructor(app: App, plugin: HomepagePlugin) {
 		super(app, plugin);
@@ -136,7 +135,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 			});
 		}
 		
-		let startupSetting = this.addToggle(
+		const startupSetting = this.addToggle(
 			"Open on startup", "When launching Obsidian, open the homepage.",
 			"openOnStartup",
 			(_) => this.display(),
@@ -171,7 +170,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 				})
 			);
 					
-		this.addHeading("Commands");
+		this.addHeading("Commands", true);
 		this.containerEl.createDiv({ 
 			cls: "nv-command-desc setting-item-description", 
 			text: "Select commands that will be executed when opening the homepage." }
@@ -202,7 +201,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		this.addToggle(
 			"Revert view on close", "When navigating away from the homepage, restore the default view.", 
 			"revertView",
-			(value) => this.plugin.homepage.setReversion(value)
+			value => this.plugin.homepage.setReversion(value)
 		);
 		this.addToggle("Auto-scroll", "When opening the homepage, scroll to the bottom and focus on the last line.", "autoScroll");
 		
@@ -214,7 +213,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 			});
 		}
 		
-		if (hasWorkspaces) Array.from(document.getElementsByClassName(HIDDEN)).forEach(this.disableSetting);
+		if (hasWorkspaces) this.workspaceHidden.forEach(this.disableSetting);
 		if (!this.plugin.homepage.data.openOnStartup || dailynotesAutorun) this.disableSetting(openingSetting.settingEl);
 	}
 	
@@ -222,9 +221,10 @@ export class HomepageSettingTab extends PluginSettingTab {
 		setting.setAttribute("nv-greyed", "");
 	}
 	
-	addHeading(name: string): Setting {
+	addHeading(name: string, workspaces: boolean = false): Setting {
 		const heading = new Setting(this.containerEl).setHeading().setName(name);
-		heading.settingEl.addClass(HIDDEN);
+		
+		if (!workspaces) this.workspaceHidden.push(heading.settingEl);
 		return heading;
 	}
 	
@@ -243,7 +243,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 				});
 			});
 		
-		dropdown.settingEl.addClass(HIDDEN);
+		this.workspaceHidden.push(dropdown.settingEl);
 		return dropdown;
 	}
 	
@@ -259,7 +259,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 				})
 			);
 		
-		if (!workspaces) toggle.settingEl.addClass(HIDDEN);
+		if (!workspaces) this.workspaceHidden.push(toggle.settingEl);
 		return toggle;
 	}
 	
@@ -270,7 +270,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 			const command = (this.app as any).commands.findCommand(id);
 			if (!command) continue;
 			
-			let pill = this.commandBox.createDiv({ cls: "nv-command-pill", text: command.name });
+			const pill = this.commandBox.createDiv({ cls: "nv-command-pill", text: command.name });
 			
 			new ButtonComponent(pill)
 				.setIcon("trash-2")
