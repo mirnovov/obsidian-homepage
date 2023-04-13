@@ -7,7 +7,7 @@
 		"target": "es2021",
 		"allowJs": true,
 		"noImplicitAny": true,
-		"moduleResolution": "node",
+		"moduleResolution": "bundler",
 		"importHelpers": true,
 		"lib": [
 			"dom",

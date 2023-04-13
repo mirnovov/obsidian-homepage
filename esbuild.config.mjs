@@ -1,21 +1,18 @@
 import esbuild from "esbuild";
-import process from "process";
 import copy from "esbuild-plugin-copy";
+import process from "process";
 import fs from "fs";
 import { dirname } from "path";
 
-const prod = (process.argv[2] === "production");
-const outPath = (process.argv[2] != undefined && !prod) ? process.argv[2] : "./out/main.js";
+const prod = process.argv[2] === "production";
+const outPath = process.argv[2] && !prod ? process.argv[2] : "./out/main.js";
 const outDir = dirname(outPath);
 
-if (!fs.existsSync(outDir)) fs.mkdirSync(outDir);
-
-esbuild.build({
+const context = await esbuild.context({
 	entryPoints: ["src/main.ts"],
 	bundle: true,
 	external: ["obsidian", "electron"],
 	format: "cjs",
-	watch: !prod,
 	target: "es2021",
 	logLevel: "info",
 	sourcemap: prod ? false : "inline",
@@ -31,4 +28,15 @@ esbuild.build({
 			watch: !prod
 		})
 	]
-}).catch(e => { throw e });
+});
+
+if (!fs.existsSync(outDir)) fs.mkdirSync(outDir);
+
+if (prod) {
+	await context.rebuild();
+	await context.dispose();
+}
+else {
+	await context.watch();
+}
+	
