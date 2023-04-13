@@ -51,7 +51,7 @@ export class Homepage {
 	data: HomepageData;
 	
 	name: string;
-	lastView: WeakRef<MarkdownView> = null;
+	lastView?: WeakRef<MarkdownView> = undefined;
 	computedValue: string;
 	
 	constructor(name: string, plugin: HomepagePlugin) {
@@ -130,7 +130,7 @@ export class Homepage {
 		
 		if (mode != Mode.Retain) {
 			//hack to fix pin bug
-			this.app.workspace.getActiveViewOfType(OView).leaf.setPinned(false);
+			this.app.workspace.getActiveViewOfType(OView)?.leaf.setPinned(false);
 		}
 		
 		do {
@@ -160,7 +160,7 @@ export class Homepage {
 		if (!view) {
 			//for canvas, kanban
 			if (this.data.pin) {
-				this.app.workspace.getActiveViewOfType(OView).leaf.setPinned(true);	
+				this.app.workspace.getActiveViewOfType(OView)?.leaf.setPinned(true);	
 			}
 			return;	
 		}
@@ -239,7 +239,7 @@ export class Homepage {
 	}
 	
 	revertView = async (): Promise<void> => {
-		if (!this.plugin.loaded || this.lastView == null) return;
+		if (!this.plugin.loaded || this.lastView == undefined) return;
 		
 		const view = this.lastView.deref();
 		if (!view || trimFile(view.file) == this.computedValue) return;
@@ -251,7 +251,6 @@ export class Homepage {
 		state.mode = config.defaultViewMode;
 		state.source = !config.livePreview;
 		await view.leaf.setViewState({type: "markdown", state: state});
-		this.lastView = null;
-	}
-	
+		this.lastView = undefined;
+	}	
 }

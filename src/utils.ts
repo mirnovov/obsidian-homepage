@@ -18,7 +18,7 @@ export function getDailynotesAutorun(plugin: HomepagePlugin): any {
 	return dailyNotes?.enabled && dailyNotes?.instance.options.autorun; 
 };
 
-export function randomFile(app: App): string {
+export function randomFile(app: App): string | undefined {
 	const files = app.vault.getFiles().filter(
 		(f: TFile) => ["md", "canvas"].contains(f.extension)
 	);

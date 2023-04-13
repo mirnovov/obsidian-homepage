@@ -12,12 +12,13 @@
 	"license": "MIT",
 	"dependencies": {
 		"@popperjs/core": "2.11.7",
+		"obsidian": "^1.1.13",
 		"obsidian-daily-notes-interface": "^0.9.4"
 	},
 	"devDependencies": {
+		"@jgoz/esbuild-plugin-typecheck": "^3.0.2",
 		"esbuild": "^0.17.0",
 		"esbuild-plugin-copy": "^2.1.1",
-		"obsidian": "^1.1.1",
 		"tslib": "^2.3.0",
 		"typescript": "^5.0"
 	}

@@ -4,7 +4,7 @@ import { DEFAULT, HomepageData, Kind, Mode, View } from "./homepage";
 import { CommandSuggestModal, FileSuggest, WorkspaceSuggest } from "./ui";
 import { getDailynotesAutorun } from "./utils";
 
-type HomepageObject = { [key: string | symbol]: HomepageData }
+type HomepageObject = { [key: string]: HomepageData }
 
 export interface HomepageSettings {
 	version: number,
@@ -50,7 +50,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		this.settings = plugin.settings;
 	}
 
-	sanitiseNote(value: string): string {
+	sanitiseNote(value: string): string | null {
 		if (value === null || value.match(/^\s*$/) !== null) {
 			return null;
 		}
@@ -106,7 +106,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		}
 		
 		if (this.plugin.homepage.data.kind == Kind.MomentDate) {
-			const sample = descContainer.lastChild.createEl("b", {attr: {class: "u-pop"}});
+			const sample = descContainer.lastChild!.createEl("b", {attr: {class: "u-pop"}});
 			
 			mainSetting.addMomentFormat(text => text
 				.setDefaultFormat("YYYY-MM-DD")

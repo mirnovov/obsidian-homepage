@@ -7,9 +7,9 @@ class Suggest<T> {
 	private values: T[];
 	private suggestions: HTMLDivElement[];
 	private selectedItem: number;
-	private containerEl: HTMLElement;
+	private containerEl: HTMLDivElement;
 
-	constructor(owner: ISuggestOwner<T>, containerEl: HTMLElement, scope: Scope) {
+	constructor(owner: ISuggestOwner<T>, containerEl: HTMLDivElement, scope: Scope) {
 		this.owner = owner;
 		this.containerEl = containerEl;
 
@@ -46,16 +46,16 @@ class Suggest<T> {
 		});
 	}
 
-	onSuggestionClick(event: MouseEvent, el: HTMLDivElement): void {
+	onSuggestionClick(event: MouseEvent, el: HTMLElement): void {
 		event.preventDefault();
 
-		const item = this.suggestions.indexOf(el);
+		const item = this.suggestions.indexOf(el as HTMLDivElement);
 		this.setSelectedItem(item, false);
 		this.useSelectedItem(event);
 	}
 
-	onSuggestionMouseover(_event: MouseEvent, el: HTMLDivElement): void {
-		const item = this.suggestions.indexOf(el);
+	onSuggestionMouseover(_event: MouseEvent, el: HTMLElement): void {
+		const item = this.suggestions.indexOf(el as HTMLDivElement);
 		this.setSelectedItem(item, false);
 	}
 

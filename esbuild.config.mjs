@@ -1,5 +1,6 @@
 import esbuild from "esbuild";
 import copy from "esbuild-plugin-copy";
+import { typecheckPlugin } from "@jgoz/esbuild-plugin-typecheck";
 import process from "process";
 import fs from "fs";
 import { dirname } from "path";
@@ -27,7 +28,7 @@ const context = await esbuild.context({
 			],
 			watch: !prod
 		})
-	]
+	].concat(prod ? typecheckPlugin() : [])
 });
 
 if (!fs.existsSync(outDir)) fs.mkdirSync(outDir);
