@@ -302,9 +302,9 @@ export class HomepageSettingTab extends PluginSettingTab {
 		const config = (this.app.vault as any).config;
 		const info: any = {
 			...this.settings,
-			_defaultViewMode: config.defaultViewMode,
-			_livePreview: config.livePreview,
-			_focusNewTab: config.focusNewTab,
+			_defaultViewMode: config.defaultViewMode || "default",
+			_livePreview: config.livePreview || "default",
+			_focusNewTab: config.focusNewTab || "default",
 			_plugins: Object.keys(this.plugin.communityPlugins),
 			_internalPlugins: Object.values(this.plugin.internalPlugins).flatMap(
 				(p: any) => p.enabled ? [p.instance.id] : []
