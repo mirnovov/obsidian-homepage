@@ -75,7 +75,7 @@ export default class HomepagePlugin extends Plugin {
 	async loadSettings(): Promise<HomepageSettings> {
 		let settingsData: any = await this.loadData();
 		
-		if (settingsData.version == 3) {
+		if (!settingsData || settingsData.version !== 2) {
 			return Object.assign({}, DEFAULT_SETTINGS, settingsData);
 		}
 		else {
