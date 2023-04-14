@@ -103,6 +103,22 @@
 	border-top: none !important;
 }
 
+.nv-debug-button {
+	margin: 3em 0 -0.2em;
+	font-size: var(--font-ui-smaller);
+	padding: 0;
+	height: auto;
+	float: right;
+	box-shadow: none !important;
+	background: none !important;
+	color: var(--text-faint);
+	cursor: pointer;
+}
+
+.nv-debug-button:hover, .nv-debug-button:active {
+	text-decoration: underline;
+}
+
 .is-phone #nv-main-setting .setting-item-control {
 	flex-wrap: wrap;
 	justify-content: flex-start;

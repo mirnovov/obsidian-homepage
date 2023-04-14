@@ -1,4 +1,4 @@
-import { App, ButtonComponent, PluginSettingTab, Setting, normalizePath } from "obsidian";
+import { App, ButtonComponent, Notice, Platform, PluginSettingTab, Setting, normalizePath } from "obsidian";
 import HomepagePlugin from "./main";
 import { DEFAULT, HomepageData, Kind, Mode, View } from "./homepage";
 import { CommandSuggestModal, FileSuggest, WorkspaceSuggest } from "./ui";
@@ -213,6 +213,13 @@ export class HomepageSettingTab extends PluginSettingTab {
 			});
 		}
 		
+		if (!Platform.isMobile) {	
+			new ButtonComponent(this.containerEl)
+				.setButtonText("Copy debug info")
+				.setClass("nv-debug-button")
+				.onClick(async () => await this.copyDebugInfo());
+		}
+		
 		if (hasWorkspaces) this.workspaceHidden.forEach(this.disableSetting);
 		if (!this.plugin.homepage.data.openOnStartup || dailynotesAutorun) this.disableSetting(openingSetting.settingEl);
 	}
@@ -290,4 +297,22 @@ export class HomepageSettingTab extends PluginSettingTab {
 				modal.open();
 			});
 	} 
+	
+	async copyDebugInfo(): Promise<void> {
+		const config = (this.app.vault as any).config;
+		const info: any = {
+			...this.settings,
+			_defaultViewMode: config.defaultViewMode,
+			_livePreview: config.livePreview,
+			_focusNewTab: config.focusNewTab,
+			_plugins: Object.keys(this.plugin.communityPlugins),
+			_internalPlugins: Object.values(this.plugin.internalPlugins).flatMap(
+				(p: any) => p.enabled ? [p.instance.id] : []
+			),
+			_obsidianVersion: (window as any).electron.ipcRenderer.sendSync("version")
+		};
+		
+		await navigator.clipboard.writeText(JSON.stringify(info));
+		new Notice("Copied homepage debug information");
+	}
 }

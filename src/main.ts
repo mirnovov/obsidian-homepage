@@ -138,5 +138,5 @@ export default class HomepagePlugin extends Plugin {
 			default:
 				return true;
 		}
-	}
+	}	
 }
