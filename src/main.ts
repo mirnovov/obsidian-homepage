@@ -1,4 +1,4 @@
-import { Platform, Plugin, addIcon } from "obsidian";
+import { Keymap, Platform, Plugin, addIcon } from "obsidian";
 import { DEFAULT_SETTINGS, HomepageSettings, HomepageSettingTab } from "./settings";
 import { DEFAULT, MOBILE, Homepage, Kind } from "./homepage";
 
@@ -120,7 +120,9 @@ export default class HomepagePlugin extends Plugin {
 			this.addRibbonIcon(
 				"homepage", 
 				"Open homepage", 
-				e => this.homepage.open(e.button == 2)
+				e => this.homepage.open(
+					e.button == 2 || Keymap.isModifier(e, "Mod")
+				)
 			)
 			.setAttribute("id", "nv-homepage-icon");
 		}
