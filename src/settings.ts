@@ -313,6 +313,6 @@ export class HomepageSettingTab extends PluginSettingTab {
 		};
 		
 		await navigator.clipboard.writeText(JSON.stringify(info));
-		new Notice("Copied homepage debug information");
+		new Notice("Copied homepage debug information to clipboard");
 	}
 }

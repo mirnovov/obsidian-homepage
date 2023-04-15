@@ -111,7 +111,8 @@
 	float: right;
 	box-shadow: none !important;
 	background: none !important;
-	color: var(--text-faint);
+	color: var(--text-accent);
+	font-weight: 600;
 	cursor: pointer;
 }
 
