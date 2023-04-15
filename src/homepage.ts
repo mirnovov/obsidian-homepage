@@ -59,6 +59,11 @@ export class Homepage {
 		this.plugin = plugin;
 		this.app = plugin.app;
 		this.data = plugin.settings.homepages[name];
+		
+		if (!this.data.commands) {
+			this.data.commands = [];
+			this.save();
+		}
 	}
 	
 	async setReversion(value: boolean): Promise<void> {

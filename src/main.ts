@@ -100,6 +100,8 @@ export default class HomepagePlugin extends Plugin {
 				data.kind = Kind.File;
 			}
 			
+			data.commands = [];
+			
 			delete data.workspace;
 			delete data.momentFormat;
 			delete data.defaultNote;
