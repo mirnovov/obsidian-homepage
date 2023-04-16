@@ -105,7 +105,7 @@ export class Homepage {
 			return;
 		}
 		
-		workspacePlugin.loadWorkspace(this.computedValue);
+		workspacePlugin.loadWorkspace(this.data.value);
 	}
 	
 	async launchPage(mode: Mode) {

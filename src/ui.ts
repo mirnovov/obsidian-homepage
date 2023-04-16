@@ -45,7 +45,7 @@ export class FileSuggest extends TextInputSuggest<TFile> {
 
 export class WorkspaceSuggest extends TextInputSuggest<string> {
 	getSuggestions(inputStr: string): string[] {
-		const workspaces = Object.keys((this.app as any).plugins.workspaces?.instance.workspaces);
+		const workspaces = Object.keys((this.app as any).internalPlugins.plugins.workspaces?.instance.workspaces);
 		const inputLower = inputStr.toLowerCase();
 
 		return workspaces.filter((workspace: string) => workspace.toLowerCase().contains(inputLower));
