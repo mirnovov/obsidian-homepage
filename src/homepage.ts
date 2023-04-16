@@ -2,7 +2,7 @@ import { App, MarkdownView, Notice, View as OView, WorkspaceLeaf, moment } from 
 import HomepagePlugin from "./main";
 import { getDailynotesAutorun, randomFile, trimFile, untrimName } from "./utils";
 
-const LEAF_TYPES: string[] = ["markdown", "canvas", "kanban"];
+export const LEAF_TYPES: string[] = ["markdown", "canvas", "kanban"];
 
 export const DEFAULT: string = "Main Homepage";
 export const MOBILE: string = "Mobile Homepage";
