@@ -2,7 +2,7 @@ import { App, MarkdownView, Notice, View as OView, WorkspaceLeaf, moment } from 
 import HomepagePlugin from "./main";
 import { getDailynotesAutorun, randomFile, trimFile, untrimName } from "./utils";
 
-const LEAF_TYPES: string[] = ["markdown", "canvas", "kanban"];
+export const LEAF_TYPES: string[] = ["markdown", "canvas", "kanban"];
 
 export const DEFAULT: string = "Main Homepage";
 export const MOBILE: string = "Mobile Homepage";
@@ -252,9 +252,8 @@ export class Homepage {
 		const state = view.getState();
 		const config = (this.app.vault as any).config;
 		
-		console.log(state.mode, state.source);
-		state.mode = config.defaultViewMode;
-		state.source = !config.livePreview;
+		state.mode = config.defaultViewMode || "source";
+		state.source = !config.livePreview || false;
 		await view.leaf.setViewState({type: "markdown", state: state});
 		this.lastView = undefined;
 	}	

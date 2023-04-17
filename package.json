@@ -4,8 +4,9 @@
 	"description": "Opens a specified note upon launching Obsidian, instead of the most recent note.",
 	"main": "main.js",
 	"scripts": {
-		"dev": "node esbuild.config.mjs",
-		"build": "node esbuild.config.mjs production"
+		"dev": "node build.mjs",
+		"build": "node build.mjs production",
+		"test": "node build.mjs test"
 	},
 	"keywords": [],
 	"author": "novov",
@@ -19,6 +20,7 @@
 		"@jgoz/esbuild-plugin-typecheck": "^3.0.2",
 		"esbuild": "^0.17.0",
 		"esbuild-plugin-copy": "^2.1.1",
+		"opener": "^1.5.2",
 		"tslib": "^2.3.0",
 		"typescript": "^5.0"
 	}
