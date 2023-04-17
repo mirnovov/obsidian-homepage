@@ -1,8 +1,9 @@
-import { Mode } from "src/homepage";
+import { MarkdownView, TAbstractFile } from "obsidian";
+import { Kind, Mode, View } from "src/homepage";
 import HomepageTestPlugin from "./main";
 
 export default class HomepageTests {
-	async fileReplaceAll(this: HomepageTestPlugin) {
+	async replaceAll(this: HomepageTestPlugin) {
 		await this.app.workspace.openLinkText("Note A", "", false);
 		await this.app.workspace.openLinkText("Note B", "", true);
 		
@@ -10,15 +11,14 @@ export default class HomepageTests {
 		this.homepage.save();
 		
 		this.homepage.open();
-		await this.sleep(50);
+		await this.sleep(100);
 		
 		let file = this.app.workspace.getActiveFile();
 		let leaves = this.app.workspace.getLeavesOfType("markdown");
-		console.log(file, leaves);
-		this.assert(file?.name == "Home.md" && leaves.length == 1, "Homepage doesn't open");
+		this.assert(file?.name == "Home.md" && leaves.length == 1, file, leaves);
 	}
 	
-	async fileReplaceLast(this: HomepageTestPlugin) {
+	async replaceLast(this: HomepageTestPlugin) {
 		await this.app.workspace.openLinkText("Note A", "", false);
 		await this.app.workspace.openLinkText("Note B", "", true);
 		
@@ -26,14 +26,14 @@ export default class HomepageTests {
 		this.homepage.save();
 
 		this.homepage.open();
-		await this.sleep(50);
+		await this.sleep(100);
 		
 		let file = this.app.workspace.getActiveFile();
 		let leaves = this.app.workspace.getLeavesOfType("markdown");
-		this.assert(file?.name == "Home.md" && leaves.length == 2, "Homepage doesn't open");
+		this.assert(file?.name == "Home.md" && leaves.length == 2, file, leaves);
 	}
 	
-	async fileRetain(this: HomepageTestPlugin) {
+	async retain(this: HomepageTestPlugin) {
 		await this.app.workspace.openLinkText("Note A", "", false);
 		await this.app.workspace.openLinkText("Note B", "", true);
 		
@@ -41,10 +41,124 @@ export default class HomepageTests {
 		this.homepage.save();
 	
 		this.homepage.open();
-		await this.sleep(50);
+		await this.sleep(100);
 		
 		let file = this.app.workspace.getActiveFile();
 		let leaves = this.app.workspace.getLeavesOfType("markdown");
-		this.assert(file?.name == "Home.md" && leaves.length == 3, "Homepage doesn't open");
+		this.assert(file?.name == "Home.md" && leaves.length == 3, file, leaves);
 	}
+	
+	async isPinned(this: HomepageTestPlugin) {
+		this.homepage.data.pin = true;
+		this.homepage.save();
+	
+		this.homepage.open();
+		await this.sleep(100);
+		let leaf = this.app.workspace.getActiveViewOfType(MarkdownView)?.leaf;
+		
+		this.assert(leaf && leaf.getViewState().pinned as any, leaf);
+	}
+
+	async hasView(this: HomepageTestPlugin) {
+		this.homepage.data.view = View.Reading;
+		this.homepage.save();
+	
+		this.homepage.open();
+		await this.sleep(100);
+		let state = this.app.workspace.getActiveViewOfType(MarkdownView)?.getState();
+		
+		this.assert(state?.mode == "preview", state);
+		
+		this.homepage.data.view = View.Source;
+		this.homepage.save();
+		
+		this.homepage.open();
+		await this.sleep(100);
+		state = this.app.workspace.getActiveViewOfType(MarkdownView)?.getState();
+		
+		this.assert(state?.mode == "source" && state.source, state);
+	}
+	
+	async reversion(this: HomepageTestPlugin) {
+		this.homepage.data.view = View.Reading;
+		this.homepage.setReversion(this.homepage.data.revertView);
+		this.homepage.save();
+	
+		this.homepage.open();
+		await this.sleep(200);
+		let mode = this.app.workspace.getActiveViewOfType(MarkdownView)?.getMode();
+		this.assert(mode == "preview", mode);
+		
+		await this.app.workspace.openLinkText("Note B", "", false);
+		await this.sleep(200);
+		mode = this.app.workspace.getActiveViewOfType(MarkdownView)?.getMode();
+		this.assert(mode == "source", mode);
+	}
+	
+	async commands(this: HomepageTestPlugin) {
+		this.addCommand({
+			id: "nv-test-command",
+			name: "Test",
+			callback: () => (this as any).test = true
+		});
+		
+		this.homepage.data.commands = ["homepage:nv-test-command"];
+		this.homepage.save();
+	
+		this.homepage.open();
+		await this.sleep(100);
+		
+		this.assert((this as any).test, this);
+	}
+	
+	async autoCreate(this: HomepageTestPlugin) {
+		this.homepage.data.value = "temp";
+		this.homepage.save();
+
+		this.homepage.open();
+		await this.sleep(100);
+		
+		let file = this.app.workspace.getActiveFile();
+		this.assert(file?.name == "temp.md", file);
+		
+		this.app.vault.delete(file as TAbstractFile);
+		
+		this.homepage.data.autoCreate == false;
+		this.homepage.save();
+	
+		this.homepage.open();
+		await this.sleep(100);
+		
+		file = this.app.workspace.getActiveFile();
+		this.assert(file?.name != "temp.md", file);
+	}
+	
+	async workspaces(this: HomepageTestPlugin) {
+		await this.app.workspace.openLinkText("Note A", "", false);
+		
+		const bottom = this.app.workspace.getLeaf("split", "horizontal");
+		this.app.workspace.setActiveLeaf(bottom, { focus: true });
+		
+		await this.app.workspace.openLinkText("Note B", "", false);
+		this.internalPlugins.workspaces.instance.saveWorkspace("Home");
+		
+		this.app.workspace.iterateAllLeaves(l => l.detach());
+		this.homepage.data.kind = Kind.Workspace;
+		this.homepage.open();
+		await this.sleep(100);
+		
+		const split = (this.app.workspace.rootSplit as any).children[0];
+		const upper = split.children[0].children[0].view;
+		const lower = split.children[1].children[0].view;
+
+		this.assert(
+			split.direction == "horizontal" &&
+			upper.file.name == "Note A.md" && lower.file.name == "Note B.md",
+			split, upper, lower
+		);
+	}
+	
+	//async failure(this: HomepageTestPlugin) {
+	//	this.assert(false);
+	//}
 }

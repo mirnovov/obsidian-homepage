@@ -2,6 +2,7 @@ import { App, TFile } from "obsidian";
 import HomepagePlugin from "./main";
 
 export function trimFile(file: TFile): string {
+	if (!file) return "";
 	return file.extension == "md" ? file.path.slice(0, -3): file.path;
 }
 

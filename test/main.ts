@@ -1,4 +1,4 @@
-import { Modal } from "obsidian";
+import { ButtonComponent, Modal, getIcon } from "obsidian";
 import HomepagePlugin from "src/main";
 import { DEFAULT_DATA } from "src/settings";
 import HomepageTests from "./tests";
@@ -9,6 +9,42 @@ type Result = {
 	passed: boolean
 }
 
+const TEST_CSS = `
+	.nv-result {
+		border-top: 1px solid var(--hr-color);
+		padding: 4px 0;
+	}
+	
+	.nv-result .svg-icon, .nv-result-summary .svg-icon {
+		stroke: var(--color-green); 
+		stroke-width: 4px; 
+		width: 1em;
+		height: 1em;
+		vertical-align: text-bottom;
+	}
+	
+	.nv-result .svg-icon {
+		margin-right: 5px;
+	}
+	
+	.nv-result .lucide-x, .nv-result-summary .lucide-x {
+		stroke: var(--color-red);
+	}
+	
+	.nv-result code {
+		display: block;
+		color: var(--text-muted);
+		font-family: var(--font-monospace);
+		font-size: 0.8em;
+		padding: 3px 0 0;
+	}
+	
+	.nv-devtools {
+		float: right;
+		padding: 0;
+	}
+`;
+
 export default class HomepageTestPlugin extends HomepagePlugin {
 	async onload(): Promise<void> {
 		this.registerObsidianProtocolHandler("nv-testing-restart", async () => {
@@ -16,7 +52,6 @@ export default class HomepageTestPlugin extends HomepagePlugin {
 		});
 		
 		super.onload();
-		
 		this.app.workspace.onLayoutReady(async () => await this.runTests());
 	}
 	
@@ -26,28 +61,36 @@ export default class HomepageTestPlugin extends HomepagePlugin {
 		
 		for (const name of Object.getOwnPropertyNames(HomepageTests.prototype)) {
 			if (name == "constructor") continue;
-			
+			const result = { name: name, error: null, passed: true };
+
 			//reset state
-			this.homepage.data = DEFAULT_DATA;
+			this.homepage.data = { ...DEFAULT_DATA };
 			this.homepage.save();
 			this.app.workspace.iterateAllLeaves(l => l.detach());
-			await this.sleep(70);
+			await this.sleep(50);
 						
 			try {
 				await (tests as any)[name].call(this);
-				results.push({name: name, error: null, passed: true})
 			}
 			catch (e: any) {
-				results.push({name: name, error: e, passed: false})
+				if (!(e instanceof TestAssertionError)) console.error(e);
+				result.error = e;
+				result.passed = false;
 			}
+			
+			results.push(result);
 		}
 		
 		const modal = new TestResultModal(this, results);
 		modal.open();
 	}
 	
-	assert(cond: boolean, string = "") {
-		if (!cond) throw new Error(string);
+	assert(cond: boolean, ...args: any[]) {
+		if (!cond) {
+			const e = new TestAssertionError(args.toString());
+			console.error("Assertion failed: ", args.length ? args : null);
+			throw e;
+		}
 	}
 	
 	sleep(ms: number) {
@@ -68,27 +111,50 @@ class TestResultModal extends Modal {
 	async onOpen() {
 		let success = 0, failure = 0;
 		
+		this.contentEl.createEl("style", { text: TEST_CSS });
+		
 		for (const result of this.results) {
+			const div = this.contentEl.createDiv("nv-result");
+			div.append(
+				getIcon(result.passed ? "check" : "cross") as any, 
+				result.name
+			);
+			
 			if (result.passed) {
-				this.contentEl.createDiv({ 
-					text: `✅ ${result.name} succeeded` 
-				});
 				success += 1;
 			}
 			else {
-				const div = this.contentEl.createDiv({
-					text: `❌ ${result.name} failed: `
-				});
-				div.createEl("br");
 				div.createEl("code", { text: `${result.error}` });
 				failure += 1;
 			}
-			
-			this.titleEl.innerHTML = `✅ ${success} Passed &nbsp;&nbsp; ❌ ${failure} Failed`;
 		}
+		
+		this.titleEl.classList.add("nv-result-summary");
+		this.titleEl.append(
+			getIcon("check") as any, 
+			` ${success} Passed\xa0\xa0\xa0`,
+			getIcon("cross") as any,
+			` ${failure} Failed`
+		);
+		
+		new ButtonComponent(this.contentEl)
+			.setIcon("terminal-square")
+			.setClass("clickable-icon")
+			.setClass("nv-devtools")
+			.onClick(() => {
+				const ew = (window as any).electronWindow;
+				!ew.isDevToolsOpened() ? ew.openDevTools() : ew.closeDevTools();
+			})
 	}
 	
 	onClose() {
 		this.contentEl.empty();
+	}
+}
+
+class TestAssertionError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = "TestAssertionError";
 	}
 }

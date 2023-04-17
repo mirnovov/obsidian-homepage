@@ -10,7 +10,12 @@ package-lock.json
 
 # build
 out
-test/vault/.obsidian/plugins/homepage
 
 # obsidian
 data.json
+
+# testing
+test/vault/.obsidian/plugins/homepage/*
+test/vault/.obsidian/workspace.json
+test/vault/.obsidian/workspaces.json
+test/vault/.obsidian/app.json
