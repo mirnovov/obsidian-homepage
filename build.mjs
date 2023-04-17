@@ -16,8 +16,8 @@ switch (process.argv[2]) {
 		break;
 	case "test":
 		mode = "test";
-		outPath = "./test/vault/.obsidian/plugins/homepage/main.js";
-		inPath = "test/harness.ts";
+		outPath = "./tests/vault/.obsidian/plugins/homepage/main.js";
+		inPath = "./tests/harness.ts";
 		break;
 	default:
 		mode = "dev";
@@ -68,7 +68,7 @@ if (mode == "test") {
 	opener("obsidian://nv-testing-restart");
 	
 	setTimeout(() => {
-		const path = encodeURI(resolve("./test/vault"))
+		const path = encodeURI(resolve("./tests/vault"))
 		opener(`obsidian://open?path=${path}`)
 	}, 500);
 }

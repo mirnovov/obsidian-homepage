@@ -15,7 +15,7 @@ out
 data.json
 
 # testing
-test/vault/.obsidian/plugins/homepage/*
-test/vault/.obsidian/workspace.json
-test/vault/.obsidian/workspaces.json
-test/vault/.obsidian/app.json
+tests/vault/.obsidian/plugins/homepage/*
+tests/vault/.obsidian/workspace.json
+tests/vault/.obsidian/workspaces.json
+tests/vault/.obsidian/app.json
