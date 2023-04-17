@@ -40,7 +40,7 @@ plugins = [
 ];
 
 if (mode == "prod") plugins.push(typecheckPlugin());
-if (!fs.existsSync(outDir)) fs.mkdirSync(outDir);
+if (!fs.existsSync(outDir)) fs.mkdirSync(outDir, { recursive: true });
 
 const context = await esbuild.context({
 	entryPoints: [inPath],
