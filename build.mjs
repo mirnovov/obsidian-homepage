@@ -17,7 +17,7 @@ switch (process.argv[2]) {
 	case "test":
 		mode = "test";
 		outPath = "./test/vault/.obsidian/plugins/homepage/main.js";
-		inPath = "test/main.ts";
+		inPath = "test/harness.ts";
 		break;
 	default:
 		mode = "dev";

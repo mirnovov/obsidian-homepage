@@ -10,12 +10,25 @@ type Result = {
 }
 
 const TEST_CSS = `
-	.nv-result {
+	.nv-modal {
+		overflow: hidden;
+	}
+	
+	.nv-results {
+		overflow: scroll;
+		max-height: 70vh;
+	}
+	
+	.nv-results div {
 		border-top: 1px solid var(--hr-color);
 		padding: 4px 0;
 	}
 	
-	.nv-result .svg-icon, .nv-result-summary .svg-icon {
+	.nv-results div:first-child {
+		border-top: none;
+	}
+	
+	.nv-results .svg-icon, .nv-result-summary .svg-icon {
 		stroke: var(--color-green); 
 		stroke-width: 4px; 
 		width: 1em;
@@ -23,15 +36,15 @@ const TEST_CSS = `
 		vertical-align: text-bottom;
 	}
 	
-	.nv-result .svg-icon {
+	.nv-results .svg-icon {
 		margin-right: 5px;
 	}
 	
-	.nv-result .lucide-x, .nv-result-summary .lucide-x {
+	.nv-results .lucide-x, .nv-result-summary .lucide-x {
 		stroke: var(--color-red);
 	}
 	
-	.nv-result code {
+	.nv-results code {
 		display: block;
 		color: var(--text-muted);
 		font-family: var(--font-monospace);
@@ -40,8 +53,9 @@ const TEST_CSS = `
 	}
 	
 	.nv-devtools {
-		float: right;
+		align-self: flex-end;
 		padding: 0;
+		margin: 5px 0 0;
 	}
 `;
 
@@ -109,13 +123,15 @@ class TestResultModal extends Modal {
 	}
 	
 	async onOpen() {
+		this.modalEl.addClass("nv-modal");		
+		this.modalEl.createEl("style", { text: TEST_CSS });
 		let success = 0, failure = 0;
 		
-		this.contentEl.createEl("style", { text: TEST_CSS });
+		this.contentEl.addClass("nv-results");
 		
 		for (const result of this.results) {
-			const div = this.contentEl.createDiv("nv-result");
-			div.append(
+			const row = this.contentEl.createDiv();
+			row.append(
 				getIcon(result.passed ? "check" : "cross") as any, 
 				result.name
 			);
@@ -124,7 +140,7 @@ class TestResultModal extends Modal {
 				success += 1;
 			}
 			else {
-				div.createEl("code", { text: `${result.error}` });
+				row.createEl("code", { text: `${result.error}` });
 				failure += 1;
 			}
 		}
@@ -137,7 +153,7 @@ class TestResultModal extends Modal {
 			` ${failure} Failed`
 		);
 		
-		new ButtonComponent(this.contentEl)
+		new ButtonComponent(this.modalEl)
 			.setIcon("terminal-square")
 			.setClass("clickable-icon")
 			.setClass("nv-devtools")

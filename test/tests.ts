@@ -1,6 +1,7 @@
 import { MarkdownView, TAbstractFile } from "obsidian";
 import { Kind, Mode, View } from "src/homepage";
-import HomepageTestPlugin from "./main";
+import { HomepageSettings, DEFAULT_SETTINGS } from "src/settings";
+import HomepageTestPlugin from "./harness";
 
 export default class HomepageTests {
 	async replaceAll(this: HomepageTestPlugin) {
@@ -133,6 +134,20 @@ export default class HomepageTests {
 		this.assert(file?.name != "temp.md", file);
 	}
 	
+	async autoScroll(this: HomepageTestPlugin) {
+		this.homepage.data.autoScroll = true;
+		this.homepage.save();
+		
+		this.homepage.open();
+		await this.sleep(100);
+		
+		const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+		const count = (view as any).editor.lineCount() - 1;
+		const pos = (view as any).editor.getCursor().line;
+
+		this.assert(count == pos, view, count, pos);
+	}
+	
 	async workspaces(this: HomepageTestPlugin) {
 		await this.app.workspace.openLinkText("Note A", "", false);
 		
@@ -158,7 +173,86 @@ export default class HomepageTests {
 		);
 	}
 	
-	//async failure(this: HomepageTestPlugin) {
-	//	this.assert(false);
-	//}
+	async random(this: HomepageTestPlugin) {
+		this.homepage.data.kind = Kind.Random;
+		this.homepage.save();
+		
+		//check that the files are different at least 1/10 times
+		let name = null, newname;
+		
+		for (let i = 0; i < 10; i++) {
+			this.homepage.open();
+			await this.sleep(70);
+			newname = this.app.workspace.getActiveFile()?.name;
+			
+			if (i > 0 && newname !== name) return;
+			name = newname;
+		}
+		this.assert(false);
+	}
+	
+	async dailyNote(this: HomepageTestPlugin) {
+		this.homepage.data.kind = Kind.DailyNote;
+		this.homepage.save();
+
+		this.homepage.open();
+		await this.sleep(100);
+		
+		const dailyNote = await this.internalPlugins["daily-notes"].instance.getDailyNote();
+		const file = this.app.workspace.getActiveFile();
+		
+		this.assert(file?.name == dailyNote.name, file, dailyNote);
+		this.app.vault.delete(dailyNote);
+	}
+	
+	async loadEmptySettings(this: HomepageTestPlugin) {
+		this.settings = {} as HomepageSettings;
+		this.saveSettings();
+		this.settings = await this.loadSettings();
+		this.homepage = this.getHomepage();
+		
+		const actual = JSON.stringify(this.settings);
+		const expected = JSON.stringify(DEFAULT_SETTINGS);
+
+		this.assert(actual == expected);
+	}
+	
+	async upgradeSettings(this: HomepageTestPlugin) {
+		this.settings = {
+			version: 2,
+			defaultNote: "Home",
+			useMoment: false,
+			momentFormat: "YYYY-MM-DD",
+			workspace: "Default",
+			workspaceEnabled: true,
+			openOnStartup: true,
+			hasRibbonIcon: true,
+			openMode: Mode.ReplaceAll,
+			manualOpenMode: Mode.Retain,
+			view: View.Default,
+			revertView: true,
+			refreshDataview: false,
+			autoCreate: true,
+			autoScroll: false,
+			pin: false
+		} as any;
+		
+		this.saveSettings();
+		this.settings = await this.loadSettings();
+		this.homepage = this.getHomepage();
+		
+		this.assert(
+			this.homepage.data.commands.length == 0 &&
+			this.homepage.data.value == "Default" &&
+			this.homepage.data.kind == Kind.Workspace
+		);
+		
+		//check that the settings tab isn't broken upon upgrade
+		const { setting } = (this.app as any);
+		
+		setting.open();
+		setting.openTabById("homepage");
+		this.assert(document.getElementsByClassName("nv-debug-button").length > 0);
+		setting.close();
+	}
 }
