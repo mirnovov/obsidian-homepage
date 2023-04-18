@@ -123,7 +123,8 @@ export default class HomepagePlugin extends Plugin {
 				"homepage", 
 				"Open homepage", 
 				e => this.homepage.open(
-					e.button == 2 || Keymap.isModifier(e, "Mod")
+					e.button == 1 || e.button == 2 || Keymap.isModifier(e, "Mod")
+					//right click, middle click, or ctrl/cmd
 				)
 			)
 			.setAttribute("id", "nv-homepage-icon");
