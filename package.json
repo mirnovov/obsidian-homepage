@@ -1,7 +1,7 @@
 {
 	"name": "obsidian-homepage",
 	"version": "3.0.2",
-	"description": "Opens a specified note upon launching Obsidian, instead of the most recent note.",
+	"description": "Open a specified note, canvas, or workspace upon launching Obsidian, or set it for quick access later.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node build.mjs",
