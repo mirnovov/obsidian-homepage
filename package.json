@@ -22,6 +22,32 @@
 		"esbuild-plugin-copy": "^2.1.1",
 		"opener": "^1.5.2",
 		"tslib": "^2.3.0",
-		"typescript": "^5.0"
+		"typescript": "^5.0",
+		"@typescript-eslint/eslint-plugin": "^5.2.0",
+		"@typescript-eslint/parser": "^5.2.0"
+	},
+	"eslintConfig": {
+		"root": true,
+		"parser": "@typescript-eslint/parser",
+		"env": { "node": true },
+		"plugins": ["@typescript-eslint"],
+		"extends": [
+			"eslint:recommended",
+			"plugin:@typescript-eslint/eslint-recommended",
+			"plugin:@typescript-eslint/recommended"
+		], 
+		"parserOptions": { "sourceType": "module" },
+		"rules": {
+			"no-case-declarations": "off",
+			"no-unused-vars": "off",
+			"@typescript-eslint/ban-ts-comment": "off",
+			"@typescript-eslint/no-empty-function": "off",
+			"@typescript-eslint/no-explicit-any": "off",
+			"@typescript-eslint/no-inferrable-types": "off",
+			"@typescript-eslint/no-not-null-assertions": "off",
+			"@typescript-eslint/no-unused-vars": [
+				"error", { "args": "none" }
+			]
+		} 
 	}
 }

@@ -92,13 +92,13 @@ export class Homepage {
 		
 		if (!this.data.commands) return;
 				
-		for (let command of this.data.commands) {
+		for (const command of this.data.commands) {
 			(this.app as any).commands.executeCommandById(command);
 		}
 	}
 	
 	async launchWorkspace() {
-		let workspacePlugin = this.plugin.internalPlugins.workspaces?.instance;
+		const workspacePlugin = this.plugin.internalPlugins.workspaces?.instance;
 		
 		if(!(this.data.value in workspacePlugin.workspaces)) {
 			new Notice(`Cannot find the workspace "${this.data.value}" to use as the homepage.`);
@@ -154,7 +154,7 @@ export class Homepage {
 	}
 		
 	async isNonextant(): Promise<boolean> {
-		let name = untrimName(this.computedValue);
+		const name = untrimName(this.computedValue);
 		return !(await this.app.vault.adapter.exists(name));
 	} 
 	
@@ -210,7 +210,7 @@ export class Homepage {
 	}
 	
 	getOpened(): WorkspaceLeaf[] {
-		let leaves = LEAF_TYPES.flatMap(i => this.app.workspace.getLeavesOfType(i));
+		const leaves = LEAF_TYPES.flatMap(i => this.app.workspace.getLeavesOfType(i));
 		return leaves.filter(
 			leaf => trimFile((leaf.view as any).file) == this.computedValue
 		);

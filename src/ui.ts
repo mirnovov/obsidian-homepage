@@ -34,7 +34,7 @@ export class FileSuggest extends TextInputSuggest<TFile> {
 				`<div class="nav-file-tag" style="display:inline-block;vertical-align:middle">canvas</div>`
 			);
 		}
-	 }
+	}
 
 	selectSuggestion(file: TFile) {
 		this.inputEl.value = trimFile(file);
@@ -74,15 +74,15 @@ export class CommandSuggestModal extends FuzzySuggestModal<Object> {
 		this.tab = tab;
 	}
 
-	getItems(): Object[] {
+	getItems(): object[] {
 		return Object.values((this.app as any).commands.commands);
 	}
 
-	getItemText(item: Object): string {
+	getItemText(item: object): string {
 		return (item as any).name;
 	}
 
-	onChooseItem(item: Object) {
+	onChooseItem(item: object) {
 		if ((item as any).id === "homepage:open-homepage") {
 			new Notice("Really?");
 			return;

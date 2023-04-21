@@ -70,7 +70,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		const mainSetting = new Setting(this.containerEl)
 			.setName("Homepage")
 			.addDropdown(async dropdown => {
-				for (let key of Object.values(Kind)) {
+				for (const key of Object.values(Kind)) {
 					if (!this.plugin.hasRequiredPlugin(key)) continue;
 					dropdown.addOption(key, key);
 				}
@@ -179,7 +179,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		this.updateCommandBox();
 		
 		this.addHeading("Vault environment");
-		let openingSetting = this.addDropdown(
+		const openingSetting = this.addDropdown(
 			"Opening method", "Determine how extant tabs and panes are affected on startup.", 
 			"openMode",
 			Mode
@@ -239,7 +239,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		const dropdown = new Setting(this.containerEl)
 			.setName(name).setDesc(desc)
 			.addDropdown(async dropdown => {
-				for (let key of Object.values(source)) {
+				for (const key of Object.values(source)) {
 					dropdown.addOption(key, key);
 				}
 				dropdown.setValue(this.plugin.homepage.data[setting]);

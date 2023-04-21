@@ -14,8 +14,8 @@ export default class HomepageTests {
 		this.homepage.open();
 		await this.sleep(100);
 		
-		let file = this.app.workspace.getActiveFile();
-		let leaves = this.app.workspace.getLeavesOfType("markdown");
+		const file = this.app.workspace.getActiveFile();
+		const leaves = this.app.workspace.getLeavesOfType("markdown");
 		this.assert(file?.name == "Home.md" && leaves.length == 1, file, leaves);
 	}
 	
@@ -29,8 +29,8 @@ export default class HomepageTests {
 		this.homepage.open();
 		await this.sleep(100);
 		
-		let file = this.app.workspace.getActiveFile();
-		let leaves = this.app.workspace.getLeavesOfType("markdown");
+		const file = this.app.workspace.getActiveFile();
+		const leaves = this.app.workspace.getLeavesOfType("markdown");
 		this.assert(file?.name == "Home.md" && leaves.length == 2, file, leaves);
 	}
 	
@@ -44,8 +44,8 @@ export default class HomepageTests {
 		this.homepage.open();
 		await this.sleep(100);
 		
-		let file = this.app.workspace.getActiveFile();
-		let leaves = this.app.workspace.getLeavesOfType("markdown");
+		const file = this.app.workspace.getActiveFile();
+		const leaves = this.app.workspace.getLeavesOfType("markdown");
 		this.assert(file?.name == "Home.md" && leaves.length == 3, file, leaves);
 	}
 	
@@ -55,7 +55,7 @@ export default class HomepageTests {
 	
 		this.homepage.open();
 		await this.sleep(100);
-		let leaf = this.app.workspace.getActiveViewOfType(MarkdownView)?.leaf;
+		const leaf = this.app.workspace.getActiveViewOfType(MarkdownView)?.leaf;
 		
 		this.assert(leaf && leaf.getViewState().pinned as any, leaf);
 	}

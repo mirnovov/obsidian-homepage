@@ -15,7 +15,7 @@ export default class HomepagePlugin extends Plugin {
 	homepage: Homepage;
 	
 	async onload(): Promise<void> {
-		let activeInitially = document.body.querySelector(".progress-bar") !== null;
+		const activeInitially = document.body.querySelector(".progress-bar") !== null;
 		
 		this.settings = await this.loadSettings();
 		this.internalPlugins = (this.app as any).internalPlugins.plugins;
@@ -23,7 +23,7 @@ export default class HomepagePlugin extends Plugin {
 		this.homepage = this.getHomepage();
 		
 		this.app.workspace.onLayoutReady(async () => {
-			let ntp = this.communityPlugins["new-tab-default-page"];
+			const ntp = this.communityPlugins["new-tab-default-page"];
 
 			if (ntp) {
 				ntp._checkForNewTab = ntp.checkForNewTab;
@@ -56,7 +56,7 @@ export default class HomepagePlugin extends Plugin {
 	}
 	
 	async onunload(): Promise<void> {
-		let ntp = this.communityPlugins["new-tab-default-page"];
+		const ntp = this.communityPlugins["new-tab-default-page"];
 		if (!ntp) return;
 		ntp.checkForNewTab = ntp._checkForNewTab;
 	}
@@ -73,19 +73,19 @@ export default class HomepagePlugin extends Plugin {
 	}
 	
 	async loadSettings(): Promise<HomepageSettings> {
-		let settingsData: any = await this.loadData();
+		const settingsData: any = await this.loadData();
 		
 		if (!settingsData || settingsData.version !== 2) {
 			return Object.assign({}, DEFAULT_SETTINGS, settingsData);
 		}
 		else {
-			let settings: HomepageSettings = {
+			const settings: HomepageSettings = {
 				version: 3,
 				homepages: {},
 				separateMobile: false
 			}
 			
-			let data = settingsData;
+			const data = settingsData;
 			
 			if (settingsData.workspaceEnabled) {
 				data.value = data.workspace;

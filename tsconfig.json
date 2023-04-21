@@ -12,6 +12,8 @@
 		"strict": true,
 		"strictPropertyInitialization": false,
 		"skipLibCheck": true,
+		"isolatedModules": true,
+		"noFallthroughCasesInSwitch": true,
 		"lib": [
 			"dom",
 			"es5",
