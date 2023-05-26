@@ -176,7 +176,7 @@ export class Homepage {
 		
 		const state = view.getState();
 		
-		if (this.data.revertView && this.plugin.loaded) {
+		if (this.data.revertView) {
 			this.lastView = new WeakRef(view);
 		}
 	
@@ -248,7 +248,7 @@ export class Homepage {
 	}
 	
 	revertView = async (): Promise<void> => {
-		if (!this.plugin.loaded || this.lastView == undefined) return;
+		if (this.lastView == undefined) return;
 		
 		const view = this.lastView.deref();
 		if (!view || trimFile(view.file) == this.computedValue) return;
