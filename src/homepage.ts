@@ -249,12 +249,17 @@ export class Homepage {
 		const view = this.lastView.deref();
 		if (!view || trimFile(view.file) == this.computedValue) return;
 	
-		const state = view.getState();
-		const config = (this.app.vault as any).config;
+		const state = view.getState(),
+			  config = (this.app.vault as any).config,
+			  mode = config.defaultViewMode || "source",
+			  source = !config.livePreview || false;
 		
-		state.mode = config.defaultViewMode || "source";
-		state.source = !config.livePreview || false;
-		await view.leaf.setViewState({type: "markdown", state: state});
+		if (mode != state.mode || source != state.source) {
+			state.mode = mode;
+			state.source = source;
+			await view.leaf.setViewState({type: "markdown", state: state, active: true });
+		}
+		
 		this.lastView = undefined;
 	}	
 }
