@@ -1,6 +1,6 @@
 import { App, MarkdownView, Notice, View as OView, WorkspaceLeaf, moment } from "obsidian";
 import HomepagePlugin from "./main";
-import { getDailynotesAutorun, randomFile, trimFile, untrimName } from "./utils";
+import { getDailynotesAutorun, emptyActiveView, randomFile, trimFile, untrimName } from "./utils";
 
 export const LEAF_TYPES: string[] = ["markdown", "canvas", "kanban"];
 
@@ -127,6 +127,10 @@ export class Homepage {
 				this.app.workspace.setActiveLeaf(alreadyOpened[0]);
 				await this.configure();
 				return;
+			}
+			else if (mode == Mode.Retain && emptyActiveView(this.app)) {
+				//if there is an empty tab, don't keep it
+				mode = Mode.ReplaceLast;
 			}
 		}
 		else {

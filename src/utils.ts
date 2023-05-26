@@ -1,4 +1,4 @@
-import { App, TFile } from "obsidian";
+import { App, TFile, View as OView } from "obsidian";
 import HomepagePlugin from "./main";
 
 export function trimFile(file: TFile): string {
@@ -30,5 +30,9 @@ export function randomFile(app: App): string | undefined {
 	}
 
 	return undefined;
+}
+
+export function emptyActiveView(app: App): boolean {
+	return app.workspace.getActiveViewOfType(OView)?.getViewType() == "empty";
 }
 
