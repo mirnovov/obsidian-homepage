@@ -41,12 +41,14 @@ export enum View {
 export enum Kind {
 	File = "File",
 	Workspace = "Workspace",
-	MomentDate = "Date-dependent file",
 	Random = "Random file",
 	DailyNote = "Daily Note",
 	WeeklyNote = "Weekly Note",
 	MonthlyNote = "Monthly Note",
-	YearlyNote = "Yearly Note"
+	YearlyNote = "Yearly Note",
+	
+	//deprecated, will be removed in 4.0
+	MomentDate = "Date-dependent file"
 }
 
 export class Homepage {

@@ -72,7 +72,11 @@ export class HomepageSettingTab extends PluginSettingTab {
 			.addDropdown(async dropdown => {
 				for (const key of Object.values(Kind)) {
 					if (!this.plugin.hasRequiredPlugin(key)) continue;
-					dropdown.addOption(key, key);
+					
+					let desc = key as string;
+					if (key == Kind.MomentDate) desc = "Moment (legacy)";
+					
+					dropdown.addOption(key, desc);
 				}
 				dropdown.setValue(this.plugin.homepage.data.kind);
 				dropdown.onChange(async option => {
@@ -94,7 +98,8 @@ export class HomepageSettingTab extends PluginSettingTab {
 				break;
 			case Kind.MomentDate:
 				descContainer.innerHTML = 
-				`Enter a note or canvas to use based on <a href="https://momentjs.com/docs/#/displaying/format/" target="_blank" rel="noopener">Moment date formatting</a>.<small>This is separate from Daily or Periodic Notes, but can be set so it corresponds to the same files. Surround words in <code>[brackets]</code> to include them unmodified.
+				`<span class="mod-warning">This type is deprecated and will eventually be removed. Use Daily/Weekly/Monthly/Yearly Note instead, which works natively with Daily and Periodic Notes.</span><br>
+				Enter a note or canvas to use based on <a href="https://momentjs.com/docs/#/displaying/format/" target="_blank" rel="noopener">Moment date formatting</a>.<small> Surround words in <code>[brackets]</code> to include them unmodified.
 				<br> Currently, your specification will produce: </small>`;
 				break;
 			case Kind.Random:
