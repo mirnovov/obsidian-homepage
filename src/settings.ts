@@ -210,8 +210,12 @@ export class HomepageSettingTab extends PluginSettingTab {
 			"manualOpenMode",
 			Mode
 		);
-		this.addToggle("Auto-create", "If the homepage doesn't exist, create a note with the specified name.", "autoCreate");
-		this.addToggle("Pin", "Pin the homepage when opening.", "pin");
+		const autoCreateSetting = this.addToggle(
+			"Auto-create", "If the homepage doesn't exist, create a note with the specified name.", "autoCreate"
+		);
+		this.addToggle(
+			"Pin", "Pin the homepage when opening.", "pin"
+		);
 		
 		this.addHeading("Pane");
 		this.addDropdown(
@@ -243,6 +247,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		
 		if (hasWorkspaces) this.workspaceHidden.forEach(this.disableSetting);
 		if (!this.plugin.homepage.data.openOnStartup || autorun) this.disableSetting(openingSetting.settingEl);
+		if (PERIODIC_KINDS.includes(this.plugin.homepage.data.kind as Kind)) this.disableSetting(autoCreateSetting.settingEl);
 	}
 	
 	disableSetting(setting: Element): void {
