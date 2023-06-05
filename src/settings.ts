@@ -60,6 +60,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 	display(): void {
 		const hasWorkspaces = this.plugin.homepage.data.kind == Kind.Workspace;
 		const autorun = getAutorun(this.plugin);
+		let pluginDisabled = false;
 		
 		const descContainer = document.createElement("article");
 		const suggestor = hasWorkspaces ? WorkspaceSuggest : FileSuggest;
@@ -71,7 +72,10 @@ export class HomepageSettingTab extends PluginSettingTab {
 			.setName("Homepage")
 			.addDropdown(async dropdown => {
 				for (const key of Object.values(Kind)) {
-					if (!this.plugin.hasRequiredPlugin(key)) continue;
+					if (!this.plugin.hasRequiredPlugin(key)) {
+						if (key == this.plugin.homepage.data.kind) pluginDisabled = true;
+						else continue;
+					}
 					
 					let desc = key as string;
 					if (key == Kind.MomentDate) desc = "Moment (legacy)";
@@ -113,6 +117,13 @@ export class HomepageSettingTab extends PluginSettingTab {
 			case Kind.YearlyNote:
 				descContainer.innerHTML = `Your Periodic ${this.plugin.homepage.data.kind} will be used.`;
 				break;
+		}
+		
+		if (pluginDisabled) {
+			descContainer.createDiv({
+				text: `The plugin required for this homepage type isn't available.`, 
+				attr: {class: "mod-warning"}
+			});
 		}
 		
 		if (this.plugin.homepage.data.kind == Kind.MomentDate) {
