@@ -1,6 +1,7 @@
 import { Keymap, Platform, Plugin, addIcon } from "obsidian";
-import { DEFAULT_SETTINGS, HomepageSettings, HomepageSettingTab } from "./settings";
 import { DEFAULT, MOBILE, Homepage, Kind } from "./homepage";
+import { hasRequiredPeriodicity } from "./periodic";
+import { DEFAULT_SETTINGS, HomepageSettings, HomepageSettingTab } from "./settings";
 
 const ICON: string = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5"><path d="M10.025 21H6v-7H3v-1.5L12 3l9 9.5V14h-3v7h-4v-7h-3.975v7Z" style="fill:none;stroke:currentColor;stroke-width:2px"/></svg>`
 
@@ -49,7 +50,7 @@ export default class HomepagePlugin extends Plugin {
 		});
 
 		console.log(
-			`Homepage: ${this.homepage.computeValue()} `+
+			`Homepage: ${this.homepage.data.value} `+
 			`(method: ${this.homepage.data.openMode}, view: ${this.homepage.data.view}, `+
 			`kind: ${this.homepage.data.kind})`
 		);
@@ -136,10 +137,13 @@ export default class HomepagePlugin extends Plugin {
 	
 	hasRequiredPlugin(kind: Kind): boolean {
 		switch (kind) {
-			case Kind.DailyNote:
-				return this.internalPlugins["daily-notes"]?.enabled;
 			case Kind.Workspace:
 				return this.internalPlugins["workspaces"]?.enabled;
+			case Kind.DailyNote:
+			case Kind.WeeklyNote:
+			case Kind.MonthlyNote:
+			case Kind.YearlyNote:
+				return hasRequiredPeriodicity(this, kind);
 			default:
 				return true;
 		}

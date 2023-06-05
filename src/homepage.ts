@@ -1,6 +1,7 @@
 import { App, MarkdownView, Notice, View as OView, WorkspaceLeaf, moment } from "obsidian";
 import HomepagePlugin from "./main";
-import { getDailynotesAutorun, emptyActiveView, randomFile, trimFile, untrimName } from "./utils";
+import { getAutorun, getPeriodicNote } from "./periodic";
+import { emptyActiveView, randomFile, trimFile, untrimName } from "./utils";
 
 export const LEAF_TYPES: string[] = ["markdown", "canvas", "kanban"];
 
@@ -42,7 +43,10 @@ export enum Kind {
 	Workspace = "Workspace",
 	MomentDate = "Date-dependent file",
 	Random = "Random file",
-	DailyNote = "Daily Note"
+	DailyNote = "Daily Note",
+	WeeklyNote = "Weekly Note",
+	MonthlyNote = "Monthly Note",
+	YearlyNote = "Yearly Note"
 }
 
 export class Homepage {
@@ -109,10 +113,10 @@ export class Homepage {
 	}
 	
 	async launchPage(mode: Mode) {
-		this.computedValue = this.computeValue();
+		this.computedValue = await this.computeValue();
 		this.plugin.executing = true;
 		
-		if (getDailynotesAutorun(this.plugin) && !this.plugin.loaded) {
+		if (getAutorun(this.plugin) && !this.plugin.loaded) {
 			return;
 		}
 		else if (!this.data.autoCreate && await this.isNonextant()) {
@@ -220,9 +224,8 @@ export class Homepage {
 		);
 	}
 	
-	computeValue(): string {
+	async computeValue(): Promise<string> {
 		let val = this.data.value;
-		let dailyNotes, format;
 	
 		switch (this.data.kind) {
 			case Kind.MomentDate:
@@ -233,9 +236,10 @@ export class Homepage {
 				if (file) val = file;
 				break;
 			case Kind.DailyNote:
-				dailyNotes = this.plugin.internalPlugins["daily-notes"];
-				format = dailyNotes.instance.options.format;
-				val = moment().format(format || "YYYY-MM-DD");
+			case Kind.WeeklyNote:
+			case Kind.MonthlyNote:
+			case Kind.YearlyNote:
+				val = await getPeriodicNote(this.data.kind);
 				break;
 		}
 	

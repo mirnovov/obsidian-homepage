@@ -1,8 +1,8 @@
 import { App, ButtonComponent, Notice, Platform, PluginSettingTab, Setting, normalizePath } from "obsidian";
 import HomepagePlugin from "./main";
 import { DEFAULT, HomepageData, Kind, Mode, View } from "./homepage";
+import { PERIODIC_KINDS, getAutorun } from "./periodic";
 import { CommandSuggestModal, FileSuggest, WorkspaceSuggest } from "./ui";
-import { getDailynotesAutorun } from "./utils";
 
 type HomepageObject = { [key: string]: HomepageData }
 
@@ -35,7 +35,7 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
 }
 
 export const DEFAULT_DATA: HomepageData = DEFAULT_SETTINGS.homepages[DEFAULT];
-const UNCHANGEABLE: Kind[] = [Kind.Random, Kind.DailyNote];
+const UNCHANGEABLE: Kind[] = [Kind.Random, Kind.DailyNote, ...PERIODIC_KINDS];
 
 export class HomepageSettingTab extends PluginSettingTab {
 	plugin: HomepagePlugin;
@@ -59,7 +59,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 	
 	display(): void {
 		const hasWorkspaces = this.plugin.homepage.data.kind == Kind.Workspace;
-		const dailynotesAutorun = getDailynotesAutorun(this.plugin);
+		const autorun = getAutorun(this.plugin);
 		
 		const descContainer = document.createElement("article");
 		const suggestor = hasWorkspaces ? WorkspaceSuggest : FileSuggest;
@@ -101,7 +101,12 @@ export class HomepageSettingTab extends PluginSettingTab {
 				descContainer.innerHTML = `A random note or canvas from your Obsidian folder will be selected.`;
 				break;
 			case Kind.DailyNote:
-				descContainer.innerHTML = `Your Daily Note will be used.`;
+				descContainer.innerHTML = `Your Daily Note or Periodic Daily Note will be used.`;
+				break;
+			case Kind.WeeklyNote:
+			case Kind.MonthlyNote:
+			case Kind.YearlyNote:
+				descContainer.innerHTML = `Your Periodic ${this.plugin.homepage.data.kind} will be used.`;
 				break;
 		}
 		
@@ -142,7 +147,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 			true
 		);
 		
-		if (dailynotesAutorun) {
+		if (autorun) {
 			startupSetting.descEl.createDiv({
 				text: `This setting has been disabled, as it isn't compatible with Daily Notes' "Open daily note on startup" functionality. To use it, disable the Daily Notes setting.`, 
 				attr: {class: "mod-warning"}
@@ -221,7 +226,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		}
 		
 		if (hasWorkspaces) this.workspaceHidden.forEach(this.disableSetting);
-		if (!this.plugin.homepage.data.openOnStartup || dailynotesAutorun) this.disableSetting(openingSetting.settingEl);
+		if (!this.plugin.homepage.data.openOnStartup || autorun) this.disableSetting(openingSetting.settingEl);
 	}
 	
 	disableSetting(setting: Element): void {
