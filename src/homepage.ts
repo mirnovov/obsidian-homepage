@@ -18,6 +18,7 @@ export interface HomepageData {
 	manualOpenMode: string,
 	view: string,
 	revertView: boolean,
+	openWhenEmpty: boolean,
 	refreshDataview: boolean,
 	autoCreate: boolean,
 	autoScroll: boolean,
@@ -79,6 +80,11 @@ export class Homepage {
 		else {
 			this.app.workspace.off("layout-change", this.revertView);
 		}
+	}
+	
+	async setEmpty(value: boolean): Promise<void> {
+		if (value) this.plugin.registerEvent(this.app.workspace.on("layout-change", this.openWhenEmpty));
+		else this.app.workspace.off("layout-change", this.openWhenEmpty);
 	}
 	
 	async open(alternate: boolean = false): Promise<void> {
@@ -271,5 +277,17 @@ export class Homepage {
 		}
 		
 		this.lastView = undefined;
-	}	
+	}
+	
+	openWhenEmpty = async (): Promise<void> => {
+		if (!this.plugin.loaded) return;
+		const leaf = this.app.workspace.getActiveViewOfType(OView)?.leaf;
+		
+		if (
+			leaf?.getViewState().type !== "empty" ||
+			(leaf as any)?.parentSplit.children.length != 1
+		) return
+		
+		await this.open();
+	}
 }

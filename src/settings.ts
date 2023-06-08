@@ -24,6 +24,7 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
 			manualOpenMode: Mode.Retain,
 			view: View.Default,
 			revertView: true,
+			openWhenEmpty: false,
 			refreshDataview: false,
 			autoCreate: true,
 			autoScroll: false,
@@ -227,6 +228,11 @@ export class HomepageSettingTab extends PluginSettingTab {
 			"Revert view on close", "When navigating away from the homepage, restore the default view.", 
 			"revertView",
 			value => this.plugin.homepage.setReversion(value)
+		);
+		this.addToggle(
+			"Open when empty", "When there are no tabs open, open the homepage.", 
+			"openWhenEmpty",
+			value => this.plugin.homepage.setEmpty(value)
 		);
 		this.addToggle("Auto-scroll", "When opening the homepage, scroll to the bottom and focus on the last line.", "autoScroll");
 		

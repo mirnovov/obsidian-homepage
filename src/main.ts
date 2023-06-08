@@ -41,6 +41,8 @@ export default class HomepagePlugin extends Plugin {
 		addIcon("homepage", ICON);
 		this.setIcon(this.homepage.data.hasRibbonIcon);
 		this.homepage.setReversion(this.homepage.data.revertView);
+		this.homepage.setEmpty(this.homepage.data.openWhenEmpty);
+
 		this.addSettingTab(new HomepageSettingTab(this.app, this));
 
 		this.addCommand({
