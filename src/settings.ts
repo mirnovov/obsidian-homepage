@@ -202,12 +202,12 @@ export class HomepageSettingTab extends PluginSettingTab {
 		
 		this.addHeading("Vault environment");
 		const openingSetting = this.addDropdown(
-			"Opening method", "Determine how extant tabs and panes are affected on startup.", 
+			"Opening method", "Determine how extant tabs and views are affected on startup.", 
 			"openMode",
 			Mode
 		);
 		this.addDropdown(
-			"Manual opening method", "Determine how extant tabs and panes are affected when opening with commands or the ribbon button.", 
+			"Manual opening method", "Determine how extant tabs and views are affected when opening with commands or the ribbon button.", 
 			"manualOpenMode",
 			Mode
 		);
@@ -217,8 +217,13 @@ export class HomepageSettingTab extends PluginSettingTab {
 		this.addToggle(
 			"Pin", "Pin the homepage when opening.", "pin"
 		);
+		this.addToggle(
+			"Open when empty", "When there are no tabs open, open the homepage.", 
+			"openWhenEmpty",
+			value => this.plugin.homepage.setEmpty(value)
+		);
 		
-		this.addHeading("Pane");
+		this.addHeading("Opened view");
 		this.addDropdown(
 			"Homepage view", "Choose what view to open the homepage in.", 
 			"view",
@@ -228,11 +233,6 @@ export class HomepageSettingTab extends PluginSettingTab {
 			"Revert view on close", "When navigating away from the homepage, restore the default view.", 
 			"revertView",
 			value => this.plugin.homepage.setReversion(value)
-		);
-		this.addToggle(
-			"Open when empty", "When there are no tabs open, open the homepage.", 
-			"openWhenEmpty",
-			value => this.plugin.homepage.setEmpty(value)
 		);
 		this.addToggle("Auto-scroll", "When opening the homepage, scroll to the bottom and focus on the last line.", "autoScroll");
 		
