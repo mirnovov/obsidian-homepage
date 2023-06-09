@@ -2,6 +2,8 @@ import { ButtonComponent, Modal, getIcon } from "obsidian";
 import HomepagePlugin from "src/main";
 import { DEFAULT_DATA } from "src/settings";
 import HomepageTests from "./tests";
+import HomepagePluginTests from "./plugin-tests";
+
 
 type Result = {
 	name: string,
@@ -19,13 +21,21 @@ const TEST_CSS = `
 		max-height: 70vh;
 	}
 	
+	.nv-results h1 {
+		font-weight: var(--font-bold);
+		font-size: var(--font-smallest);
+		color: var(--text-muted);
+		padding: 20px 0 6px;
+		margin: 0;
+	}
+	
+	.nv-results h1:first-child {
+		padding-top: 4px;
+	}
+	
 	.nv-results div {
 		border-top: 1px solid var(--hr-color);
 		padding: 4px 0;
-	}
-	
-	.nv-results div:first-child {
-		border-top: none;
 	}
 	
 	.nv-results .svg-icon, .nv-result-summary .svg-icon {
@@ -59,21 +69,37 @@ const TEST_CSS = `
 	}
 `;
 
+const TEST_SUITES = [HomepageTests, HomepagePluginTests];
+
 export default class HomepageTestPlugin extends HomepagePlugin {
+
+	testResults: Record<string, Result[]> = {};
+
 	async onload(): Promise<void> {
 		this.registerObsidianProtocolHandler("nv-testing-restart", async () => {
 			(window as any).electron.remote.app.quit();
 		});
 		
 		super.onload();
-		this.app.workspace.onLayoutReady(async () => await this.runTests());
+		this.app.workspace.onLayoutReady(async () => await this.execute());
 	}
 	
-	async runTests() {
-		const tests = new HomepageTests();
-		const results = [];
+	async execute(): Promise<void> {
+		for (const suite of TEST_SUITES) {
+			await this.runTests(suite);
+		}		
+
+		const modal = new TestResultModal(this);
+		modal.open();
+	}
+	
+	async runTests(suite: any): Promise<void> {
+		const tests = new suite();
+		const className = tests.constructor.name;
 		
-		for (const name of Object.getOwnPropertyNames(HomepageTests.prototype)) {
+		this.testResults[className] = [];
+		
+		for (const name of Object.getOwnPropertyNames(suite.prototype)) {
 			if (name == "constructor") continue;
 			const result = { name: name, error: null, passed: true };
 
@@ -92,11 +118,8 @@ export default class HomepageTestPlugin extends HomepagePlugin {
 				result.passed = false;
 			}
 			
-			results.push(result);
+			this.testResults[className].push(result);
 		}
-		
-		const modal = new TestResultModal(this, results);
-		modal.open();
 	}
 	
 	assert(cond: boolean, ...args: any[]) {
@@ -114,12 +137,11 @@ export default class HomepageTestPlugin extends HomepagePlugin {
 
 class TestResultModal extends Modal {
 	plugin: HomepageTestPlugin;
-	results: Result[];
+	results: Record<string, Result[]>;
 	
-	constructor(plugin: HomepageTestPlugin, results: Result[]) {
+	constructor(plugin: HomepageTestPlugin) {
 		super(plugin.app);
 		this.plugin = plugin;
-		this.results = results;
 	}
 	
 	async onOpen() {
@@ -129,19 +151,23 @@ class TestResultModal extends Modal {
 		
 		this.contentEl.addClass("nv-results");
 		
-		for (const result of this.results) {
-			const row = this.contentEl.createDiv();
-			row.append(
-				getIcon(result.passed ? "check" : "cross") as any, 
-				result.name
-			);
-			
-			if (result.passed) {
-				success += 1;
-			}
-			else {
-				row.createEl("code", { text: `${result.error}` });
-				failure += 1;
+		for (const [name, suite] of Object.entries(this.plugin.testResults)) {
+			this.contentEl.createEl("h1", { text: name });
+
+			for (const result of suite) {
+				const row = this.contentEl.createDiv();
+				row.append(
+					getIcon(result.passed ? "check" : "cross") as any, 
+					result.name
+				);
+				
+				if (result.passed) {
+					success += 1;
+				}
+				else {
+					row.createEl("code", { text: `${result.error}` });
+					failure += 1;
+				}
 			}
 		}
 		

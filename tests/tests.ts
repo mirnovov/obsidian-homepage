@@ -148,31 +148,6 @@ export default class HomepageTests {
 		this.assert(count == pos, view, count, pos);
 	}
 	
-	async workspaces(this: HomepageTestPlugin) {
-		await this.app.workspace.openLinkText("Note A", "", false);
-		
-		const bottom = this.app.workspace.getLeaf("split", "horizontal");
-		this.app.workspace.setActiveLeaf(bottom, { focus: true });
-		
-		await this.app.workspace.openLinkText("Note B", "", false);
-		this.internalPlugins.workspaces.instance.saveWorkspace("Home");
-		
-		this.app.workspace.iterateAllLeaves(l => l.detach());
-		this.homepage.data.kind = Kind.Workspace;
-		this.homepage.open();
-		await this.sleep(100);
-		
-		const split = (this.app.workspace.rootSplit as any).children[0];
-		const upper = split.children[0].children[0].view;
-		const lower = split.children[1].children[0].view;
-
-		this.assert(
-			split.direction == "horizontal" &&
-			upper.file.name == "Note A.md" && lower.file.name == "Note B.md",
-			split, upper, lower
-		);
-	}
-	
 	async random(this: HomepageTestPlugin) {
 		this.homepage.data.kind = Kind.Random;
 		this.homepage.save();
@@ -190,21 +165,7 @@ export default class HomepageTests {
 		}
 		this.assert(false);
 	}
-	
-	async dailyNote(this: HomepageTestPlugin) {
-		this.homepage.data.kind = Kind.DailyNote;
-		this.homepage.save();
 
-		this.homepage.open();
-		await this.sleep(100);
-		
-		const dailyNote = await this.internalPlugins["daily-notes"].instance.getDailyNote();
-		const file = this.app.workspace.getActiveFile();
-		
-		this.assert(file?.name == dailyNote.name, file, dailyNote);
-		this.app.vault.delete(dailyNote);
-	}
-	
 	async loadEmptySettings(this: HomepageTestPlugin) {
 		this.settings = {} as HomepageSettings;
 		this.saveSettings();
