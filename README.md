@@ -2,7 +2,7 @@
 <p align="center">Open a specified note, canvas, or workspace upon launching <a href="https://obsidian.md">Obsidian</a>.</p>
 <br>
 
-* Use any note, canvas, or workspace as a homepage. Alternatively, choose a random note, use your Daily Note, or create advanced schedules using [Moment syntax](https://momentjs.com/docs/#/displaying/format/).
+* Use any note, canvas, or workspace as a homepage. Alternatively, choose a random note, or use your Daily or Periodic Notes.
 * Decide what happens to old tabs that were left open - keep them, replace the last note, or remove them all.
 
 <!---->
