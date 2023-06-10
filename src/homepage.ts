@@ -1,4 +1,4 @@
-import { App, MarkdownView, Notice, View as OView, WorkspaceLeaf, moment } from "obsidian";
+import { App, FileView, MarkdownView, Notice, View as OView, WorkspaceLeaf, moment } from "obsidian";
 import HomepagePlugin from "./main";
 import { getAutorun, getPeriodicNote } from "./periodic";
 import { emptyActiveView, randomFile, trimFile, untrimName } from "./utils";
@@ -23,7 +23,8 @@ export interface HomepageData {
 	autoCreate: boolean,
 	autoScroll: boolean,
 	pin: boolean,
-	commands: string[]
+	commands: string[],
+	alwaysApply: boolean
 } 
 
 export enum Mode {
@@ -59,6 +60,7 @@ export class Homepage {
 	
 	name: string;
 	lastView?: WeakRef<MarkdownView> = undefined;
+	openedViews: WeakMap<FileView, string> = new WeakMap();
 	computedValue: string;
 	
 	constructor(name: string, plugin: HomepagePlugin) {
@@ -71,20 +73,6 @@ export class Homepage {
 			this.data.commands = [];
 			this.save();
 		}
-	}
-	
-	async setReversion(value: boolean): Promise<void> {
-		if (value && this.data.view !== View.Default) {
-			this.plugin.registerEvent(this.app.workspace.on("layout-change", this.revertView));
-		} 
-		else {
-			this.app.workspace.off("layout-change", this.revertView);
-		}
-	}
-	
-	async setEmpty(value: boolean): Promise<void> {
-		if (value) this.plugin.registerEvent(this.app.workspace.on("layout-change", this.openWhenEmpty));
-		else this.app.workspace.off("layout-change", this.openWhenEmpty);
 	}
 	
 	async open(alternate: boolean = false): Promise<void> {
@@ -259,7 +247,7 @@ export class Homepage {
 		await this.plugin.saveSettings();
 	}
 	
-	revertView = async (): Promise<void> => {
+	async revertView(): Promise<void> {
 		if (this.lastView == undefined) return;
 		
 		const view = this.lastView.deref();
@@ -279,7 +267,7 @@ export class Homepage {
 		this.lastView = undefined;
 	}
 	
-	openWhenEmpty = async (): Promise<void> => {
+	async openWhenEmpty(): Promise<void> {
 		if (!this.plugin.loaded) return;
 		const leaf = this.app.workspace.getActiveViewOfType(OView)?.leaf;
 		
@@ -289,5 +277,22 @@ export class Homepage {
 		) return
 		
 		await this.open();
+	}
+	
+	async apply(): Promise<void> {
+		const currentView = this.app.workspace.getActiveViewOfType(FileView);
+		if (!currentView) return;
+		
+		const currentValue = trimFile(currentView.file);
+		if (this.openedViews.get(currentView) === currentValue) return;
+		
+		this.openedViews.set(currentView, currentValue);
+		
+		if (
+			currentValue === await this.computeValue() &&
+			this.plugin.loaded && !this.plugin.executing
+		) {
+			await this.configure()
+		}
 	}
 }

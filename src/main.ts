@@ -40,8 +40,7 @@ export default class HomepagePlugin extends Plugin {
 
 		addIcon("homepage", ICON);
 		this.setIcon(this.homepage.data.hasRibbonIcon);
-		this.homepage.setReversion(this.homepage.data.revertView);
-		this.homepage.setEmpty(this.homepage.data.openWhenEmpty);
+		this.registerEvent(this.app.workspace.on("layout-change", this.onLayoutChange));
 
 		this.addSettingTab(new HomepageSettingTab(this.app, this));
 
@@ -59,9 +58,18 @@ export default class HomepagePlugin extends Plugin {
 	}
 	
 	async onunload(): Promise<void> {
+		this.app.workspace.off("layout-change", this.onLayoutChange)
+		
 		const ntp = this.communityPlugins["new-tab-default-page"];
 		if (!ntp) return;
 		ntp.checkForNewTab = ntp._checkForNewTab;
+	}
+	
+	onLayoutChange = async (): Promise<void> => {
+		if (this.homepage.data.revertView) await this.homepage.revertView();
+		if (this.homepage.data.openWhenEmpty) await this.homepage.openWhenEmpty();
+		if (this.homepage.data.alwaysApply) await this.homepage.apply();
+
 	}
 	
 	getHomepage(): Homepage {

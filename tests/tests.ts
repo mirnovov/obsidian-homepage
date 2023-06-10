@@ -82,7 +82,6 @@ export default class HomepageTests {
 	
 	async reversion(this: HomepageTestPlugin) {
 		this.homepage.data.view = View.Reading;
-		this.homepage.setReversion(this.homepage.data.revertView);
 		this.homepage.save();
 	
 		this.homepage.open();

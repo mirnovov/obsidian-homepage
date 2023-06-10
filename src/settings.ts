@@ -29,7 +29,8 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
 			autoCreate: true,
 			autoScroll: false,
 			pin: false,
-			commands: []
+			commands: [],
+			alwaysApply: false
 		}
 	},
 	separateMobile: false
@@ -173,12 +174,19 @@ export class HomepageSettingTab extends PluginSettingTab {
 		}
 		
 		this.addToggle(
+			"Open when empty", "When there are no tabs open, open the homepage.", 
+			"openWhenEmpty"
+		);
+		this.addToggle(
+			"Use when opening normally", "Use homepage settings when opening it normally, such as from a link or the file browser.",
+			"alwaysApply"
+		);
+		this.addToggle(
 			"Use ribbon icon", "Show a little house on the ribbon, allowing you to quickly access the homepage.",
 			"hasRibbonIcon",
 			(value) => this.plugin.setIcon(value),
 			true
 		);
-		
 		new Setting(this.containerEl)
 			.setName("Separate mobile homepage")
 			.setDesc("For mobile devices, store the homepage and its settings separately.")
@@ -217,11 +225,6 @@ export class HomepageSettingTab extends PluginSettingTab {
 		this.addToggle(
 			"Pin", "Pin the homepage when opening.", "pin"
 		);
-		this.addToggle(
-			"Open when empty", "When there are no tabs open, open the homepage.", 
-			"openWhenEmpty",
-			value => this.plugin.homepage.setEmpty(value)
-		);
 		
 		this.addHeading("Opened view");
 		this.addDropdown(
@@ -231,8 +234,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		);
 		this.addToggle(
 			"Revert view on close", "When navigating away from the homepage, restore the default view.", 
-			"revertView",
-			value => this.plugin.homepage.setReversion(value)
+			"revertView"
 		);
 		this.addToggle("Auto-scroll", "When opening the homepage, scroll to the bottom and focus on the last line.", "autoScroll");
 		
