@@ -69,7 +69,6 @@ export default class HomepagePlugin extends Plugin {
 		if (this.homepage.data.revertView) await this.homepage.revertView();
 		if (this.homepage.data.openWhenEmpty) await this.homepage.openWhenEmpty();
 		if (this.homepage.data.alwaysApply) await this.homepage.apply();
-
 	}
 	
 	getHomepage(): Homepage {

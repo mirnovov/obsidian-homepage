@@ -1,6 +1,5 @@
 import { MarkdownView, TAbstractFile } from "obsidian";
 import { Kind, Mode, View } from "src/homepage";
-import { HomepageSettings, DEFAULT_SETTINGS } from "src/settings";
 import HomepageTestPlugin from "./harness";
 
 export default class HomepageTests {
@@ -164,55 +163,28 @@ export default class HomepageTests {
 		}
 		this.assert(false);
 	}
-
-	async loadEmptySettings(this: HomepageTestPlugin) {
-		this.settings = {} as HomepageSettings;
-		this.saveSettings();
-		this.settings = await this.loadSettings();
-		this.homepage = this.getHomepage();
+	
+	async alwaysApply(this: HomepageTestPlugin) {
+		this.homepage.data.view = View.Source;
+		this.homepage.data.alwaysApply = true;
+		this.homepage.save();
 		
-		const actual = JSON.stringify(this.settings);
-		const expected = JSON.stringify(DEFAULT_SETTINGS);
-
-		this.assert(actual == expected);
+		this.app.workspace.openLinkText("Home", "", false);
+		await this.sleep(500);
+		
+		let state = this.app.workspace.getActiveViewOfType(MarkdownView)?.getState();
+		this.assert(state?.mode == "source" && state.source == true, state);
 	}
 	
-	async upgradeSettings(this: HomepageTestPlugin) {
-		this.settings = {
-			version: 2,
-			defaultNote: "Home",
-			useMoment: false,
-			momentFormat: "YYYY-MM-DD",
-			workspace: "Default",
-			workspaceEnabled: true,
-			openOnStartup: true,
-			hasRibbonIcon: true,
-			openMode: Mode.ReplaceAll,
-			manualOpenMode: Mode.Retain,
-			view: View.Default,
-			revertView: true,
-			refreshDataview: false,
-			autoCreate: true,
-			autoScroll: false,
-			pin: false
-		} as any;
+	async openWhenEmpty(this: HomepageTestPlugin) {
+		this.homepage.data.openWhenEmpty = true;
+		this.homepage.save();
 		
-		this.saveSettings();
-		this.settings = await this.loadSettings();
-		this.homepage = this.getHomepage();
+		this.app.workspace.iterateAllLeaves(l => l.detach());
+		await this.sleep(500);
 		
-		this.assert(
-			this.homepage.data.commands.length == 0 &&
-			this.homepage.data.value == "Default" &&
-			this.homepage.data.kind == Kind.Workspace
-		);
-		
-		//check that the settings tab isn't broken upon upgrade
-		const { setting } = (this.app as any);
-		
-		setting.open();
-		setting.openTabById("homepage");
-		this.assert(document.getElementsByClassName("nv-debug-button").length > 0);
-		setting.close();
+		const file = this.app.workspace.getActiveFile();
+		const leaves = this.app.workspace.getLeavesOfType("markdown");
+		this.assert(file?.name == "Home.md" && leaves.length == 1, file, leaves);
 	}
 }

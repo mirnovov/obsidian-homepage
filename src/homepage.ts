@@ -292,7 +292,7 @@ export class Homepage {
 			currentValue === await this.computeValue() &&
 			this.plugin.loaded && !this.plugin.executing
 		) {
-			await this.configure()
+			await this.configure();
 		}
 	}
 }

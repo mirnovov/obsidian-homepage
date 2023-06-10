@@ -1,9 +1,9 @@
 import { ButtonComponent, Modal, getIcon } from "obsidian";
 import HomepagePlugin from "src/main";
 import { DEFAULT_DATA } from "src/settings";
-import HomepageTests from "./tests";
 import HomepagePluginTests from "./plugin-tests";
-
+import HomepageSettingsTests from "./settings-tests";
+import HomepageTests from "./tests";
 
 type Result = {
 	name: string,
@@ -69,7 +69,7 @@ const TEST_CSS = `
 	}
 `;
 
-const TEST_SUITES = [HomepageTests, HomepagePluginTests];
+const TEST_SUITES = [HomepageTests, HomepagePluginTests, HomepageSettingsTests];
 
 export default class HomepageTestPlugin extends HomepagePlugin {
 
