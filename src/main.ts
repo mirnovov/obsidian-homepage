@@ -152,7 +152,7 @@ export default class HomepagePlugin extends Plugin {
 			case Kind.WeeklyNote:
 			case Kind.MonthlyNote:
 			case Kind.YearlyNote:
-				return hasRequiredPeriodicity(this, kind);
+				return hasRequiredPeriodicity(kind, this);
 			default:
 				return true;
 		}

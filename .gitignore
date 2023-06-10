@@ -18,7 +18,7 @@ data.json
 tests/vault/.obsidian/plugins/dataview/*
 tests/vault/.obsidian/plugins/homepage/*
 tests/vault/.obsidian/plugins/periodic-notes/*
+!tests/vault/.obsidian/plugins/periodic-notes/data.json
 tests/vault/.obsidian/workspace.json
 tests/vault/.obsidian/workspaces.json
 tests/vault/.obsidian/app.json
-

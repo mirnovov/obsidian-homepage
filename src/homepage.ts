@@ -235,7 +235,7 @@ export class Homepage {
 			case Kind.WeeklyNote:
 			case Kind.MonthlyNote:
 			case Kind.YearlyNote:
-				val = await getPeriodicNote(this.data.kind);
+				val = await getPeriodicNote(this.data.kind, this.plugin);
 				break;
 		}
 	
