@@ -70,6 +70,7 @@ export async function getPeriodicNote(kind: Kind, plugin: HomepagePlugin): Promi
 		
 	}
 	else {
+		periodicNotes.cache.initialize();
 		note = (
 			periodicNotes.getPeriodicNote(info.noun, date) ||
 			await periodicNotes.createPeriodicNote(info.noun, date)
@@ -91,7 +92,7 @@ export function hasRequiredPeriodicity(kind: Kind, plugin: HomepagePlugin): bool
 	}
 	else {
 		const noun = PERIODIC_INFO[kind].noun;
-		return plugin.communityPlugins["periodic-notes"].getActiveSet().set;
+		return plugin.communityPlugins["periodic-notes"]?.calendarSetManager?.getActiveSet()[noun]?.enabled;
 	}
 }
 
