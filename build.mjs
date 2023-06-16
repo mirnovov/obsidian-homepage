@@ -62,8 +62,9 @@ async function generateContext(mode) {
 }
 
 async function startTests() {
-	await ensurePlugin("blacksmithgu/obsidian-dataview", "master", "dataview")
-	await ensurePlugin("liamcain/obsidian-periodic-notes", "main", "periodic-notes")
+	await ensurePlugin("blacksmithgu/obsidian-dataview", "master", "dataview");
+	await ensurePlugin("liamcain/obsidian-periodic-notes", "main", "periodic-notes");
+	await ensurePlugin("mgmeyers/obsidian-kanban", "main", "obsidian-kanban");
 	
 	opener("obsidian://nv-testing-restart");
 	

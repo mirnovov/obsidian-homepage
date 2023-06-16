@@ -28,6 +28,18 @@ export default class HomepagePluginTests {
 		);
 	}
 	
+	async openCanvas(this: HomepageTestPlugin) {
+		this.homepage.data.value = "Canvas.canvas";
+		this.homepage.save();
+		
+		this.homepage.open();
+		await this.sleep(100);
+		
+		const file = this.app.workspace.getActiveFile();
+		const leaves = this.app.workspace.getLeavesOfType("canvas");
+		this.assert(file?.name == "Canvas.canvas" && leaves.length == 1, file, leaves);
+	}
+	
 	async dailyNote(this: HomepageTestPlugin) {
 		this.homepage.data.kind = Kind.DailyNote;
 		this.homepage.save();
@@ -133,4 +145,20 @@ export default class HomepagePluginTests {
 		
 		(this.app as any).plugins.disablePluginAndSave("dataview");
 	}
+	
+	async openKanban(this: HomepageTestPlugin) {
+		(this.app as any).plugins.enablePluginAndSave("obsidian-kanban");
+
+		this.homepage.data.value = "Kanban.md";
+		this.homepage.save();
+		
+		this.homepage.open();
+		await this.sleep(100);
+		
+		const file = this.app.workspace.getActiveFile();
+		const leaves = this.app.workspace.getLeavesOfType("kanban");
+		this.assert(file?.name == "Kanban.md" && leaves.length == 1, file, leaves);
+		
+		(this.app as any).plugins.disablePluginAndSave("obsidian-kanban");
+	}	
 }
