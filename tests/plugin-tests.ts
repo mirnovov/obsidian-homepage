@@ -161,4 +161,15 @@ export default class HomepagePluginTests {
 		
 		(this.app as any).plugins.disablePluginAndSave("obsidian-kanban");
 	}	
+	
+	async openGraph(this: HomepageTestPlugin) {
+		this.homepage.data.kind = Kind.Graph;
+		this.homepage.save();
+		
+		this.homepage.open();
+		await this.sleep(100);
+		
+		const leaves = this.app.workspace.getLeavesOfType("graph");
+		this.assert(leaves.length == 1, leaves);
+	}	
 }

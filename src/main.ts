@@ -148,6 +148,8 @@ export default class HomepagePlugin extends Plugin {
 		switch (kind) {
 			case Kind.Workspace:
 				return this.internalPlugins["workspaces"]?.enabled;
+			case Kind.Graph:
+				return this.internalPlugins["graph"]?.enabled;
 			case Kind.DailyNote:
 			case Kind.WeeklyNote:
 			case Kind.MonthlyNote:

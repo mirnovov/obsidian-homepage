@@ -37,14 +37,14 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
 }
 
 export const DEFAULT_DATA: HomepageData = DEFAULT_SETTINGS.homepages[DEFAULT];
-const UNCHANGEABLE: Kind[] = [Kind.Random, Kind.DailyNote, ...PERIODIC_KINDS];
+const UNCHANGEABLE: Kind[] = [Kind.Random, Kind.Graph, ...PERIODIC_KINDS];
 
 export class HomepageSettingTab extends PluginSettingTab {
 	plugin: HomepagePlugin;
 	settings: HomepageSettings;
+	elements: Record<string, Setting>;
 	
 	commandBox: HTMLElement;
-	workspaceHidden: HTMLElement[] = [];
 
 	constructor(app: App, plugin: HomepagePlugin) {
 		super(app, plugin);
@@ -68,6 +68,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		const suggestor = hasWorkspaces ? WorkspaceSuggest : FileSuggest;
 
 		this.containerEl.empty();
+		this.elements = {};
 		descContainer.id = "nv-desc";
 		
 		const mainSetting = new Setting(this.containerEl)
@@ -101,6 +102,9 @@ export class HomepageSettingTab extends PluginSettingTab {
 				break;
 			case Kind.Workspace:
 				descContainer.innerHTML = `Enter an Obsidian workspace to use.`;
+				break;
+			case Kind.Graph:
+				descContainer.innerHTML = `Your graph view will be used.`;
 				break;
 			case Kind.MomentDate:
 				descContainer.innerHTML = 
@@ -158,19 +162,18 @@ export class HomepageSettingTab extends PluginSettingTab {
 			});
 		}
 		
-		const startupSetting = this.addToggle(
+		this.addToggle(
 			"Open on startup", "When launching Obsidian, open the homepage.",
 			"openOnStartup",
-			(_) => this.display(),
-			true
+			(_) => this.display()
 		);
 		
 		if (autorun) {
-			startupSetting.descEl.createDiv({
+			this.elements.openOnStartup.descEl.createDiv({
 				text: `This setting has been disabled, as it isn't compatible with Daily Notes' "Open daily note on startup" functionality. To use it, disable the Daily Notes setting.`, 
 				attr: {class: "mod-warning"}
 			});
-			this.disableSetting(startupSetting.settingEl);
+			this.disableSetting("openOnStartup");
 		}
 		
 		this.addToggle(
@@ -184,8 +187,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		this.addToggle(
 			"Use ribbon icon", "Show a little house on the ribbon, allowing you to quickly access the homepage.",
 			"hasRibbonIcon",
-			(value) => this.plugin.setIcon(value),
-			true
+			(value) => this.plugin.setIcon(value)
 		);
 		new Setting(this.containerEl)
 			.setName("Separate mobile homepage")
@@ -200,7 +202,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 				})
 			);
 					
-		this.addHeading("Commands", true);
+		this.addHeading("Commands", "commandsHeading");
 		this.containerEl.createDiv({ 
 			cls: "nv-command-desc setting-item-description", 
 			text: "Select commands that will be executed when opening the homepage." }
@@ -208,8 +210,8 @@ export class HomepageSettingTab extends PluginSettingTab {
 		this.commandBox = this.containerEl.createDiv({ cls: "nv-command-box" });
 		this.updateCommandBox();
 		
-		this.addHeading("Vault environment");
-		const openingSetting = this.addDropdown(
+		this.addHeading("Vault environment", "vaultHeading");
+		this.addDropdown(
 			"Opening method", "Determine how extant tabs and views are affected on startup.", 
 			"openMode",
 			Mode
@@ -219,14 +221,10 @@ export class HomepageSettingTab extends PluginSettingTab {
 			"manualOpenMode",
 			Mode
 		);
-		const autoCreateSetting = this.addToggle(
-			"Auto-create", "If the homepage doesn't exist, create a note with the specified name.", "autoCreate"
-		);
-		this.addToggle(
-			"Pin", "Pin the homepage when opening.", "pin"
-		);
+		this.addToggle("Auto-create", "If the homepage doesn't exist, create a note with the specified name.", "autoCreate");
+		this.addToggle("Pin", "Pin the homepage when opening.", "pin");
 		
-		this.addHeading("Opened view");
+		this.addHeading("Opened view", "paneHeading");
 		this.addDropdown(
 			"Homepage view", "Choose what view to open the homepage in.", 
 			"view",
@@ -241,7 +239,9 @@ export class HomepageSettingTab extends PluginSettingTab {
 		if ("dataview" in this.plugin.communityPlugins) {
 			this.addToggle(
 				"Refresh Dataview", "Always attempt to reload Dataview views when opening the homepage.", "refreshDataview"
-			).descEl.createDiv({
+			);
+			
+			this.elements.refreshDataview.descEl.createDiv({
 				text: "Requires Dataview auto-refresh to be enabled.", attr: {class: "mod-warning"}
 			});
 		}
@@ -253,23 +253,30 @@ export class HomepageSettingTab extends PluginSettingTab {
 				.onClick(async () => await this.copyDebugInfo());
 		}
 		
-		if (hasWorkspaces) this.workspaceHidden.forEach(this.disableSetting);
-		if (!this.plugin.homepage.data.openOnStartup || autorun) this.disableSetting(openingSetting.settingEl);
-		if (PERIODIC_KINDS.includes(this.plugin.homepage.data.kind as Kind)) this.disableSetting(autoCreateSetting.settingEl);
+		if (hasWorkspaces) {
+			this.disableSettings("openWhenEmpty", "alwaysApply", "vaultHeading", "openMode", "manualOpenMode", "autoCreate", "pin");
+		}
+		if (hasWorkspaces || this.plugin.homepage.data.kind == Kind.Graph) {
+			this.disableSettings("paneHeading", "view", "revertView", "autoScroll", "refreshDataview");
+		}
+		if (!this.plugin.homepage.data.openOnStartup || autorun) this.disableSetting("openMode");
+		if (PERIODIC_KINDS.includes(this.plugin.homepage.data.kind as Kind)) this.disableSetting("autoCreate");
 	}
 	
-	disableSetting(setting: Element): void {
-		setting.setAttribute("nv-greyed", "");
+	disableSetting(setting: string): void {
+		this.elements[setting]?.settingEl.setAttribute("nv-greyed", "");
 	}
 	
-	addHeading(name: string, workspaces: boolean = false): Setting {
+	disableSettings(...settings: string[]): void {
+		settings.forEach(s => this.disableSetting(s));
+	}
+	
+	addHeading(name: string, setting: string): void {
 		const heading = new Setting(this.containerEl).setHeading().setName(name);
-		
-		if (!workspaces) this.workspaceHidden.push(heading.settingEl);
-		return heading;
+		this.elements[setting] = heading;
 	}
 	
-	addDropdown(name: string, desc: string, setting: string, source: object, callback?: (v: any) => any): Setting {
+	addDropdown(name: string, desc: string, setting: string, source: object, callback?: (v: any) => any): void {
 		const dropdown = new Setting(this.containerEl)
 			.setName(name).setDesc(desc)
 			.addDropdown(async dropdown => {
@@ -284,11 +291,10 @@ export class HomepageSettingTab extends PluginSettingTab {
 				});
 			});
 		
-		this.workspaceHidden.push(dropdown.settingEl);
-		return dropdown;
+		this.elements[setting] = dropdown;
 	}
 	
-	addToggle(name: string, desc: string, setting: string, callback?: (v: any) => any, workspaces: boolean = false): Setting {
+	addToggle(name: string, desc: string, setting: string, callback?: (v: any) => any): void {
 		const toggle = new Setting(this.containerEl)
 			.setName(name).setDesc(desc)
 			.addToggle(toggle => toggle
@@ -300,8 +306,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 				})
 			);
 		
-		if (!workspaces) this.workspaceHidden.push(toggle.settingEl);
-		return toggle;
+		this.elements[setting] = toggle;
 	}
 	
 	updateCommandBox(): void {

@@ -50,6 +50,7 @@ export default class HomepageSettingsTests {
 		
 		setting.open();
 		setting.openTabById("homepage");
+		this.sleep(100);
 		this.assert(document.getElementsByClassName("nv-debug-button").length > 0);
 		setting.close();
 	}

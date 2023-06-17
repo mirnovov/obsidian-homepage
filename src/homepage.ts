@@ -44,6 +44,7 @@ export enum Kind {
 	File = "File",
 	Workspace = "Workspace",
 	Random = "Random file",
+	Graph = "Graph view",
 	DailyNote = "Daily Note",
 	WeeklyNote = "Weekly Note",
 	MonthlyNote = "Monthly Note",
@@ -87,7 +88,7 @@ export class Homepage {
 			let mode = this.plugin.loaded ? this.data.manualOpenMode : this.data.openMode;
 			if (alternate) mode = Mode.Retain;
 			
-			await this.launchPage(mode as Mode);
+			await this.launchLeaf(mode as Mode);
 		}
 		
 		if (!this.data.commands) return;
@@ -108,7 +109,7 @@ export class Homepage {
 		workspacePlugin.loadWorkspace(this.data.value);
 	}
 	
-	async launchPage(mode: Mode) {
+	async launchLeaf(mode: Mode) {
 		this.computedValue = await this.computeValue();
 		this.plugin.executing = true;
 		
@@ -142,13 +143,24 @@ export class Homepage {
 			this.app.workspace.getActiveViewOfType(OView)?.leaf.setPinned(false);
 		}
 		
-		do {
-			await this.app.workspace.openLinkText(
-				this.computedValue, "", mode == Mode.Retain, { active: true }
-			);
+		if (this.data.kind === Kind.Graph) {
+			if (mode === Mode.Retain) {
+				const leaf = this.app.workspace.getLeaf("tab");
+				this.app.workspace.setActiveLeaf(leaf);
+			}
+			
+			(this.app as any).commands.executeCommandById("graph:open");
 		}
-		//hack to fix bug with opening link when homepage is already extant beforehand
-		while (this.app.workspace.getActiveFile() == null);
+		else {
+			do {
+				await this.app.workspace.openLinkText(
+					this.computedValue, "", mode == Mode.Retain, { active: true }
+				);
+			}
+			//hack to fix bug with opening link when homepage is already extant beforehand
+			while (this.app.workspace.getActiveFile() == null);
+		}
+
 		
 		if (mode == Mode.ReplaceAll) {
 			this.app.workspace.detachLeavesOfType("empty");
@@ -214,6 +226,8 @@ export class Homepage {
 	}
 	
 	getOpened(): WorkspaceLeaf[] {
+		if (this.data.kind == Kind.Graph) return this.app.workspace.getLeavesOfType("graph");
+		
 		const leaves = LEAF_TYPES.flatMap(i => this.app.workspace.getLeavesOfType(i));
 		return leaves.filter(
 			leaf => trimFile((leaf.view as any).file) == this.computedValue
