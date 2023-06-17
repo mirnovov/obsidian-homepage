@@ -143,30 +143,33 @@ export class Homepage {
 			this.app.workspace.getActiveViewOfType(OView)?.leaf.setPinned(false);
 		}
 		
-		if (this.data.kind === Kind.Graph) {
-			if (mode === Mode.Retain) {
-				const leaf = this.app.workspace.getLeaf("tab");
-				this.app.workspace.setActiveLeaf(leaf);
-			}
-			
-			(this.app as any).commands.executeCommandById("graph:open");
+		if (this.data.kind === Kind.Graph) await this.launchGraph(mode);
+		else await this.launchNote(mode);
+		
+		await this.configure();
+	}
+	
+	async launchGraph(mode: Mode): Promise<void> {
+		if (mode === Mode.Retain) {
+			const leaf = this.app.workspace.getLeaf("tab");
+			this.app.workspace.setActiveLeaf(leaf);
 		}
-		else {
-			do {
-				await this.app.workspace.openLinkText(
-					this.computedValue, "", mode == Mode.Retain, { active: true }
-				);
-			}
-			//hack to fix bug with opening link when homepage is already extant beforehand
-			while (this.app.workspace.getActiveFile() == null);
+		
+		(this.app as any).commands.executeCommandById("graph:open");
+	}
+	
+	async launchNote(mode: Mode): Promise<void> {
+		do {
+			await this.app.workspace.openLinkText(
+				this.computedValue, "", mode == Mode.Retain, { active: true }
+			);
 		}
-
+		//hack to fix bug with opening link when homepage is already extant beforehand
+		while (this.app.workspace.getActiveFile() == null);
 		
 		if (mode == Mode.ReplaceAll) {
 			this.app.workspace.detachLeavesOfType("empty");
 		}
-	
-		await this.configure();
 	}
 		
 	async isNonextant(): Promise<boolean> {

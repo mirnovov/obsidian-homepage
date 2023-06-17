@@ -153,7 +153,7 @@ export default class HomepagePluginTests {
 		this.homepage.save();
 		
 		this.homepage.open();
-		await this.sleep(100);
+		await this.sleep(200);
 		
 		const file = this.app.workspace.getActiveFile();
 		const leaves = this.app.workspace.getLeavesOfType("kanban");
