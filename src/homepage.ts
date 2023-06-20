@@ -265,7 +265,7 @@ export class Homepage {
 	}
 	
 	async revertView(): Promise<void> {
-		if (this.lastView == undefined) return;
+		if (this.lastView == undefined || this.data.view == View.Default) return;
 		
 		const view = this.lastView.deref();
 		if (!view || trimFile(view.file) == this.computedValue) return;
