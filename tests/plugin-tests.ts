@@ -148,18 +148,20 @@ export default class HomepagePluginTests {
 	
 	async openKanban(this: HomepageTestPlugin) {
 		(this.app as any).plugins.enablePluginAndSave("obsidian-kanban");
+		await this.sleep(200);
 
 		this.homepage.data.value = "Kanban.md";
 		this.homepage.save();
 		
 		this.homepage.open();
-		await this.sleep(200);
+		await this.sleep(100);
 		
 		const file = this.app.workspace.getActiveFile();
 		const leaves = this.app.workspace.getLeavesOfType("kanban");
 		this.assert(file?.name == "Kanban.md" && leaves.length == 1, file, leaves);
 		
 		(this.app as any).plugins.disablePluginAndSave("obsidian-kanban");
+		await this.sleep(100);
 	}	
 	
 	async openGraph(this: HomepageTestPlugin) {
