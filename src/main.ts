@@ -89,6 +89,7 @@ export default class HomepagePlugin extends Plugin {
 			return Object.assign({}, DEFAULT_SETTINGS, settingsData);
 		}
 		else {
+			//Upgrade settings from v2.x
 			const settings: HomepageSettings = {
 				version: 3,
 				homepages: {},

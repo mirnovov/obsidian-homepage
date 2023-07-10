@@ -50,7 +50,7 @@ export enum Kind {
 	MonthlyNote = "Monthly Note",
 	YearlyNote = "Yearly Note",
 	
-	//deprecated, will be removed in 4.0
+	/** @deprecated will be removed in 4.0 */
 	MomentDate = "Date-dependent file"
 }
 
@@ -274,8 +274,11 @@ export class Homepage {
 			  config = (this.app.vault as any).config,
 			  mode = config.defaultViewMode || "source",
 			  source = !config.livePreview || false;
-		
-		if (mode != state.mode || source != state.source) {
+			  
+		if (
+			view.leaf.getViewState().type == "markdown" &&
+			(mode != state.mode || source != state.source)
+		) {
 			state.mode = mode;
 			state.source = source;
 			await view.leaf.setViewState({type: "markdown", state: state, active: true });
