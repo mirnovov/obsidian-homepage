@@ -159,13 +159,16 @@ export class Homepage {
 	}
 	
 	async launchNote(mode: Mode): Promise<void> {
+		let i = 0;
+		
 		do {
 			await this.app.workspace.openLinkText(
 				this.computedValue, "", mode == Mode.Retain, { active: true }
 			);
+			i++;
 		}
 		//hack to fix bug with opening link when homepage is already extant beforehand
-		while (this.app.workspace.getActiveFile() == null);
+		while (this.app.workspace.getActiveFile() == null && i < 2);
 		
 		if (mode == Mode.ReplaceAll) {
 			this.app.workspace.detachLeavesOfType("empty");
