@@ -122,7 +122,7 @@ export default class HomepageTests {
 		
 		this.app.vault.delete(file as TAbstractFile);
 		
-		this.homepage.data.autoCreate == false;
+		this.homepage.data.autoCreate = false;
 		this.homepage.save();
 	
 		this.homepage.open();

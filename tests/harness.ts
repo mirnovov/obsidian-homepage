@@ -85,6 +85,8 @@ export default class HomepageTestPlugin extends HomepagePlugin {
 	}
 	
 	async execute(): Promise<void> {
+		await this.sleep(100);
+		
 		for (const suite of TEST_SUITES) {
 			await this.runTests(suite);
 		}		

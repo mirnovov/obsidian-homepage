@@ -6,7 +6,8 @@ export function trimFile(file: TFile): string {
 }
 
 export function untrimName(name: string): string {
-	return name.endsWith(".canvas") ? name : `${name}.md`;
+	const hasExtension = name.split("/").slice(-1)[0].contains(".");
+	return hasExtension ? name : `${name}.md`;
 }
 
 export function wrapAround(value: number, size: number): number {
