@@ -1,4 +1,4 @@
-import { App, FileView, MarkdownView, Notice, View as OView, WorkspaceLeaf, moment } from "obsidian";
+import { App, FileView, MarkdownView, Notice, View as OView, TFile, WorkspaceLeaf, moment } from "obsidian";
 import HomepagePlugin from "./main";
 import { getAutorun, getPeriodicNote } from "./periodic";
 import { emptyActiveView, randomFile, trimFile, untrimName } from "./utils";
@@ -110,23 +110,21 @@ export class Homepage {
 	}
 	
 	async launchLeaf(mode: Mode) {
+		let leaf: WorkspaceLeaf | undefined;
+
 		this.computedValue = await this.computeValue();
 		this.plugin.executing = true;
 		
 		if (getAutorun(this.plugin) && !this.plugin.loaded) {
 			return;
 		}
-		else if (!this.data.autoCreate && await this.isNonextant()) {
-			new Notice(`Homepage "${this.computedValue}" does not exist.`);
-			return;
-		}
-		
+
 		if (mode != Mode.ReplaceAll) {
 			const alreadyOpened = this.getOpened();
 	
 			if (alreadyOpened.length > 0) {
 				this.app.workspace.setActiveLeaf(alreadyOpened[0]);
-				await this.configure();
+				await this.configure(alreadyOpened[0]);
 				return;
 			}
 			else if (mode == Mode.Retain && emptyActiveView(this.app)) {
@@ -134,45 +132,53 @@ export class Homepage {
 				mode = Mode.ReplaceLast;
 			}
 		}
-		else {
-			LEAF_TYPES.forEach(i => this.app.workspace.detachLeavesOfType(i));
+		
+		if (this.data.kind === Kind.Graph) leaf = await this.launchGraph(mode);
+		else leaf = await this.launchNote(mode);
+		if (!leaf) return;
+		
+		await this.configure(leaf);
+		
+		if (mode == Mode.ReplaceAll) {
+			this.app.workspace.iterateAllLeaves(old => {
+				if (
+					LEAF_TYPES.includes(old.getViewState().type)
+					&& (leaf as any).id != (old as any).id
+				) old.detach();
+			});
+			
+			this.app.workspace.detachLeavesOfType("empty");
 		}
-		
-		if (mode != Mode.Retain) {
-			//hack to fix pin bug
-			this.app.workspace.getActiveViewOfType(OView)?.leaf.setPinned(false);
-		}
-		
-		if (this.data.kind === Kind.Graph) await this.launchGraph(mode);
-		else await this.launchNote(mode);
-		
-		await this.configure();
 	}
 	
-	async launchGraph(mode: Mode): Promise<void> {
+	async launchGraph(mode: Mode): Promise<WorkspaceLeaf | undefined> {
 		if (mode === Mode.Retain) {
 			const leaf = this.app.workspace.getLeaf("tab");
 			this.app.workspace.setActiveLeaf(leaf);
 		}
 		
 		(this.app as any).commands.executeCommandById("graph:open");
+		return this.app.workspace.getActiveViewOfType(OView)?.leaf;
 	}
 	
-	async launchNote(mode: Mode): Promise<void> {
-		let i = 0;
+	async launchNote(mode: Mode): Promise<WorkspaceLeaf | undefined> {
+		let file = this.app.metadataCache.getFirstLinkpathDest(this.computedValue, "/");
 		
-		do {
-			await this.app.workspace.openLinkText(
-				this.computedValue, "", mode == Mode.Retain, { active: true }
-			);
-			i++;
+		if (!file) {
+			if (!this.data.autoCreate) {
+				new Notice(`Homepage "${this.computedValue}" does not exist.`);
+				return undefined;
+			}
+			
+			await this.app.vault.create(untrimName(this.computedValue), "");
+			file = this.app.metadataCache.getFirstLinkpathDest(this.computedValue, "/") as TFile;
 		}
-		//hack to fix bug with opening link when homepage is already extant beforehand
-		while (this.app.workspace.getActiveFile() == null && i < 2);
 		
-		if (mode == Mode.ReplaceAll) {
-			this.app.workspace.detachLeavesOfType("empty");
-		}
+		const leaf = this.app.workspace.getLeaf(mode == Mode.Retain);
+		await leaf.openFile(file);
+		this.app.workspace.setActiveLeaf(leaf);
+		
+		return leaf;
 	}
 		
 	async isNonextant(): Promise<boolean> {
@@ -180,12 +186,11 @@ export class Homepage {
 		return !(await this.app.vault.adapter.exists(name));
 	} 
 	
-	async configure(): Promise<void> {
+	async configure(leaf: WorkspaceLeaf): Promise<void> {
 		this.plugin.executing = false;
-		const view = this.app.workspace.getActiveViewOfType(MarkdownView);
+		const view = leaf.view;
 		
-		if (!view) {
-			//for canvas, kanban
+		if (!(view instanceof MarkdownView)) {
 			if (this.data.pin) {
 				this.app.workspace.getActiveViewOfType(OView)?.leaf.setPinned(true);	
 			}
@@ -315,7 +320,7 @@ export class Homepage {
 			currentValue === await this.computeValue() &&
 			this.plugin.loaded && !this.plugin.executing
 		) {
-			await this.configure();
+			await this.configure(currentView.leaf);
 		}
 	}
 }
