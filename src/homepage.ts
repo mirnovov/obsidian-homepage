@@ -1,4 +1,4 @@
-import { App, FileView, MarkdownView, Notice, View as OView, TFile, WorkspaceLeaf, moment } from "obsidian";
+import { App, FileView, MarkdownView, Notice, View as OView, WorkspaceLeaf, moment } from "obsidian";
 import HomepagePlugin from "./main";
 import { getAutorun, getPeriodicNote } from "./periodic";
 import { emptyActiveView, randomFile, trimFile, untrimName } from "./utils";
@@ -170,8 +170,7 @@ export class Homepage {
 				return undefined;
 			}
 			
-			await this.app.vault.create(untrimName(this.computedValue), "");
-			file = this.app.metadataCache.getFirstLinkpathDest(this.computedValue, "/") as TFile;
+			file = await this.app.vault.create(untrimName(this.computedValue), "");
 		}
 		
 		const leaf = this.app.workspace.getLeaf(mode == Mode.Retain);
@@ -181,19 +180,12 @@ export class Homepage {
 		return leaf;
 	}
 		
-	async isNonextant(): Promise<boolean> {
-		const name = untrimName(this.computedValue);
-		return !(await this.app.vault.adapter.exists(name));
-	} 
-	
 	async configure(leaf: WorkspaceLeaf): Promise<void> {
 		this.plugin.executing = false;
 		const view = leaf.view;
 		
 		if (!(view instanceof MarkdownView)) {
-			if (this.data.pin) {
-				this.app.workspace.getActiveViewOfType(OView)?.leaf.setPinned(true);	
-			}
+			if (this.data.pin) view.leaf.setPinned(true);	
 			return;	
 		}
 		
