@@ -19,7 +19,6 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
 			value: "Home",
 			kind: Kind.File,
 			openOnStartup: true,
-			hasRibbonIcon: true,
 			openMode: Mode.ReplaceAll,
 			manualOpenMode: Mode.Retain,
 			view: View.Default,
@@ -183,11 +182,6 @@ export class HomepageSettingTab extends PluginSettingTab {
 		this.addToggle(
 			"Use when opening normally", "Use homepage settings when opening it normally, such as from a link or the file browser.",
 			"alwaysApply"
-		);
-		this.addToggle(
-			"Use ribbon icon", "Show a little house on the ribbon, allowing you to quickly access the homepage.",
-			"hasRibbonIcon",
-			(value) => this.plugin.setIcon(value)
 		);
 		new Setting(this.containerEl)
 			.setName("Separate mobile homepage")

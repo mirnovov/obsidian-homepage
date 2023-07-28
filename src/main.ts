@@ -1,4 +1,4 @@
-import { Keymap, Platform, Plugin, addIcon } from "obsidian";
+import { Keymap, Notice, Platform, Plugin, addIcon } from "obsidian";
 import { DEFAULT, MOBILE, Homepage, Kind } from "./homepage";
 import { hasRequiredPeriodicity } from "./periodic";
 import { DEFAULT_SETTINGS, HomepageSettings, HomepageSettingTab } from "./settings";
@@ -39,9 +39,17 @@ export default class HomepagePlugin extends Plugin {
 		});
 
 		addIcon("homepage", ICON);
-		this.setIcon(this.homepage.data.hasRibbonIcon);
-		this.registerEvent(this.app.workspace.on("layout-change", this.onLayoutChange));
+		this.addRibbonIcon(
+			"homepage", 
+			"Open homepage", 
+			e => this.homepage.open(
+				e.button == 1 || e.button == 2 || Keymap.isModifier(e, "Mod")
+				//right click, middle click, or ctrl/cmd
+			)
+		)
+		.setAttribute("id", "nv-homepage-icon");
 
+		this.registerEvent(this.app.workspace.on("layout-change", this.onLayoutChange));
 		this.addSettingTab(new HomepageSettingTab(this.app, this));
 
 		this.addCommand({
@@ -128,23 +136,6 @@ export default class HomepagePlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 
-	setIcon(value: boolean): void {
-		if (value) {
-			this.addRibbonIcon(
-				"homepage", 
-				"Open homepage", 
-				e => this.homepage.open(
-					e.button == 1 || e.button == 2 || Keymap.isModifier(e, "Mod")
-					//right click, middle click, or ctrl/cmd
-				)
-			)
-			.setAttribute("id", "nv-homepage-icon");
-		}
-		else {
-			document.getElementById("nv-homepage-icon")?.remove();
-		}
-	}
-	
 	hasRequiredPlugin(kind: Kind): boolean {
 		switch (kind) {
 			case Kind.Workspace:

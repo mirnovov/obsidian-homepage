@@ -13,7 +13,6 @@ export interface HomepageData {
 	value: string,
 	kind: string,
 	openOnStartup: boolean,
-	hasRibbonIcon: boolean,
 	openMode: string,
 	manualOpenMode: string,
 	view: string,
@@ -73,6 +72,17 @@ export class Homepage {
 		if (!this.data.commands) {
 			this.data.commands = [];
 			this.save();
+		}
+		
+		if (this.data?.hasRibbonIcon == false) {
+			this.app.workspace.onLayoutReady(async () => {
+				let ribbon = this.app.workspace.leftRibbon as any;
+				ribbon.items.find((i: any) => i.id === "homepage:Open homepage").hidden = true;
+				ribbon.onChange(true);
+				
+				delete this.data.hasRibbonIcon;
+				this.save();
+			});
 		}
 	}
 	
