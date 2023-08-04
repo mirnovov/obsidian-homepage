@@ -162,6 +162,7 @@ export default class HomepageTests {
 	}
 	
 	async reversion(this: HomepageTestPlugin) {
+		this.assert((this.app.vault as any)?.config.livePreview === undefined);
 		this.homepage.data.view = View.Reading;
 		this.homepage.save();
 	
@@ -174,6 +175,46 @@ export default class HomepageTests {
 		await this.sleep(200);
 		mode = this.app.workspace.getActiveViewOfType(MarkdownView)?.getMode();
 		this.assert(mode == "source", mode);
+	}
+	
+	async reversionThenViewChange(this: HomepageTestPlugin) {
+		this.homepage.data.view = View.Reading;
+		this.homepage.save();
+	
+		this.homepage.open();
+		await this.sleep(200);
+		const mode = this.app.workspace.getActiveViewOfType(MarkdownView)?.getMode();
+		this.assert(mode == "preview", mode);
+		
+		await this.app.workspace.openLinkText("Note B", "", false);
+		const view = this.app.workspace.getActiveViewOfType(MarkdownView),
+			  state = view?.getState() || {};
+		state.mode = "source";
+		await view?.leaf.setViewState({type: "markdown", state: state});
+		await this.sleep(200);
+		this.assert(state.source == false, state);
+	}
+	
+	async reversionWithoutDefaults(this: HomepageTestPlugin) {
+		const config = (this.app.vault as any)?.config;
+		if (!config) (this.app.vault as any).config = {};
+		
+		config.livePreview = true;
+		config.defaultViewMode = "preview";
+		this.homepage.data.view = View.Source;
+		this.homepage.save();
+		
+		this.homepage.open();
+		await this.sleep(200);
+		let mode = this.app.workspace.getActiveViewOfType(MarkdownView)?.getMode();
+		this.assert(mode == "source", mode);
+		
+		await this.app.workspace.openLinkText("Note B", "", false);
+		await this.sleep(200);
+		mode = this.app.workspace.getActiveViewOfType(MarkdownView)?.getMode();
+		this.assert(mode == "preview", mode);
+		
+		(this.app.vault as any).config = {};
 	}
 	
 	async alwaysApply(this: HomepageTestPlugin) {

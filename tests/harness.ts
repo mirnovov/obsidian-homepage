@@ -72,7 +72,6 @@ const TEST_CSS = `
 const TEST_SUITES = [HomepageTests, HomepagePluginTests, HomepageSettingsTests];
 
 export default class HomepageTestPlugin extends HomepagePlugin {
-
 	testResults: Record<string, Result[]> = {};
 
 	async onload(): Promise<void> {

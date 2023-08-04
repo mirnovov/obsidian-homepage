@@ -62,9 +62,9 @@ async function generateContext(mode) {
 }
 
 async function startTests() {
-	await ensurePlugin("blacksmithgu/obsidian-dataview", "master", "dataview");
-	await ensurePlugin("liamcain/obsidian-periodic-notes", "main", "periodic-notes");
-	await ensurePlugin("mgmeyers/obsidian-kanban", "main", "obsidian-kanban");
+	await ensurePlugin("blacksmithgu/obsidian-dataview", "dataview");
+	await ensurePlugin("liamcain/obsidian-periodic-notes", "periodic-notes");
+	await ensurePlugin("mgmeyers/obsidian-kanban", "obsidian-kanban");
 	
 	opener("obsidian://nv-testing-restart");
 	
@@ -74,10 +74,10 @@ async function startTests() {
 	}, 500);
 }
 
-async function ensurePlugin(url, branch, name) {
+async function ensurePlugin(url, name) {
 	let version = "0";
 	const latest = (await fetch(
-		`https://raw.githubusercontent.com/${url}/${branch}/manifest.json`
+		`https://raw.githubusercontent.com/${url}/HEAD/manifest.json`
 	).then(r => r.json())).version;
 	
 	try {
