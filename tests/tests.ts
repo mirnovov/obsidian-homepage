@@ -77,22 +77,7 @@ export default class HomepageTests {
 		state = this.app.workspace.getActiveViewOfType(MarkdownView)?.getState();
 		
 		this.assert(state?.mode == "source" && state.source, state);
-	}
-	
-	async reversion(this: HomepageTestPlugin) {
-		this.homepage.data.view = View.Reading;
-		this.homepage.save();
-	
-		this.homepage.open();
-		await this.sleep(200);
-		let mode = this.app.workspace.getActiveViewOfType(MarkdownView)?.getMode();
-		this.assert(mode == "preview", mode);
-		
-		await this.app.workspace.openLinkText("Note B", "", false);
-		await this.sleep(200);
-		mode = this.app.workspace.getActiveViewOfType(MarkdownView)?.getMode();
-		this.assert(mode == "source", mode);
-	}
+	}	
 	
 	async commands(this: HomepageTestPlugin) {
 		this.addCommand({
@@ -164,18 +149,6 @@ export default class HomepageTests {
 		this.assert(false);
 	}
 	
-	async alwaysApply(this: HomepageTestPlugin) {
-		this.homepage.data.view = View.Source;
-		this.homepage.data.alwaysApply = true;
-		this.homepage.save();
-		
-		this.app.workspace.openLinkText("Home", "", false);
-		await this.sleep(500);
-		
-		let state = this.app.workspace.getActiveViewOfType(MarkdownView)?.getState();
-		this.assert(state?.mode == "source" && state.source == true, state);
-	}
-	
 	async openWhenEmpty(this: HomepageTestPlugin) {
 		this.homepage.data.openWhenEmpty = true;
 		this.homepage.save();
@@ -186,5 +159,32 @@ export default class HomepageTests {
 		const file = this.app.workspace.getActiveFile();
 		const leaves = this.app.workspace.getLeavesOfType("markdown");
 		this.assert(file?.name == "Home.md" && leaves.length == 1, file, leaves);
+	}
+	
+	async reversion(this: HomepageTestPlugin) {
+		this.homepage.data.view = View.Reading;
+		this.homepage.save();
+	
+		this.homepage.open();
+		await this.sleep(200);
+		let mode = this.app.workspace.getActiveViewOfType(MarkdownView)?.getMode();
+		this.assert(mode == "preview", mode);
+		
+		await this.app.workspace.openLinkText("Note B", "", false);
+		await this.sleep(200);
+		mode = this.app.workspace.getActiveViewOfType(MarkdownView)?.getMode();
+		this.assert(mode == "source", mode);
+	}
+	
+	async alwaysApply(this: HomepageTestPlugin) {
+		this.homepage.data.view = View.Source;
+		this.homepage.data.alwaysApply = true;
+		this.homepage.save();
+		
+		this.app.workspace.openLinkText("Home", "", false);
+		await this.sleep(500);
+		
+		let state = this.app.workspace.getActiveViewOfType(MarkdownView)?.getState();
+		this.assert(state?.mode == "source" && state.source == true, state);
 	}
 }

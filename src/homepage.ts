@@ -283,7 +283,7 @@ export class Homepage {
 		const state = view.getState(),
 			  config = (this.app.vault as any).config,
 			  mode = config.defaultViewMode || "source",
-			  source = !config.livePreview || false;
+			  source = config.livePreview !== undefined ? !config.livePreview : false;
 			  
 		if (
 			view.leaf.getViewState().type == "markdown" &&
@@ -291,7 +291,7 @@ export class Homepage {
 		) {
 			state.mode = mode;
 			state.source = source;
-			await view.leaf.setViewState({type: "markdown", state: state, active: true });
+			await view.leaf.setViewState({ type: "markdown", state: state, active: true });
 		}
 		
 		this.lastView = undefined;
