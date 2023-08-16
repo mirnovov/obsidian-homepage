@@ -44,6 +44,7 @@ export enum Kind {
 	Workspace = "Workspace",
 	Random = "Random file",
 	Graph = "Graph view",
+	None = "Nothing",
 	DailyNote = "Daily Note",
 	WeeklyNote = "Weekly Note",
 	MonthlyNote = "Monthly Note",
@@ -91,10 +92,10 @@ export class Homepage {
 			new Notice("Homepage cannot be opened due to plugin unavailablity.");
 			return;
 		}
-		else if (this.data.kind == Kind.Workspace) {
+		else if (this.data.kind === Kind.Workspace) {
 			await this.launchWorkspace();
 		}
-		else {
+		else if (this.data.kind !== Kind.None) {
 			let mode = this.plugin.loaded ? this.data.manualOpenMode : this.data.openMode;
 			if (alternate) mode = Mode.Retain;
 			

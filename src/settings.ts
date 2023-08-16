@@ -36,7 +36,7 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
 }
 
 export const DEFAULT_DATA: HomepageData = DEFAULT_SETTINGS.homepages[DEFAULT];
-const UNCHANGEABLE: Kind[] = [Kind.Random, Kind.Graph, ...PERIODIC_KINDS];
+const UNCHANGEABLE: Kind[] = [Kind.Random, Kind.Graph, Kind.None, ...PERIODIC_KINDS];
 
 export class HomepageSettingTab extends PluginSettingTab {
 	plugin: HomepagePlugin;
@@ -60,6 +60,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 	
 	display(): void {
 		const hasWorkspaces = this.plugin.homepage.data.kind == Kind.Workspace;
+		const kind = this.plugin.homepage.data.kind as Kind;
 		const autorun = getAutorun(this.plugin);
 		let pluginDisabled = false;
 		
@@ -95,7 +96,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		mainSetting.settingEl.id = "nv-main-setting";
 		mainSetting.settingEl.append(descContainer);
 		
-		switch (this.plugin.homepage.data.kind) {
+		switch (kind) {
 			case Kind.File:
 				descContainer.innerHTML = `Enter a note or canvas to use.`;
 				break;
@@ -104,6 +105,9 @@ export class HomepageSettingTab extends PluginSettingTab {
 				break;
 			case Kind.Graph:
 				descContainer.innerHTML = `Your graph view will be used.`;
+				break;
+			case Kind.None:
+				descContainer.innerHTML = `Nothing will occur by default. Any commands added will still take effect.`;
 				break;
 			case Kind.MomentDate:
 				descContainer.innerHTML = 
@@ -131,7 +135,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 			});
 		}
 		
-		if (this.plugin.homepage.data.kind == Kind.MomentDate) {
+		if (kind == Kind.MomentDate) {
 			const sample = descContainer.lastChild!.createEl("b", {attr: {class: "u-pop"}});
 			
 			mainSetting.addMomentFormat(text => text
@@ -144,7 +148,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 				.setSampleEl(sample)
 			);
 		} 
-		else if (UNCHANGEABLE.includes(this.plugin.homepage.data.kind as Kind)) {
+		else if (UNCHANGEABLE.includes(kind)) {
 			mainSetting.addText(text => {
 				text.setDisabled(true);
 			});
@@ -247,10 +251,10 @@ export class HomepageSettingTab extends PluginSettingTab {
 				.onClick(async () => await this.copyDebugInfo());
 		}
 		
-		if (hasWorkspaces) {
+		if (hasWorkspaces || kind === Kind.None) {
 			this.disableSettings("openWhenEmpty", "alwaysApply", "vaultHeading", "openMode", "manualOpenMode", "autoCreate", "pin");
 		}
-		if (hasWorkspaces || this.plugin.homepage.data.kind == Kind.Graph) {
+		if (hasWorkspaces || [Kind.None, Kind.Graph].includes(kind)) {
 			this.disableSettings("paneHeading", "view", "revertView", "autoScroll", "refreshDataview");
 		}
 		if (!this.plugin.homepage.data.openOnStartup || autorun) this.disableSetting("openMode");
