@@ -1,7 +1,10 @@
-import { Keymap, Notice, Platform, Plugin, addIcon } from "obsidian";
+import { Keymap, Platform, Plugin, addIcon } from "obsidian";
 import { DEFAULT, MOBILE, Homepage, Kind } from "./homepage";
 import { hasRequiredPeriodicity } from "./periodic";
 import { DEFAULT_SETTINGS, HomepageSettings, HomepageSettingTab } from "./settings";
+
+declare const DEV: boolean;
+if (DEV) import("./dev");
 
 const ICON: string = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5"><path d="M10.025 21H6v-7H3v-1.5L12 3l9 9.5V14h-3v7h-4v-7h-3.975v7Z" style="fill:none;stroke:currentColor;stroke-width:2px"/></svg>`
 

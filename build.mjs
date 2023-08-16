@@ -57,6 +57,7 @@ async function generateContext(mode) {
 		treeShaking: true,
 		minify: mode == "prod",
 		outfile: outPath,
+		define: { DEV: (mode !== "prod").toString() },
 		plugins: plugins
 	});
 }
