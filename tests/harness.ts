@@ -111,6 +111,7 @@ export default class HomepageTestPlugin extends HomepagePlugin {
 			await this.sleep(50);
 						
 			try {
+				console.log(`Running test ${className}.${name}...`);
 				await (tests as any)[name].call(this);
 			}
 			catch (e: any) {

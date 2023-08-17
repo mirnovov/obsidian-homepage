@@ -161,6 +161,20 @@ export default class HomepageTests {
 		this.assert(file?.name == "Home.md" && leaves.length == 1, file, leaves);
 	}
 	
+	async openWhenEmptyReplaceAll(this: HomepageTestPlugin) {
+		this.homepage.data.openWhenEmpty = true;
+		this.homepage.data.manualOpenMode = Mode.ReplaceAll;
+		this.homepage.save();
+		
+		this.app.workspace.iterateAllLeaves(l => l.detach());
+		await this.sleep(500);
+		
+		const file = this.app.workspace.getActiveFile();
+		const leaves = this.app.workspace.getLeavesOfType("markdown");
+		this.assert(file?.name == "Home.md" && leaves.length == 1, file, leaves);
+	}
+
+	
 	async reversion(this: HomepageTestPlugin) {
 		this.assert((this.app.vault as any)?.config.livePreview === undefined);
 		this.homepage.data.view = View.Reading;

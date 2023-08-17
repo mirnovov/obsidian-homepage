@@ -299,7 +299,7 @@ export class Homepage {
 	}
 	
 	async openWhenEmpty(): Promise<void> {
-		if (!this.plugin.loaded) return;
+		if (!this.plugin.loaded || this.plugin.executing) return;
 		const leaf = this.app.workspace.getActiveViewOfType(OView)?.leaf;
 		
 		if (
@@ -307,7 +307,8 @@ export class Homepage {
 			(leaf as any)?.parentSplit.children.length != 1
 		) return
 		
-		await this.open();
+		//should always behave the same regardless of mode
+		await this.open(true);
 	}
 	
 	async apply(): Promise<void> {
