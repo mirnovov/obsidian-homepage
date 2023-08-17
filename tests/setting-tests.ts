@@ -2,7 +2,7 @@ import { Kind, Mode, View } from "src/homepage";
 import { HomepageSettings, DEFAULT_SETTINGS } from "src/settings";
 import HomepageTestPlugin from "./harness";
 
-export default class HomepageSettingsTests {
+export default class SettingTests {
 	async loadEmptySettings(this: HomepageTestPlugin) {
 		this.settings = {} as HomepageSettings;
 		this.saveSettings();
@@ -54,5 +54,4 @@ export default class HomepageSettingsTests {
 		this.assert(document.getElementsByClassName("nv-debug-button").length > 0);
 		setting.close();
 	}
-
 }

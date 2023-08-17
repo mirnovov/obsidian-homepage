@@ -1,9 +1,6 @@
 import { ButtonComponent, Modal, getIcon } from "obsidian";
 import HomepagePlugin from "src/main";
 import { DEFAULT_DATA } from "src/settings";
-import HomepagePluginTests from "./plugin-tests";
-import HomepageSettingsTests from "./settings-tests";
-import HomepageTests from "./tests";
 
 type Result = {
 	name: string,
@@ -69,7 +66,12 @@ const TEST_CSS = `
 	}
 `;
 
-const TEST_SUITES = [HomepageTests, HomepagePluginTests, HomepageSettingsTests];
+const TEST_SUITES = [
+	import("./opening-tests"),
+	import("./plugin-tests"),
+	import("./setting-tests"),
+	import("./view-tests")
+];
 
 export default class HomepageTestPlugin extends HomepagePlugin {
 	testResults: Record<string, Result[]> = {};
@@ -87,7 +89,7 @@ export default class HomepageTestPlugin extends HomepagePlugin {
 		await this.sleep(100);
 		
 		for (const suite of TEST_SUITES) {
-			await this.runTests(suite);
+			await this.runTests((await suite).default);
 		}		
 
 		const modal = new TestResultModal(this);
@@ -111,7 +113,6 @@ export default class HomepageTestPlugin extends HomepagePlugin {
 			await this.sleep(50);
 						
 			try {
-				console.log(`Running test ${className}.${name}...`);
 				await (tests as any)[name].call(this);
 			}
 			catch (e: any) {

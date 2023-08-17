@@ -15,8 +15,8 @@ out
 data.json
 
 # testing
-tests/*
-!tests/vault
+tests/*/
+!tests/vault/
 tests/vault/.obsidian/plugins/*/*
 !tests/vault/.obsidian/plugins/periodic-notes/data.json
 tests/vault/.obsidian/workspace.json

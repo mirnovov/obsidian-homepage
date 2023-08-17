@@ -2,7 +2,7 @@ import { MarkdownView, TFile, moment } from "obsidian";
 import { Kind, View } from "src/homepage";
 import HomepageTestPlugin from "./harness";
 
-export default class HomepagePluginTests {
+export default class PluginTests {
 	async workspaces(this: HomepageTestPlugin) {
 		await this.app.workspace.openLinkText("Note A", "", false);
 		
