@@ -130,7 +130,7 @@ export class Homepage {
 			return;
 		}
 
-		if (mode != Mode.ReplaceAll) {
+		if (mode !== Mode.ReplaceAll) {
 			const alreadyOpened = this.getOpened();
 	
 			if (alreadyOpened.length > 0) {
@@ -142,6 +142,10 @@ export class Homepage {
 				//if there is an empty tab, don't keep it
 				mode = Mode.ReplaceLast;
 			}
+		}
+		
+		if (mode !== Mode.Retain) {
+			this.app.workspace.getActiveViewOfType(OView)?.leaf.setPinned(false);
 		}
 		
 		if (this.data.kind === Kind.Graph) leaf = await this.launchGraph(mode);
