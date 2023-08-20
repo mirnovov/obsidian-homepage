@@ -19,7 +19,7 @@ export default class HomepagePlugin extends Plugin {
 	homepage: Homepage;
 	
 	async onload(): Promise<void> {
-		const activeInitially = document.body.querySelector(".progress-bar") !== null;
+		const appStartup = document.body.querySelector(".progress-bar") !== null;
 		
 		this.settings = await this.loadSettings();
 		this.internalPlugins = (this.app as any).internalPlugins.plugins;
@@ -28,7 +28,11 @@ export default class HomepagePlugin extends Plugin {
 		
 		this.app.workspace.onLayoutReady(async () => {
 			const ntp = this.communityPlugins["new-tab-default-page"];
-
+			const openInitially = (
+				this.homepage.data.openOnStartup &&
+				appStartup && !this.hasUrlParams()
+			);
+			
 			if (ntp) {
 				ntp._checkForNewTab = ntp.checkForNewTab;
 				ntp.checkForNewTab = async (e: any) => {
@@ -37,7 +41,7 @@ export default class HomepagePlugin extends Plugin {
 				}; 
 			}
 			
-			if (activeInitially && this.homepage.data.openOnStartup) await this.homepage.open();
+			if (openInitially) await this.homepage.open();
 			this.loaded = true;
 		});
 
@@ -51,7 +55,7 @@ export default class HomepagePlugin extends Plugin {
 			)
 		)
 		.setAttribute("id", "nv-homepage-icon");
-
+				
 		this.registerEvent(this.app.workspace.on("layout-change", this.onLayoutChange));
 		this.addSettingTab(new HomepageSettingTab(this.app, this));
 
@@ -137,6 +141,15 @@ export default class HomepagePlugin extends Plugin {
 	
 	async saveSettings(): Promise<void> {
 		await this.saveData(this.settings);
+	}
+	
+	hasUrlParams(): boolean {
+		const params = (window as any).OBS_ACT;
+
+		return (
+			params && ["open", "advanced-uri"].includes(params?.action) &&
+			("file" in params || "filepath" in params || "workspace" in params)
+		)
 	}
 
 	hasRequiredPlugin(kind: Kind): boolean {
