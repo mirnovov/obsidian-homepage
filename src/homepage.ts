@@ -147,23 +147,16 @@ export class Homepage {
 		if (mode !== Mode.Retain) {
 			this.app.workspace.getActiveViewOfType(OView)?.leaf.setPinned(false);
 		}
+		if (mode === Mode.ReplaceAll) {
+			LEAF_TYPES.forEach(t => this.app.workspace.detachLeavesOfType(t));
+			await Promise.resolve(); //let obsidian initialise the new empty leaf
+		}
 		
 		if (this.data.kind === Kind.Graph) leaf = await this.launchGraph(mode);
 		else leaf = await this.launchNote(mode);
 		if (!leaf) return;
 		
 		await this.configure(leaf);
-		
-		if (mode == Mode.ReplaceAll) {
-			this.app.workspace.iterateAllLeaves(old => {
-				if (
-					LEAF_TYPES.includes(old.getViewState().type)
-					&& (leaf as any).id != (old as any).id
-				) old.detach();
-			});
-			
-			this.app.workspace.detachLeavesOfType("empty");
-		}
 	}
 	
 	async launchGraph(mode: Mode): Promise<WorkspaceLeaf | undefined> {
