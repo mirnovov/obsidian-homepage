@@ -63,53 +63,12 @@ async function generateContext(mode) {
 }
 
 async function startTests() {
-	await ensurePlugin("blacksmithgu/obsidian-dataview", "dataview");
-	await ensurePlugin("liamcain/obsidian-periodic-notes", "periodic-notes");
-	await ensurePlugin("mgmeyers/obsidian-kanban", "obsidian-kanban");
-	
 	opener("obsidian://nv-testing-restart");
 	
 	setTimeout(() => {
 		const path = encodeURI(resolve("./tests/vault"))
 		opener(`obsidian://open?path=${path}`)
 	}, 500);
-}
-
-async function ensurePlugin(url, name) {
-	let version = "0";
-	const latest = (await fetch(
-		`https://raw.githubusercontent.com/${url}/HEAD/manifest.json`
-	).then(r => r.json())).version;
-	
-	try {
-		const manifest = JSON.parse(await fs.readFile(
-			`./tests/vault/.obsidian/plugins/${name}/manifest.json`
-		));
-		
-		version = manifest.version;
-	}
-	catch (e) {
-		if (e.code !== "ENOENT") throw e;
-	}
-	
-	if (latest !== version) {
-		await fs.mkdir(`./tests/vault/.obsidian/plugins/${name}/`, { recursive: true });
-
-		const info = await fetch(
-			`https://api.github.com/repos/${url}/releases/tags/${latest}`
-		).then(r => r.json());
-		
-		for (const file of info.assets) {
-			if (!["main.js", "manifest.json", "styles.css"].includes(file.name)) continue; 
-			
-			const content = await fetch(file.browser_download_url).then(r => r.text());
-			await fs.writeFile(
-				`./tests/vault/.obsidian/plugins/${name}/${file.name}`, content
-			);
-		}
-	}
-	
-	console.log(`${name} ${latest} installed for testing`);
 }
 
 const mode = getMode(process.argv[2]);

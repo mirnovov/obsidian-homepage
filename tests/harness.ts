@@ -73,6 +73,8 @@ const TEST_SUITES = [
 	import("./view-tests")
 ];
 
+const PLUGINS = ["dataview", "obsidian-kanban", "periodic-notes"];
+
 export default class HomepageTestPlugin extends HomepagePlugin {
 	testResults: Record<string, Result[]> = {};
 
@@ -82,7 +84,10 @@ export default class HomepageTestPlugin extends HomepagePlugin {
 		});
 		
 		super.onload();
-		this.app.workspace.onLayoutReady(async () => await this.execute());
+		this.app.workspace.onLayoutReady(async () => {
+			await window.homepageEnsurePlugins(PLUGINS, false);
+			await this.execute();
+		});
 	}
 	
 	async execute(): Promise<void> {
