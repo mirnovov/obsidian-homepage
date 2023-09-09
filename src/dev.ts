@@ -49,9 +49,9 @@ window.homepageEnsurePlugins = async (plugins: string[], enable: boolean) => {
 	for (const item of pluginList) keyedPluginList[item.id] = item;
 	
 	for (let id of plugins) {
-		if (id === "homepage") continue;
+		if (id === "homepage" || !(id in keyedPluginList)) continue;
 		
-		const repo = keyedPluginList[id].repo;
+		const repo = keyedPluginList[id]?.repo;
 		const manifest = await fetch(
 			`https://raw.githubusercontent.com/${repo}/HEAD/manifest.json`
 		).then(r => r.json());
