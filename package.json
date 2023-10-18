@@ -12,8 +12,7 @@
 	"author": "novov",
 	"license": "MIT",
 	"dependencies": {
-		"@popperjs/core": "2.11.7",
-		"obsidian": "^1.1.13",
+		"obsidian": "^1.4.10",
 		"obsidian-daily-notes-interface": "^0.9.4"
 	},
 	"devDependencies": {

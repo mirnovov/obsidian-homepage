@@ -1,10 +1,11 @@
-import { App, FuzzySuggestModal, Notice, TAbstractFile, TFile } from "obsidian";
+import { App, AbstractInputSuggest, FuzzySuggestModal, Notice, TAbstractFile, TFile } from "obsidian";
 import { Homepage } from "./homepage";
-import { TextInputSuggest } from "./suggest";
 import { HomepageSettingTab } from "./settings"; 
 import { trimFile } from "./utils";
 
-export class FileSuggest extends TextInputSuggest<TFile> {
+export class FileSuggest extends AbstractInputSuggest<TFile> {
+	textInputEl: HTMLInputElement;
+	
 	getSuggestions(inputStr: string): TFile[] {
 		const abstractFiles = this.app.vault.getAllLoadedFiles();
 		const files: TFile[] = [];
@@ -37,13 +38,15 @@ export class FileSuggest extends TextInputSuggest<TFile> {
 	}
 
 	selectSuggestion(file: TFile) {
-		this.inputEl.value = trimFile(file);
-		this.inputEl.trigger("input");
+		this.textInputEl.value = trimFile(file);
+		this.textInputEl.trigger("input");
 		this.close();
 	}
 }
 
-export class WorkspaceSuggest extends TextInputSuggest<string> {
+export class WorkspaceSuggest extends AbstractInputSuggest<string> {
+	textInputEl: HTMLInputElement;
+	
 	getSuggestions(inputStr: string): string[] {
 		const workspaces = Object.keys((this.app as any).internalPlugins.plugins.workspaces?.instance.workspaces);
 		const inputLower = inputStr.toLowerCase();
@@ -56,8 +59,8 @@ export class WorkspaceSuggest extends TextInputSuggest<string> {
 	}
 
 	selectSuggestion(workspace: string) {
-		this.inputEl.value = workspace;
-		this.inputEl.trigger("input");
+		this.textInputEl.value = workspace;
+		this.textInputEl.trigger("input");
 		this.close();
 	}
 }
