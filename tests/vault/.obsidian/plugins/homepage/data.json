@@ -15,7 +15,8 @@
       "autoScroll": false,
       "pin": false,
       "commands": [],
-      "alwaysApply": false
+      "alwaysApply": false,
+      "hideReleaseNotes": false
     }
   },
   "separateMobile": false

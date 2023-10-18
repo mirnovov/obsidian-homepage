@@ -29,7 +29,8 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
 			autoScroll: false,
 			pin: false,
 			commands: [],
-			alwaysApply: false
+			alwaysApply: false,
+			hideReleaseNotes: false
 		}
 	},
 	separateMobile: false
@@ -221,6 +222,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		);
 		this.addToggle("Auto-create", "If the homepage doesn't exist, create a note with the specified name.", "autoCreate");
 		this.addToggle("Pin", "Pin the homepage when opening.", "pin");
+		this.addToggle("Hide release notes", "Never display release notes when Obsidian updates.", "hideReleaseNotes");
 		
 		this.addHeading("Opened view", "paneHeading");
 		this.addDropdown(

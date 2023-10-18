@@ -23,7 +23,8 @@ export interface HomepageData {
 	autoScroll: boolean,
 	pin: boolean,
 	commands: string[],
-	alwaysApply: boolean
+	alwaysApply: boolean,
+	hideReleaseNotes: boolean
 } 
 
 export enum Mode {
@@ -92,7 +93,11 @@ export class Homepage {
 			new Notice("Homepage cannot be opened due to plugin unavailablity.");
 			return;
 		}
-		else if (this.data.kind === Kind.Workspace) {
+		else if (this.data.hideReleaseNotes) {
+			this.app.workspace.detachLeavesOfType("release-notes");
+		}
+		
+		if (this.data.kind === Kind.Workspace) {
 			await this.launchWorkspace();
 		}
 		else if (this.data.kind !== Kind.None) {
