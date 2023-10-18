@@ -52,6 +52,7 @@ declare global {
 		OBS_ACT: string | any;
 		electron: any;
 		electronWindow: any;
+		homepageLegacyOptionsEnabled: boolean;
 		homepageLoadDebugInfo: (info: any) => Promise<void>;
 		homepageEnsurePlugins: (plugins: string[], enable: boolean) => Promise<void>;
 	}

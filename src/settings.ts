@@ -84,7 +84,11 @@ export class HomepageSettingTab extends PluginSettingTab {
 					}
 					
 					let desc = key as string;
-					if (key == Kind.MomentDate) desc = "Moment (legacy)";
+					
+					if (key == Kind.MomentDate) {
+						if (!this.enableMomentOption()) continue; 
+						desc = "Moment (legacy)";
+					}
 					
 					dropdown.addOption(key, desc);
 				}
@@ -114,9 +118,8 @@ export class HomepageSettingTab extends PluginSettingTab {
 				break;
 			case Kind.MomentDate:
 				descContainer.innerHTML = 
-				`<span class="mod-warning">This type is deprecated and will eventually be removed. Use Daily/Weekly/Monthly/Yearly Note instead, which works natively with Daily and Periodic Notes.</span><br>
-				Enter a note or canvas to use based on <a href="https://momentjs.com/docs/#/displaying/format/" target="_blank" rel="noopener">Moment date formatting</a>.<small> Surround words in <code>[brackets]</code> to include them unmodified.
-				<br> Currently, your specification will produce: </small>`;
+				`<span class="mod-warning">This type is deprecated and will eventually be removed. It is only available since you have previously chosen it. Use Daily/Weekly/Monthly/Yearly Note instead, which works natively with Daily and Periodic Notes.</span><br>
+				Enter a note or canvas to use based on <a href="https://momentjs.com/docs/#/displaying/format/" target="_blank" rel="noopener">Moment date formatting</a>.`;
 				break;
 			case Kind.Random:
 				descContainer.innerHTML = `A random note or canvas from your Obsidian folder will be selected.`;
@@ -138,20 +141,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 			});
 		}
 		
-		if (kind == Kind.MomentDate) {
-			const sample = descContainer.lastChild!.createEl("b", {attr: {class: "u-pop"}});
-			
-			mainSetting.addMomentFormat(text => text
-				.setDefaultFormat("YYYY-MM-DD")
-				.setValue(this.plugin.homepage.data.value)
-				.onChange(async value => {
-					this.plugin.homepage.data.value = value;
-					await this.plugin.homepage.save();
-				})
-				.setSampleEl(sample)
-			);
-		} 
-		else if (UNCHANGEABLE.includes(kind)) {
+		if (UNCHANGEABLE.includes(kind)) {
 			mainSetting.addText(text => {
 				text.setDisabled(true);
 			});
@@ -338,6 +328,10 @@ export class HomepageSettingTab extends PluginSettingTab {
 				modal.open();
 			});
 	} 
+	
+	enableMomentOption(): boolean {
+		return this.plugin.homepage.data.kind == Kind.MomentDate || window.homepageLegacyOptionsEnabled;
+	}
 	
 	async copyDebugInfo(): Promise<void> {
 		const config = this.app.vault.config;
