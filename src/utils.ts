@@ -12,7 +12,7 @@ export function untrimName(name: string): string {
 
 export function wrapAround(value: number, size: number): number {
 	return ((value % size) + size) % size;
-};
+}
 
 export function randomFile(app: App): string | undefined {
 	const files = app.vault.getFiles().filter(

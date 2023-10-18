@@ -53,7 +53,7 @@ export class WorkspaceSuggest extends TextInputSuggest<string> {
 
 	renderSuggestion(workspace: string, el: HTMLElement) {
 		el.setText(workspace);
-	 }
+	}
 
 	selectSuggestion(workspace: string) {
 		this.inputEl.value = workspace;
@@ -62,7 +62,7 @@ export class WorkspaceSuggest extends TextInputSuggest<string> {
 	}
 }
 
-export class CommandSuggestModal extends FuzzySuggestModal<Object> {
+export class CommandSuggestModal extends FuzzySuggestModal<unknown> {
 	app: App
 	homepage: Homepage;
 	tab: HomepageSettingTab;

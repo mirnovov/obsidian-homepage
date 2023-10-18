@@ -2,8 +2,8 @@ import { DEFAULT_SETTINGS } from "./settings";
 
 declare global {
 	interface Window {
-		homepageLoadDebugInfo: Function;
-		homepageEnsurePlugins: Function;
+		homepageLoadDebugInfo: (info: any) => Promise<void>;
+		homepageEnsurePlugins: (plugins: string[], enable: boolean) => Promise<void>;
 	}
 }
 
@@ -48,7 +48,7 @@ window.homepageEnsurePlugins = async (plugins: string[], enable: boolean) => {
 	const keyedPluginList = {} as any;
 	for (const item of pluginList) keyedPluginList[item.id] = item;
 	
-	for (let id of plugins) {
+	for (const id of plugins) {
 		if (id === "homepage" || !(id in keyedPluginList)) continue;
 		
 		const repo = keyedPluginList[id]?.repo;

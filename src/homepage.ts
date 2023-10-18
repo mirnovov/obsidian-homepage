@@ -77,7 +77,7 @@ export class Homepage {
 		
 		if (this.data?.hasRibbonIcon == false) {
 			this.app.workspace.onLayoutReady(async () => {
-				let ribbon = this.app.workspace.leftRibbon as any;
+				const ribbon = this.app.workspace.leftRibbon as any;
 				ribbon.items.find((i: any) => i.id === "homepage:Open homepage").hidden = true;
 				ribbon.onChange(true);
 				
@@ -276,13 +276,13 @@ export class Homepage {
 		if (this.lastView == undefined || this.data.view == View.Default) return;
 		
 		const view = this.lastView.deref();
-		if (!view || trimFile(view.file) == this.computedValue) return;
+		if (!view || trimFile(view.file!) == this.computedValue) return;
 	
 		const state = view.getState(),
-			  config = (this.app.vault as any).config,
-			  mode = config.defaultViewMode || "source",
-			  source = config.livePreview !== undefined ? !config.livePreview : false;
-			  
+			config = (this.app.vault as any).config,
+			mode = config.defaultViewMode || "source",
+			source = config.livePreview !== undefined ? !config.livePreview : false;
+
 		if (
 			view.leaf.getViewState().type == "markdown" &&
 			(mode != state.mode || source != state.source)
@@ -312,7 +312,7 @@ export class Homepage {
 		const currentView = this.app.workspace.getActiveViewOfType(FileView);
 		if (!currentView) return;
 		
-		const currentValue = trimFile(currentView.file);
+		const currentValue = trimFile(currentView.file!);
 		if (this.openedViews.get(currentView) === currentValue) return;
 		
 		this.openedViews.set(currentView, currentValue);

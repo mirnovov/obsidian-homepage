@@ -1,20 +1,20 @@
-import { Plugin, moment } from "obsidian";
+import { Plugin, TFile, moment } from "obsidian";
 import HomepagePlugin from "./main";
 import { Kind } from "./homepage";
 import { trimFile } from "./utils";
 import { 
 	createDailyNote, getDailyNote, getAllDailyNotes,
-  	createWeeklyNote, getMonthlyNote, getAllMonthlyNotes,
-  	createMonthlyNote, getWeeklyNote, getAllWeeklyNotes,
-  	createYearlyNote, getYearlyNote, getAllYearlyNotes  	
+	createWeeklyNote, getMonthlyNote, getAllMonthlyNotes,
+	createMonthlyNote, getWeeklyNote, getAllWeeklyNotes,
+	createYearlyNote, getYearlyNote, getAllYearlyNotes  	
 } from "obsidian-daily-notes-interface";
 
 interface KindInfo {
 	noun: string,
 	adjective: string,
-	create: Function,
-	get: Function,
-	getAll: Function
+	create: (date: moment.Moment) => Promise<TFile>,
+	get: (date: moment.Moment, dailyNotes: Record<string, TFile>) => TFile,
+	getAll: () => Record<string, TFile>
 }
 
 export const PERIODIC_INFO: Record<string, KindInfo> = {
@@ -54,12 +54,12 @@ export const PERIODIC_KINDS: Kind[] = [
 
 export async function getPeriodicNote(kind: Kind, plugin: HomepagePlugin): Promise<string> {
 	const periodicNotes = plugin.communityPlugins["periodic-notes"],
-		  info = PERIODIC_INFO[kind],
-		  date = moment().startOf(info.noun as any);
+		info = PERIODIC_INFO[kind],
+		date = moment().startOf(info.noun as any);
 	let note;
 		
 	if (isLegacyPeriodicNotes(periodicNotes)) {
-		let all = info.getAll();
+		const all = info.getAll();
 		
 		if (!Object.keys(all).length) {
 			note = await info.create(date);	
@@ -99,7 +99,7 @@ export function hasRequiredPeriodicity(kind: Kind, plugin: HomepagePlugin): bool
 export function getAutorun(plugin: HomepagePlugin): any { 
 	const dailyNotes = plugin.internalPlugins["daily-notes"];
 	return dailyNotes?.enabled && dailyNotes?.instance.options.autorun; 
-};
+}
 
 function isLegacyPeriodicNotes(periodicNotes: Plugin): boolean {
 	return (periodicNotes?.manifest.version || "0").startsWith("0");
