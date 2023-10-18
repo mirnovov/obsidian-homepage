@@ -52,7 +52,7 @@ export default class OpeningTests {
 		this.addCommand({
 			id: "nv-test-command",
 			name: "Test",
-			callback: () => (this as any).test = true
+			callback: () => this.test = true
 		});
 		
 		this.homepage.data.commands = ["homepage:nv-test-command"];
@@ -61,7 +61,7 @@ export default class OpeningTests {
 		this.homepage.open();
 		await this.sleep(100);
 		
-		this.assert((this as any).test, this);
+		this.assert(this.test, this);
 	}
 	
 	async autoCreate(this: HomepageTestPlugin) {

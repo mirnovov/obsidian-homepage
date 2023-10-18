@@ -78,8 +78,8 @@ export class Homepage {
 		
 		if (this.data?.hasRibbonIcon == false) {
 			this.app.workspace.onLayoutReady(async () => {
-				const ribbon = this.app.workspace.leftRibbon as any;
-				ribbon.items.find((i: any) => i.id === "homepage:Open homepage").hidden = true;
+				const ribbon = this.app.workspace.leftRibbon;
+				ribbon.items.find(i => i.id === "homepage:Open homepage")!.hidden = true;
 				ribbon.onChange(true);
 				
 				delete this.data.hasRibbonIcon;
@@ -110,7 +110,7 @@ export class Homepage {
 		if (!this.data.commands) return;
 				
 		for (const command of this.data.commands) {
-			(this.app as any).commands.executeCommandById(command);
+			this.app.commands.executeCommandById(command);
 		}
 	}
 	
@@ -170,7 +170,7 @@ export class Homepage {
 			this.app.workspace.setActiveLeaf(leaf);
 		}
 		
-		(this.app as any).commands.executeCommandById("graph:open");
+		this.app.commands.executeCommandById("graph:open");
 		return this.app.workspace.getActiveViewOfType(OView)?.leaf;
 	}
 	
@@ -246,7 +246,7 @@ export class Homepage {
 		
 		const leaves = LEAF_TYPES.flatMap(i => this.app.workspace.getLeavesOfType(i));
 		return leaves.filter(
-			leaf => trimFile((leaf.view as any).file) == this.computedValue
+			leaf => trimFile((leaf.view as FileView).file!) == this.computedValue
 		);
 	}
 	
@@ -284,7 +284,7 @@ export class Homepage {
 		if (!view || trimFile(view.file!) == this.computedValue) return;
 	
 		const state = view.getState(),
-			config = (this.app.vault as any).config,
+			config = this.app.vault.config,
 			mode = config.defaultViewMode || "source",
 			source = config.livePreview !== undefined ? !config.livePreview : false;
 
@@ -306,7 +306,7 @@ export class Homepage {
 		
 		if (
 			leaf?.getViewState().type !== "empty" ||
-			(leaf as any)?.parentSplit.children.length != 1
+			leaf.parentSplit.children.length != 1
 		) return
 		
 		//should always behave the same regardless of mode

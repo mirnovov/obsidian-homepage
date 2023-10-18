@@ -55,7 +55,7 @@ export const PERIODIC_KINDS: Kind[] = [
 export async function getPeriodicNote(kind: Kind, plugin: HomepagePlugin): Promise<string> {
 	const periodicNotes = plugin.communityPlugins["periodic-notes"],
 		info = PERIODIC_INFO[kind],
-		date = moment().startOf(info.noun as any);
+		date = moment().startOf(info.noun as moment.unitOfTime.StartOf);
 	let note;
 		
 	if (isLegacyPeriodicNotes(periodicNotes)) {
@@ -96,7 +96,7 @@ export function hasRequiredPeriodicity(kind: Kind, plugin: HomepagePlugin): bool
 	}
 }
 
-export function getAutorun(plugin: HomepagePlugin): any { 
+export function getAutorun(plugin: HomepagePlugin): boolean { 
 	const dailyNotes = plugin.internalPlugins["daily-notes"];
 	return dailyNotes?.enabled && dailyNotes?.instance.options.autorun; 
 }

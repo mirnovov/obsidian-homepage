@@ -4,7 +4,9 @@ import { DEFAULT, HomepageData, Kind, Mode, View } from "./homepage";
 import { PERIODIC_KINDS, getAutorun } from "./periodic";
 import { CommandSuggestModal, FileSuggest, WorkspaceSuggest } from "./ui";
 
+type HomepageKey = keyof HomepageData;
 type HomepageObject = { [key: string]: HomepageData }
+type Callback<T> = (v: T) => void;
 
 export interface HomepageSettings {
 	version: number,
@@ -276,7 +278,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		this.elements[setting] = heading;
 	}
 	
-	addDropdown(name: string, desc: string, setting: string, source: object, callback?: (v: any) => any): void {
+	addDropdown(name: string, desc: string, setting: HomepageKey, source: object, callback?: Callback<string>): void {
 		const dropdown = new Setting(this.containerEl)
 			.setName(name).setDesc(desc)
 			.addDropdown(async dropdown => {
@@ -294,7 +296,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		this.elements[setting] = dropdown;
 	}
 	
-	addToggle(name: string, desc: string, setting: string, callback?: (v: any) => any): void {
+	addToggle(name: string, desc: string, setting: HomepageKey, callback?: Callback<boolean>): void {
 		const toggle = new Setting(this.containerEl)
 			.setName(name).setDesc(desc)
 			.addToggle(toggle => toggle
@@ -313,7 +315,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		this.commandBox.innerHTML = "";
 		
 		for (const [index, id] of this.plugin.homepage.data.commands.entries()) {
-			const command = (this.app as any).commands.findCommand(id);
+			const command = this.app.commands.findCommand(id);
 			if (!command) continue;
 			
 			const pill = this.commandBox.createDiv({ cls: "nv-command-pill", text: command.name });
@@ -338,17 +340,17 @@ export class HomepageSettingTab extends PluginSettingTab {
 	} 
 	
 	async copyDebugInfo(): Promise<void> {
-		const config = (this.app.vault as any).config;
-		const info: any = {
+		const config = this.app.vault.config;
+		const info = {
 			...this.settings,
 			_defaultViewMode: config.defaultViewMode || "default",
 			_livePreview: config.livePreview !== undefined ? config.livePreview : "default",
 			_focusNewTab: config.focusNewTab !== undefined ? config.focusNewTab : "default",
 			_plugins: Object.keys(this.plugin.communityPlugins),
 			_internalPlugins: Object.values(this.plugin.internalPlugins).flatMap(
-				(p: any) => p.enabled ? [p.instance.id] : []
+				p => p.enabled ? [p.instance.id] : []
 			),
-			_obsidianVersion: (window as any).electron.ipcRenderer.sendSync("version")
+			_obsidianVersion: window.electron.ipcRenderer.sendSync("version")
 		};
 		
 		await navigator.clipboard.writeText(JSON.stringify(info));

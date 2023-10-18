@@ -1,18 +1,11 @@
 import { DEFAULT_SETTINGS } from "./settings";
 
-declare global {
-	interface Window {
-		homepageLoadDebugInfo: (info: any) => Promise<void>;
-		homepageEnsurePlugins: (plugins: string[], enable: boolean) => Promise<void>;
-	}
-}
-
 window.homepageLoadDebugInfo = async (info: any) => {
-	const homepage = (app as any).plugins.plugins.homepage;
+	const homepage = app.plugins.plugins.homepage;
 	if (info.version !== DEFAULT_SETTINGS.version) console.warn("Version not supported");
 
-	(app.vault as any).config = { 
-		...(app.vault as any).config,
+	app.vault.config = { 
+		...app.vault.config,
 		livePreview: info._livePreview !== "default" ? info._livePreview : true,
 		focusNewTab: info._focusNewTab !== "default" ? info._livePreview : true,
 		defaultViewMode: info._focusNewTab !== "default" ? info._livePreview : "editing"
@@ -43,9 +36,9 @@ window.homepageEnsurePlugins = async (plugins: string[], enable: boolean) => {
 	const pluginList = await fetch(
 		`https://raw.githubusercontent.com/obsidianmd/obsidian-releases/master/community-plugins.json`
 	).then(r => r.json());
-	const pluginRegistry = (app as any).plugins;
+	const pluginRegistry = app.plugins;
 	
-	const keyedPluginList = {} as any;
+	const keyedPluginList: Record<string, any> = {};
 	for (const item of pluginList) keyedPluginList[item.id] = item;
 	
 	for (const id of plugins) {

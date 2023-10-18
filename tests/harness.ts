@@ -77,10 +77,11 @@ const PLUGINS = ["dataview", "obsidian-kanban", "periodic-notes"];
 
 export default class HomepageTestPlugin extends HomepagePlugin {
 	testResults: Record<string, Result[]> = {};
+	test = false;
 
 	async onload(): Promise<void> {
 		this.registerObsidianProtocolHandler("nv-testing-restart", async () => {
-			(window as any).electron.remote.app.quit();
+			window.electron.remote.app.quit();
 		});
 		
 		super.onload();
@@ -109,7 +110,7 @@ export default class HomepageTestPlugin extends HomepagePlugin {
 		
 		for (const name of Object.getOwnPropertyNames(suite.prototype)) {
 			if (name == "constructor") continue;
-			const result = { name: name, error: null, passed: true };
+			const result: Result = { name: name, error: null, passed: true };
 
 			//reset state
 			this.homepage.data = { ...DEFAULT_DATA };
@@ -118,11 +119,11 @@ export default class HomepageTestPlugin extends HomepagePlugin {
 			await this.sleep(50);
 						
 			try {
-				await (tests as any)[name].call(this);
+				await tests[name].call(this);
 			}
-			catch (e: any) {
+			catch (e) {
 				if (!(e instanceof TestAssertionError)) console.error(e);
-				result.error = e;
+				result.error = e as string;
 				result.passed = false;
 			}
 			
@@ -165,7 +166,7 @@ class TestResultModal extends Modal {
 			for (const result of suite) {
 				const row = this.contentEl.createDiv();
 				row.append(
-					getIcon(result.passed ? "check" : "cross") as any, 
+					getIcon(result.passed ? "check" : "cross")!, 
 					result.name
 				);
 				
@@ -181,9 +182,9 @@ class TestResultModal extends Modal {
 		
 		this.titleEl.classList.add("nv-result-summary");
 		this.titleEl.append(
-			getIcon("check") as any, 
+			getIcon("check")!, 
 			` ${success} Passed\xa0\xa0\xa0`,
-			getIcon("cross") as any,
+			getIcon("cross")!,
 			` ${failure} Failed`
 		);
 		
@@ -192,7 +193,7 @@ class TestResultModal extends Modal {
 			.setClass("clickable-icon")
 			.setClass("nv-devtools")
 			.onClick(() => {
-				const ew = (window as any).electronWindow;
+				const ew = window.electronWindow;
 				!ew.isDevToolsOpened() ? ew.openDevTools() : ew.closeDevTools();
 			})
 	}

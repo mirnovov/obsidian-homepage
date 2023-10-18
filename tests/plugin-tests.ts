@@ -17,7 +17,7 @@ export default class PluginTests {
 		this.homepage.open();
 		await this.sleep(100);
 		
-		const split = (this.app.workspace.rootSplit as any).children[0];
+		const split = this.app.workspace.rootSplit.children[0];
 		const upper = split.children[0].children[0].view;
 		const lower = split.children[1].children[0].view;
 	
@@ -55,7 +55,7 @@ export default class PluginTests {
 	}
 
 	async periodicDailyNote(this: HomepageTestPlugin) {
-		(this.app as any).plugins.enablePluginAndSave("periodic-notes");
+		await this.app.plugins.enablePluginAndSave("periodic-notes");
 		await this.sleep(100);
 	
 		this.homepage.data.kind = Kind.DailyNote;
@@ -70,11 +70,11 @@ export default class PluginTests {
 		this.assert(file?.name == name, file, name);
 		this.app.vault.delete(this.app.vault.getAbstractFileByPath(name) as TFile);
 		
-		(this.app as any).plugins.disablePluginAndSave("periodic-notes");
+		await this.app.plugins.disablePluginAndSave("periodic-notes");
 	}
 	
 	async periodicNoteExtant(this: HomepageTestPlugin) {
-		(this.app as any).plugins.enablePluginAndSave("periodic-notes");
+		await this.app.plugins.enablePluginAndSave("periodic-notes");
 		await this.sleep(100);
 	
 		this.homepage.data.kind = Kind.DailyNote;
@@ -91,11 +91,11 @@ export default class PluginTests {
 		this.assert(file?.name == name, file, name);
 		this.app.vault.delete(this.app.vault.getAbstractFileByPath(name) as TFile);
 		
-		(this.app as any).plugins.disablePluginAndSave("periodic-notes");
+		await this.app.plugins.disablePluginAndSave("periodic-notes");
 	}
 	
 	async periodicWeeklyNote(this: HomepageTestPlugin) {
-		(this.app as any).plugins.enablePluginAndSave("periodic-notes");
+		await this.app.plugins.enablePluginAndSave("periodic-notes");
 		await this.sleep(100);
 	
 		this.homepage.data.kind = Kind.WeeklyNote;
@@ -110,44 +110,44 @@ export default class PluginTests {
 		this.assert(file?.name == name, file, name);
 		this.app.vault.delete(this.app.vault.getAbstractFileByPath(name) as TFile);
 		
-		(this.app as any).plugins.disablePluginAndSave("periodic-notes");
+		await this.app.plugins.disablePluginAndSave("periodic-notes");
 	}
 	
 	async dataviewRefresh(this: HomepageTestPlugin) {
-		(this.app as any).plugins.enablePluginAndSave("dataview");
+		await this.app.plugins.enablePluginAndSave("dataview");
 
 		this.homepage.data.view = View.Reading;
 		this.homepage.data.refreshDataview = true;
 		this.homepage.data.value = "Dataview";
 		await this.sleep(100);
 		
-		let previous = "" as any;
+		let previous = "";
 		
 		for (let i = 0; i < 5; i++) {
 			this.homepage.open();
 			await this.sleep(100);
 			
-			let current = document.getElementsByClassName(
+			const current = document.getElementsByClassName(
 				"block-language-dataviewjs"
 			)[0].getElementsByTagName("span")[0].textContent;
 			
 			this.app.workspace.getActiveViewOfType(MarkdownView)?.leaf.detach();
 			
 			if (current !== previous && i > 0) {
-				(this.app as any).plugins.disablePluginAndSave("dataview");
+				this.app.plugins.disablePluginAndSave("dataview");
 				return;
 			}
 			
-			previous = current;
+			previous = current!;
 		}
 		
 		this.assert(false);
 		
-		(this.app as any).plugins.disablePluginAndSave("dataview");
+		await this.app.plugins.disablePluginAndSave("dataview");
 	}
 	
 	async openKanban(this: HomepageTestPlugin) {
-		(this.app as any).plugins.enablePluginAndSave("obsidian-kanban");
+		await this.app.plugins.enablePluginAndSave("obsidian-kanban");
 		await this.sleep(200);
 
 		this.homepage.data.value = "Kanban.md";
@@ -160,7 +160,7 @@ export default class PluginTests {
 		const leaves = this.app.workspace.getLeavesOfType("kanban");
 		this.assert(file?.name == "Kanban.md" && leaves.length == 1, file, leaves);
 		
-		(this.app as any).plugins.disablePluginAndSave("obsidian-kanban");
+		await this.app.plugins.disablePluginAndSave("obsidian-kanban");
 		await this.sleep(100);
 	}	
 	

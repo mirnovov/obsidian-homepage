@@ -10,9 +10,9 @@ export default class ViewTests {
 		this.homepage.open();
 		await this.sleep(100);
 		
-		const view = this.app.workspace.getActiveViewOfType(MarkdownView);
-		const count = (view as any).editor.lineCount() - 1;
-		const pos = (view as any).editor.getCursor().line;
+		const view = this.app.workspace.getActiveViewOfType(MarkdownView)!;
+		const count = view.editor.lineCount() - 1;
+		const pos = view.editor.getCursor().line;
 	
 		this.assert(count == pos, view, count, pos);
 	}
@@ -25,7 +25,7 @@ export default class ViewTests {
 		await this.sleep(100);
 		const leaf = this.app.workspace.getActiveViewOfType(MarkdownView)?.leaf;
 		
-		this.assert(leaf && leaf.getViewState().pinned as any, leaf);
+		this.assert(leaf! && leaf.getViewState()!.pinned!, leaf);
 	}
 	
 	async hasView(this: HomepageTestPlugin) {
@@ -56,12 +56,12 @@ export default class ViewTests {
 		this.app.workspace.openLinkText("Home", "", false);
 		await this.sleep(500);
 		
-		let state = this.app.workspace.getActiveViewOfType(MarkdownView)?.getState();
+		const state = this.app.workspace.getActiveViewOfType(MarkdownView)?.getState();
 		this.assert(state?.mode == "source" && state.source == true, state);
 	}
 	
 	async reversion(this: HomepageTestPlugin) {
-		this.assert((this.app.vault as any)?.config.livePreview === undefined);
+		this.assert(this.app.vault?.config.livePreview === undefined);
 		this.homepage.data.view = View.Reading;
 		this.homepage.save();
 	
@@ -87,7 +87,7 @@ export default class ViewTests {
 		
 		await this.app.workspace.openLinkText("Note B", "", false);
 		const view = this.app.workspace.getActiveViewOfType(MarkdownView),
-			  state = view?.getState() || {};
+			state = view?.getState() || {};
 		state.mode = "source";
 		await view?.leaf.setViewState({type: "markdown", state: state});
 		await this.sleep(200);
@@ -95,8 +95,8 @@ export default class ViewTests {
 	}
 	
 	async reversionWithoutDefaults(this: HomepageTestPlugin) {
-		const config = (this.app.vault as any)?.config;
-		if (!config) (this.app.vault as any).config = {};
+		const config = this.app.vault?.config;
+		if (!config) this.app.vault.config = {};
 		
 		config.livePreview = true;
 		config.defaultViewMode = "preview";
@@ -113,6 +113,6 @@ export default class ViewTests {
 		mode = this.app.workspace.getActiveViewOfType(MarkdownView)?.getMode();
 		this.assert(mode == "preview", mode);
 		
-		(this.app.vault as any).config = {};
+		this.app.vault.config = {};
 	}
 }

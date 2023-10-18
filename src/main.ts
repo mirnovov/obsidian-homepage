@@ -10,8 +10,8 @@ const ICON: string = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg
 
 export default class HomepagePlugin extends Plugin {
 	settings: HomepageSettings;
-	internalPlugins: any;
-	communityPlugins: any;
+	internalPlugins: Record<string, any>;
+	communityPlugins: Record<string, any>;
 	
 	loaded: boolean = false;
 	executing: boolean = false;
@@ -22,8 +22,8 @@ export default class HomepagePlugin extends Plugin {
 		const appStartup = document.body.querySelector(".progress-bar") !== null;
 		
 		this.settings = await this.loadSettings();
-		this.internalPlugins = (this.app as any).internalPlugins.plugins;
-		this.communityPlugins = (this.app as any).plugins.plugins;
+		this.internalPlugins = this.app.internalPlugins.plugins;
+		this.communityPlugins = this.app.plugins.plugins;
 		this.homepage = this.getHomepage();
 		
 		this.app.workspace.onLayoutReady(async () => {
@@ -98,7 +98,7 @@ export default class HomepagePlugin extends Plugin {
 	}
 	
 	async loadSettings(): Promise<HomepageSettings> {
-		const settingsData: any = await this.loadData();
+		const settingsData = await this.loadData();
 		
 		if (!settingsData || settingsData.version !== 2) {
 			return Object.assign({}, DEFAULT_SETTINGS, settingsData);
@@ -144,7 +144,7 @@ export default class HomepagePlugin extends Plugin {
 	}
 	
 	hasUrlParams(): boolean {
-		const params = (window as any).OBS_ACT;
+		const params = window.OBS_ACT;
 
 		return (
 			params && ["open", "advanced-uri"].includes(params?.action) &&

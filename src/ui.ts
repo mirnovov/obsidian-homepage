@@ -1,4 +1,4 @@
-import { App, AbstractInputSuggest, FuzzySuggestModal, Notice, TAbstractFile, TFile } from "obsidian";
+import { App, AbstractInputSuggest, Command, FuzzySuggestModal, Notice, TAbstractFile, TFile } from "obsidian";
 import { Homepage } from "./homepage";
 import { HomepageSettingTab } from "./settings"; 
 import { trimFile } from "./utils";
@@ -48,7 +48,7 @@ export class WorkspaceSuggest extends AbstractInputSuggest<string> {
 	textInputEl: HTMLInputElement;
 	
 	getSuggestions(inputStr: string): string[] {
-		const workspaces = Object.keys((this.app as any).internalPlugins.plugins.workspaces?.instance.workspaces);
+		const workspaces = Object.keys(this.app.internalPlugins.plugins.workspaces?.instance.workspaces);
 		const inputLower = inputStr.toLowerCase();
 
 		return workspaces.filter((workspace: string) => workspace.toLowerCase().contains(inputLower));
@@ -77,16 +77,16 @@ export class CommandSuggestModal extends FuzzySuggestModal<unknown> {
 		this.tab = tab;
 	}
 
-	getItems(): object[] {
-		return Object.values((this.app as any).commands.commands);
+	getItems(): Command[] {
+		return Object.values(this.app.commands.commands);
 	}
 
-	getItemText(item: object): string {
-		return (item as any).name;
+	getItemText(item: Command): string {
+		return item.name;
 	}
 
-	onChooseItem(item: object) {
-		if ((item as any).id === "homepage:open-homepage") {
+	onChooseItem(item: Command) {
+		if (item.id === "homepage:open-homepage") {
 			new Notice("Really?");
 			return;
 		}
@@ -94,7 +94,7 @@ export class CommandSuggestModal extends FuzzySuggestModal<unknown> {
 			this.homepage.data.commands = [];
 		}
 		
-		this.homepage.data.commands.push((item as any).id);
+		this.homepage.data.commands.push(item.id);
 		this.homepage.save();
 		this.tab.updateCommandBox();
 	}

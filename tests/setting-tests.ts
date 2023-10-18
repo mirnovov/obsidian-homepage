@@ -46,7 +46,7 @@ export default class SettingTests {
 		);
 		
 		//check that the settings tab isn't broken upon upgrade
-		const { setting } = (this.app as any);
+		const { setting } = this.app;
 		
 		setting.open();
 		setting.openTabById("homepage");
