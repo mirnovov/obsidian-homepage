@@ -1,7 +1,7 @@
 import { App, FileView, MarkdownView, Notice, View as OView, WorkspaceLeaf, moment } from "obsidian";
 import HomepagePlugin from "./main";
 import { getAutorun, getPeriodicNote } from "./periodic";
-import { emptyActiveView, randomFile, trimFile, untrimName } from "./utils";
+import { emptyActiveView, equalsCaseless, randomFile, trimFile, untrimName } from "./utils";
 
 export const LEAF_TYPES: string[] = ["markdown", "canvas", "kanban"];
 
@@ -281,7 +281,7 @@ export class Homepage {
 		if (this.lastView == undefined || this.data.view == View.Default) return;
 		
 		const view = this.lastView.deref();
-		if (!view || trimFile(view.file!) == this.computedValue) return;
+		if (!view || equalsCaseless(trimFile(view.file!), this.computedValue)) return;
 	
 		const state = view.getState(),
 			config = this.app.vault.config,

@@ -94,6 +94,17 @@ export default class ViewTests {
 		this.assert(state.source == false, state);
 	}
 	
+	async reversionCaseInsensitive(this: HomepageTestPlugin) {
+		this.homepage.data.view = View.Reading;
+		this.homepage.data.value = "home";
+		this.homepage.save();
+	
+		this.homepage.open();
+		await this.sleep(200);
+		const mode = this.app.workspace.getActiveViewOfType(MarkdownView)?.getMode();
+		this.assert(mode == "preview", mode);
+	}
+	
 	async reversionWithoutDefaults(this: HomepageTestPlugin) {
 		const config = this.app.vault?.config;
 		if (!config) this.app.vault.config = {};

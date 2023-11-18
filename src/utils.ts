@@ -31,3 +31,7 @@ export function emptyActiveView(app: App): boolean {
 	return app.workspace.getActiveViewOfType(OView)?.getViewType() == "empty";
 }
 
+export function equalsCaseless(a: string, b: string): boolean {
+	return a.localeCompare(b, undefined, { sensitivity: 'accent' }) === 0;
+}
+
