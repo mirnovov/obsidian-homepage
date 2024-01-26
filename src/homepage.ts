@@ -137,7 +137,7 @@ export class Homepage {
 
 		if (mode !== Mode.ReplaceAll) {
 			const alreadyOpened = this.getOpened();
-	
+			
 			if (alreadyOpened.length > 0) {
 				this.app.workspace.setActiveLeaf(alreadyOpened[0]);
 				await this.configure(alreadyOpened[0]);
@@ -250,8 +250,12 @@ export class Homepage {
 		if (this.data.kind == Kind.Graph) return this.app.workspace.getLeavesOfType("graph");
 		
 		const leaves = LEAF_TYPES.flatMap(i => this.app.workspace.getLeavesOfType(i));
+
 		return leaves.filter(
-			leaf => trimFile((leaf.view as FileView).file!) == this.computedValue
+			leaf => equalsCaseless(
+				trimFile((leaf.view as FileView).file!), 
+				this.computedValue
+			)
 		);
 	}
 	
