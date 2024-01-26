@@ -75,17 +75,6 @@ export class Homepage {
 			this.data.commands = [];
 			this.save();
 		}
-		
-		if (this.data?.hasRibbonIcon == false) {
-			this.app.workspace.onLayoutReady(async () => {
-				const ribbon = this.app.workspace.leftRibbon;
-				ribbon.items.find(i => i.id === "homepage:Open homepage")!.hidden = true;
-				ribbon.onChange(true);
-				
-				delete this.data.hasRibbonIcon;
-				this.save();
-			});
-		}
 	}
 	
 	async open(alternate: boolean = false): Promise<void> {

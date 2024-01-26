@@ -32,16 +32,6 @@ declare module "obsidian" {
 		parentSplit: WorkspaceSplit;
 	}
 	
-	interface WorkspaceRibbon {
-		items: WorkspaceRibbonItem[];
-		onChange: (a: boolean) => void;
-	}
-	
-	interface WorkspaceRibbonItem {
-		id: string;
-		hidden: boolean;
-	}
-	
 	interface WorkspaceSplit {
 		children: any[];
 	}
