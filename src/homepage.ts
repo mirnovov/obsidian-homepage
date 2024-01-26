@@ -186,9 +186,14 @@ export class Homepage {
 			file = await this.app.vault.create(untrimName(this.computedValue), "");
 		}
 		
+		const content = await this.app.vault.cachedRead(file);
 		const leaf = this.app.workspace.getLeaf(mode == Mode.Retain);
 		await leaf.openFile(file);
 		this.app.workspace.setActiveLeaf(leaf);
+		
+		if (content !== await this.app.vault.read(file)) {
+			await this.app.vault.modify(file, content);
+		}
 		
 		return leaf;
 	}
