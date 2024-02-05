@@ -54,4 +54,19 @@ export default class SettingTests {
 		this.assert(document.getElementsByClassName("nv-debug-button").length > 0);
 		setting.close();
 	}
+	
+	async setToActiveFile(this: HomepageTestPlugin) {
+		await this.app.workspace.openLinkText("Note A", "", false);
+		
+		this.app.commands.executeCommandById("homepage:set-to-active-file");
+		await this.sleep(100);
+		
+		this.assert(this.homepage.data.value == "Note A", this.homepage.data.value);
+		
+		this.homepage.open();
+		await this.sleep(100);
+		
+		const file = this.app.workspace.getActiveFile();
+		this.assert(file?.name == "Note A.md", file);
+	}
 }

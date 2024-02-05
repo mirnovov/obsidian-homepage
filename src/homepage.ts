@@ -1,6 +1,7 @@
 import { App, FileView, MarkdownView, Notice, View as OView, WorkspaceLeaf, moment } from "obsidian";
 import HomepagePlugin from "./main";
 import { getAutorun, getPeriodicNote } from "./periodic";
+import { UNCHANGEABLE } from "./settings";
 import { emptyActiveView, equalsCaseless, randomFile, trimFile, untrimName } from "./utils";
 
 export const LEAF_TYPES: string[] = ["markdown", "canvas", "kanban"];
@@ -268,6 +269,18 @@ export class Homepage {
 	async save(): Promise<void> {
 		this.plugin.settings.homepages[this.name] = this.data; 
 		await this.plugin.saveSettings();
+	}
+	
+	async setToActiveFile(): Promise<void> {		
+		this.data.value = trimFile(this.app.workspace.getActiveFile()!);
+		await this.save();
+		
+		new Notice(`The homepage has been changed to "${this.data.value}".`);
+	}
+	
+	canSetToFile(): boolean {
+		return (this.app.workspace.getActiveFile() !== null &&
+		!UNCHANGEABLE.includes(this.data.kind as Kind));
 	}
 	
 	async revertView(): Promise<void> {

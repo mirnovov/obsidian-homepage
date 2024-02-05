@@ -64,6 +64,15 @@ export default class HomepagePlugin extends Plugin {
 			name: "Open homepage",
 			callback: () => this.homepage.open(),
 		});
+		
+		this.addCommand({
+			id: "set-to-active-file",
+			name: "Set to active file",
+			checkCallback: checking => {
+				if (checking) return this.homepage.canSetToFile();
+				this.homepage.setToActiveFile();
+			}
+		});
 
 		console.log(
 			`Homepage: ${this.homepage.data.value} `+

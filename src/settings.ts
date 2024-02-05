@@ -39,7 +39,7 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
 }
 
 export const DEFAULT_DATA: HomepageData = DEFAULT_SETTINGS.homepages[DEFAULT];
-const UNCHANGEABLE: Kind[] = [Kind.Random, Kind.Graph, Kind.None, ...PERIODIC_KINDS];
+export const UNCHANGEABLE: Kind[] = [Kind.Random, Kind.Graph, Kind.None, ...PERIODIC_KINDS];
 
 export class HomepageSettingTab extends PluginSettingTab {
 	plugin: HomepagePlugin;
