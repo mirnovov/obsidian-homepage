@@ -70,11 +70,6 @@ export class Homepage {
 		this.plugin = plugin;
 		this.app = plugin.app;
 		this.data = plugin.settings.homepages[name];
-		
-		if (!this.data.commands) {
-			this.data.commands = [];
-			this.save();
-		}
 	}
 	
 	async open(alternate: boolean = false): Promise<void> {
