@@ -78,9 +78,6 @@ export class Homepage {
 			new Notice("Homepage cannot be opened due to plugin unavailablity.");
 			return;
 		}
-		else if (this.data.hideReleaseNotes) {
-			this.app.workspace.detachLeavesOfType("release-notes");
-		}
 		
 		if (this.data.kind === Kind.Workspace) {
 			await this.launchWorkspace();

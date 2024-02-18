@@ -196,7 +196,10 @@ export default class HomepagePlugin extends Plugin {
 	}
 	
 	unpatchReleaseNotes(): void {
-		if (this.newRelease) this.app.nvOrig_showReleaseNotes();
+		if (this.newRelease && !this.homepage.data.hideReleaseNotes) {
+			this.app.nvOrig_showReleaseNotes();
+		}
+		
 		this.app.showReleaseNotes = this.app.nvOrig_showReleaseNotes;
 	}
 }
