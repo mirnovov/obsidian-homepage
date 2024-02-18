@@ -78,6 +78,12 @@ export class Homepage {
 			new Notice("Homepage cannot be opened due to plugin unavailablity.");
 			return;
 		}
+		else if (this.data.kind === Kind.MomentDate) {
+			new Notice(
+				"Moment-based homepages are deprecated, and will be removed in a future version. "+ 
+				"Please change your homepage to a Daily or Periodic Notes type in the Homepage settings pane."
+			);
+		}
 		
 		if (this.data.kind === Kind.Workspace) {
 			await this.launchWorkspace();
