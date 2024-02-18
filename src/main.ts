@@ -9,17 +9,20 @@ if (DEV) import("./dev");
 const ICON: string = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5"><path d="M10.025 21H6v-7H3v-1.5L12 3l9 9.5V14h-3v7h-4v-7h-3.975v7Z" style="fill:none;stroke:currentColor;stroke-width:2px"/></svg>`
 
 export default class HomepagePlugin extends Plugin {
+	homepage: Homepage;
 	settings: HomepageSettings;
+
 	internalPlugins: Record<string, any>;
 	communityPlugins: Record<string, any>;
+	newRelease: boolean = false;
 	
 	loaded: boolean = false;
 	executing: boolean = false;
 	
-	homepage: Homepage;
-	
 	async onload(): Promise<void> {
 		const appStartup = document.body.querySelector(".progress-bar") !== null;
+
+		this.patchReleaseNotes();
 		
 		this.settings = await this.loadSettings();
 		this.internalPlugins = this.app.internalPlugins.plugins;
@@ -27,22 +30,17 @@ export default class HomepagePlugin extends Plugin {
 		this.homepage = this.getHomepage();
 		
 		this.app.workspace.onLayoutReady(async () => {
-			const ntp = this.communityPlugins["new-tab-default-page"];
 			const openInitially = (
 				this.homepage.data.openOnStartup &&
 				appStartup && !this.hasUrlParams()
 			);
 			
-			if (ntp) {
-				ntp._checkForNewTab = ntp.checkForNewTab;
-				ntp.checkForNewTab = async (e: any) => {
-					if (this && this.executing) { return; }
-					return await ntp._checkForNewTab(e);
-				}; 
-			}
-			
+			this.patchNewTabPage();
+					
 			if (openInitially) await this.homepage.open();
 			this.loaded = true;
+			
+			this.unpatchReleaseNotes();
 		});
 
 		addIcon("homepage", ICON);
@@ -83,10 +81,7 @@ export default class HomepagePlugin extends Plugin {
 	
 	async onunload(): Promise<void> {
 		this.app.workspace.off("layout-change", this.onLayoutChange)
-		
-		const ntp = this.communityPlugins["new-tab-default-page"];
-		if (!ntp) return;
-		ntp.checkForNewTab = ntp._checkForNewTab;
+		this.unpatchNewTabPage();
 	}
 	
 	onLayoutChange = async (): Promise<void> => {
@@ -175,5 +170,33 @@ export default class HomepagePlugin extends Plugin {
 			default:
 				return true;
 		}
-	}	
+	}
+	
+	patchNewTabPage(): void {
+		const ntp = this.communityPlugins["new-tab-default-page"];
+		if (!ntp) return;
+		
+		ntp.nvOrig_checkForNewTab = ntp.checkForNewTab;
+		ntp.checkForNewTab = async (e: any) => {
+			if (this && this.executing) { return; }
+			return await ntp.nvOrig_checkForNewTab(e);
+		}; 
+	}
+	
+	unpatchNewTabPage(): void {
+		const ntp = this.communityPlugins["new-tab-default-page"];
+		if (!ntp) return;
+		
+		ntp.checkForNewTab = ntp._checkForNewTab;
+	}
+	
+	patchReleaseNotes(): void {
+		this.app.nvOrig_showReleaseNotes = this.app.showReleaseNotes;
+		this.app.showReleaseNotes = () => this.newRelease = true;
+	}
+	
+	unpatchReleaseNotes(): void {
+		if (this.newRelease) this.app.nvOrig_showReleaseNotes();
+		this.app.showReleaseNotes = this.app.nvOrig_showReleaseNotes;
+	}
 }

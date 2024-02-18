@@ -6,6 +6,8 @@ declare module "obsidian" {
 		plugins: PluginRegistry;
 		internalPlugins: PluginRegistry;
 		setting: any;
+		showReleaseNotes: () => void;
+		nvOrig_showReleaseNotes: () => void;
 	}
 	
 	interface CommandRegistry {
