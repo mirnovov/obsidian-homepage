@@ -1,6 +1,7 @@
 import { ButtonComponent, Modal, getIcon } from "obsidian";
 import HomepagePlugin from "src/main";
 import { DEFAULT_DATA } from "src/settings";
+import { sleep } from "src/utils";
 
 type Result = {
 	name: string,
@@ -92,7 +93,7 @@ export default class HomepageTestPlugin extends HomepagePlugin {
 	}
 	
 	async execute(): Promise<void> {
-		await this.sleep(100);
+		await sleep(100);
 		
 		for (const suite of TEST_SUITES) {
 			await this.runTests((await suite).default);
@@ -116,7 +117,7 @@ export default class HomepageTestPlugin extends HomepagePlugin {
 			this.homepage.data = { ...DEFAULT_DATA };
 			this.homepage.save();
 			this.app.workspace.iterateAllLeaves(l => l.detach());
-			await this.sleep(50);
+			await sleep(50);
 						
 			try {
 				await tests[name].call(this);
@@ -137,10 +138,6 @@ export default class HomepageTestPlugin extends HomepagePlugin {
 			console.error("Assertion failed: ", args.length ? args : null);
 			throw e;
 		}
-	}
-	
-	sleep(ms: number) {
-		return new Promise(resolve => setTimeout(resolve, ms));
 	}
 }
 

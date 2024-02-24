@@ -2,7 +2,7 @@ import { App, FileView, MarkdownView, Notice, View as OView, WorkspaceLeaf, mome
 import HomepagePlugin from "./main";
 import { getAutorun, getPeriodicNote } from "./periodic";
 import { UNCHANGEABLE } from "./settings";
-import { emptyActiveView, equalsCaseless, randomFile, trimFile, untrimName } from "./utils";
+import { emptyActiveView, equalsCaseless, randomFile, sleep, trimFile, untrimName } from "./utils";
 
 export const LEAF_TYPES: string[] = ["markdown", "canvas", "kanban"];
 
@@ -111,6 +111,7 @@ export class Homepage {
 		}
 		
 		workspacePlugin.loadWorkspace(this.data.value);
+		await sleep(100);
 	}
 	
 	async launchLeaf(mode: Mode) {
@@ -142,7 +143,7 @@ export class Homepage {
 		}
 		if (mode === Mode.ReplaceAll) {
 			LEAF_TYPES.forEach(t => this.app.workspace.detachLeavesOfType(t));
-			await Promise.resolve(); //let obsidian initialise the new empty leaf
+			await sleep(0); //let obsidian initialise the new empty leaf
 		}
 		
 		if (this.data.kind === Kind.Graph) leaf = await this.launchGraph(mode);

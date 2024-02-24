@@ -1,5 +1,6 @@
 import { MarkdownView } from "obsidian";
 import { View } from "src/homepage";
+import { sleep } from "src/utils";
 import HomepageTestPlugin from "./harness";
 
 export default class ViewTests {
@@ -8,7 +9,7 @@ export default class ViewTests {
 		this.homepage.save();
 		
 		this.homepage.open();
-		await this.sleep(100);
+		await sleep(100);
 		
 		const view = this.app.workspace.getActiveViewOfType(MarkdownView)!;
 		const count = view.editor.lineCount() - 1;
@@ -22,7 +23,7 @@ export default class ViewTests {
 		this.homepage.save();
 	
 		this.homepage.open();
-		await this.sleep(100);
+		await sleep(100);
 		const leaf = this.app.workspace.getActiveViewOfType(MarkdownView)?.leaf;
 		
 		this.assert(leaf! && leaf.getViewState()!.pinned!, leaf);
@@ -33,7 +34,7 @@ export default class ViewTests {
 		this.homepage.save();
 	
 		this.homepage.open();
-		await this.sleep(100);
+		await sleep(100);
 		let state = this.app.workspace.getActiveViewOfType(MarkdownView)?.getState();
 		
 		this.assert(state?.mode == "preview", state);
@@ -42,7 +43,7 @@ export default class ViewTests {
 		this.homepage.save();
 		
 		this.homepage.open();
-		await this.sleep(100);
+		await sleep(100);
 		state = this.app.workspace.getActiveViewOfType(MarkdownView)?.getState();
 		
 		this.assert(state?.mode == "source" && state.source, state);
@@ -54,7 +55,7 @@ export default class ViewTests {
 		this.homepage.save();
 		
 		this.app.workspace.openLinkText("Home", "", false);
-		await this.sleep(500);
+		await sleep(500);
 		
 		const state = this.app.workspace.getActiveViewOfType(MarkdownView)?.getState();
 		this.assert(state?.mode == "source" && state.source == true, state);
@@ -66,12 +67,12 @@ export default class ViewTests {
 		this.homepage.save();
 	
 		this.homepage.open();
-		await this.sleep(200);
+		await sleep(200);
 		let mode = this.app.workspace.getActiveViewOfType(MarkdownView)?.getMode();
 		this.assert(mode == "preview", mode);
 		
 		await this.app.workspace.openLinkText("Note B", "", false);
-		await this.sleep(200);
+		await sleep(200);
 		mode = this.app.workspace.getActiveViewOfType(MarkdownView)?.getMode();
 		this.assert(mode == "source", mode);
 	}
@@ -81,7 +82,7 @@ export default class ViewTests {
 		this.homepage.save();
 	
 		this.homepage.open();
-		await this.sleep(200);
+		await sleep(200);
 		const mode = this.app.workspace.getActiveViewOfType(MarkdownView)?.getMode();
 		this.assert(mode == "preview", mode);
 		
@@ -90,7 +91,7 @@ export default class ViewTests {
 			state = view?.getState() || {};
 		state.mode = "source";
 		await view?.leaf.setViewState({type: "markdown", state: state});
-		await this.sleep(200);
+		await sleep(200);
 		this.assert(state.source == false, state);
 	}
 	
@@ -100,7 +101,7 @@ export default class ViewTests {
 		this.homepage.save();
 	
 		this.homepage.open();
-		await this.sleep(200);
+		await sleep(200);
 		const mode = this.app.workspace.getActiveViewOfType(MarkdownView)?.getMode();
 		this.assert(mode == "preview", mode);
 	}
@@ -115,12 +116,12 @@ export default class ViewTests {
 		this.homepage.save();
 		
 		this.homepage.open();
-		await this.sleep(200);
+		await sleep(200);
 		let mode = this.app.workspace.getActiveViewOfType(MarkdownView)?.getMode();
 		this.assert(mode == "source", mode);
 		
 		await this.app.workspace.openLinkText("Note B", "", false);
-		await this.sleep(200);
+		await sleep(200);
 		mode = this.app.workspace.getActiveViewOfType(MarkdownView)?.getMode();
 		this.assert(mode == "preview", mode);
 		

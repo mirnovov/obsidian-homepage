@@ -1,5 +1,6 @@
 import { Kind, Mode, View } from "src/homepage";
 import { HomepageSettings, DEFAULT_SETTINGS } from "src/settings";
+import { sleep } from "src/utils";
 import HomepageTestPlugin from "./harness";
 
 export default class SettingTests {
@@ -50,7 +51,7 @@ export default class SettingTests {
 		
 		setting.open();
 		setting.openTabById("homepage");
-		this.sleep(100);
+		sleep(100);
 		this.assert(document.getElementsByClassName("nv-debug-button").length > 0);
 		setting.close();
 	}
@@ -59,12 +60,12 @@ export default class SettingTests {
 		await this.app.workspace.openLinkText("Note A", "", false);
 		
 		this.app.commands.executeCommandById("homepage:set-to-active-file");
-		await this.sleep(100);
+		await sleep(100);
 		
 		this.assert(this.homepage.data.value == "Note A", this.homepage.data.value);
 		
 		this.homepage.open();
-		await this.sleep(100);
+		await sleep(100);
 		
 		const file = this.app.workspace.getActiveFile();
 		this.assert(file?.name == "Note A.md", file);

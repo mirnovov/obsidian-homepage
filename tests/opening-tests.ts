@@ -1,5 +1,6 @@
 import { TAbstractFile } from "obsidian";
 import { Kind, Mode } from "src/homepage";
+import { sleep } from "src/utils";
 import HomepageTestPlugin from "./harness";
 
 export default class OpeningTests {
@@ -11,7 +12,7 @@ export default class OpeningTests {
 		this.homepage.save();
 		
 		this.homepage.open();
-		await this.sleep(200);
+		await sleep(200);
 		
 		const file = this.app.workspace.getActiveFile();
 		const leaves = this.app.workspace.getLeavesOfType("markdown");
@@ -26,7 +27,7 @@ export default class OpeningTests {
 		this.homepage.save();
 
 		this.homepage.open();
-		await this.sleep(100);
+		await sleep(100);
 		
 		const file = this.app.workspace.getActiveFile();
 		const leaves = this.app.workspace.getLeavesOfType("markdown");
@@ -41,7 +42,7 @@ export default class OpeningTests {
 		this.homepage.save();
 	
 		this.homepage.open();
-		await this.sleep(100);
+		await sleep(100);
 		
 		const file = this.app.workspace.getActiveFile();
 		const leaves = this.app.workspace.getLeavesOfType("markdown");
@@ -59,7 +60,7 @@ export default class OpeningTests {
 		this.homepage.save();
 	
 		this.homepage.open();
-		await this.sleep(100);
+		await sleep(100);
 		
 		this.assert(this.test, this);
 	}
@@ -69,7 +70,7 @@ export default class OpeningTests {
 		this.homepage.save();
 
 		this.homepage.open();
-		await this.sleep(100);
+		await sleep(100);
 		
 		let file = this.app.workspace.getActiveFile();
 		this.assert(file?.name == "temp.md", file);
@@ -80,7 +81,7 @@ export default class OpeningTests {
 		this.homepage.save();
 	
 		this.homepage.open();
-		await this.sleep(100);
+		await sleep(100);
 		
 		file = this.app.workspace.getActiveFile();
 		this.assert(file?.name != "temp.md", file);
@@ -95,7 +96,7 @@ export default class OpeningTests {
 		
 		for (let i = 0; i < 10; i++) {
 			this.homepage.open();
-			await this.sleep(70);
+			await sleep(70);
 			newname = this.app.workspace.getActiveFile()?.name;
 			
 			if (i > 0 && newname !== name) return;
@@ -109,7 +110,7 @@ export default class OpeningTests {
 		this.homepage.save();
 		
 		this.app.workspace.iterateAllLeaves(l => l.detach());
-		await this.sleep(500);
+		await sleep(500);
 		
 		const file = this.app.workspace.getActiveFile();
 		const leaves = this.app.workspace.getLeavesOfType("markdown");
@@ -122,7 +123,7 @@ export default class OpeningTests {
 		this.homepage.save();
 		
 		this.app.workspace.iterateAllLeaves(l => l.detach());
-		await this.sleep(500);
+		await sleep(500);
 		
 		const file = this.app.workspace.getActiveFile();
 		const leaves = this.app.workspace.getLeavesOfType("markdown");

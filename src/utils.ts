@@ -35,3 +35,6 @@ export function equalsCaseless(a: string, b: string): boolean {
 	return a.localeCompare(b, undefined, { sensitivity: 'accent' }) === 0;
 }
 
+export function sleep(ms: number): Promise<void> {
+	return new Promise(resolve => setTimeout(resolve, ms));
+}
