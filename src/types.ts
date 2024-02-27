@@ -42,10 +42,15 @@ declare module "obsidian" {
 declare global {
 	interface Window {
 		OBS_ACT: string | any;
+		Capacitor: any;
 		electron: any;
 		electronWindow: any;
 		homepageLegacyOptionsEnabled: boolean;
 		homepageLoadDebugInfo: (info: any) => Promise<void>;
 		homepageEnsurePlugins: (plugins: string[], enable: boolean) => Promise<void>;
+	}
+	
+	interface URLSearchParams {
+		keys: () => Iterable<string>
 	}
 }

@@ -1,4 +1,4 @@
-import { Keymap, Platform, Plugin, addIcon } from "obsidian";
+import { Keymap, ObsidianProtocolData, Platform, Plugin, addIcon } from "obsidian";
 import { DEFAULT, MOBILE, Homepage, Kind } from "./homepage";
 import { hasRequiredPeriodicity } from "./periodic";
 import { DEFAULT_SETTINGS, HomepageSettings, HomepageSettingTab } from "./settings";
@@ -32,7 +32,7 @@ export default class HomepagePlugin extends Plugin {
 		this.app.workspace.onLayoutReady(async () => {
 			const openInitially = (
 				this.homepage.data.openOnStartup &&
-				appStartup && !this.hasUrlParams()
+				appStartup && !(await this.hasUrlParams())
 			);
 			
 			this.patchNewTabPage();
@@ -147,12 +147,26 @@ export default class HomepagePlugin extends Plugin {
 		await this.saveData(this.settings);
 	}
 	
-	hasUrlParams(): boolean {
-		const params = window.OBS_ACT;
-
+	async hasUrlParams(): Promise<boolean> {
+		let action: string, params: Array<string>;
+		
+		if (Platform.isMobile) {
+			const launchUrl = await window.Capacitor.Plugins.App.getLaunchUrl();
+			if (!launchUrl) return false;
+			
+			const url = new URL(launchUrl.url);
+			params = Array.from(url.searchParams.keys());
+			action = url.hostname;
+		}
+		else if (window.OBS_ACT) {
+			params = Object.keys(window.OBS_ACT);
+			action = window.OBS_ACT.action
+		}
+		else return false;
+		
 		return (
-			params && ["open", "advanced-uri"].includes(params?.action) &&
-			("file" in params || "filepath" in params || "workspace" in params)
+			["open", "advanced-uri"].includes(action) &&
+			["file", "filepath", "workspace"].some(e => params.includes(e))
 		)
 	}
 
