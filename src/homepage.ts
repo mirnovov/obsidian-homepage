@@ -5,6 +5,7 @@ import { UNCHANGEABLE } from "./settings";
 import { emptyActiveView, equalsCaseless, randomFile, sleep, trimFile, untrimName } from "./utils";
 
 export const LEAF_TYPES: string[] = ["markdown", "canvas", "kanban"];
+export const CLOSED_LEAVES: string[] = [...LEAF_TYPES, "audio", "graph", "image", "pdf", "video"];
 
 export const DEFAULT: string = "Main Homepage";
 export const MOBILE: string = "Mobile Homepage";
@@ -142,8 +143,10 @@ export class Homepage {
 			this.app.workspace.getActiveViewOfType(OView)?.leaf.setPinned(false);
 		}
 		if (mode === Mode.ReplaceAll) {
-			LEAF_TYPES.forEach(t => this.app.workspace.detachLeavesOfType(t));
-			await sleep(0); //let obsidian initialise the new empty leaf
+			//replacing leaf types we don't know can unexpected cause issues, so limit to known
+			//then let obsidian initialise the new empty leaf
+			CLOSED_LEAVES.forEach(t => this.app.workspace.detachLeavesOfType(t));
+			await sleep(0);
 		}
 		
 		if (this.data.kind === Kind.Graph) leaf = await this.launchGraph(mode);

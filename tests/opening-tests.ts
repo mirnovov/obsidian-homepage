@@ -19,6 +19,20 @@ export default class OpeningTests {
 		this.assert(file?.name == "Home.md" && leaves.length == 1, file, leaves);
 	}
 	
+	async replaceAllImage(this: HomepageTestPlugin) {
+		await this.app.workspace.openLinkText("Note A", "", false);
+		await this.app.workspace.openLinkText("Image.png", "", true);
+		
+		this.homepage.data.manualOpenMode = Mode.ReplaceAll;
+		this.homepage.save();
+		
+		this.homepage.open();
+		await sleep(200);
+		
+		const leaves = this.app.workspace.getLeavesOfType("image");
+		this.assert(leaves.length == 0, leaves);
+	}
+	
 	async replaceLast(this: HomepageTestPlugin) {
 		await this.app.workspace.openLinkText("Note A", "", false);
 		await this.app.workspace.openLinkText("Note B", "", true);
