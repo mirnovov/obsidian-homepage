@@ -1,7 +1,6 @@
 import { App, FileView, MarkdownView, Notice, View as OView, WorkspaceLeaf, moment } from "obsidian";
 import HomepagePlugin from "./main";
-import { getAutorun, getPeriodicNote } from "./periodic";
-import { UNCHANGEABLE } from "./settings";
+import { PERIODIC_KINDS, getAutorun, getPeriodicNote } from "./periodic";
 import { emptyActiveView, equalsCaseless, randomFile, sleep, trimFile, untrimName } from "./utils";
 
 export const LEAF_TYPES: string[] = ["markdown", "canvas", "kanban"];
@@ -56,6 +55,8 @@ export enum Kind {
 	/** @deprecated will be removed in 4.0 */
 	MomentDate = "Date-dependent file"
 }
+
+export const UNCHANGEABLE: Kind[] = [Kind.Random, Kind.Graph, Kind.None, ...PERIODIC_KINDS];
 
 export class Homepage {
 	plugin: HomepagePlugin;

@@ -1,6 +1,6 @@
 import { App, ButtonComponent, Notice, Platform, PluginSettingTab, Setting, normalizePath } from "obsidian";
 import HomepagePlugin from "./main";
-import { DEFAULT, HomepageData, Kind, Mode, View } from "./homepage";
+import { UNCHANGEABLE, DEFAULT, HomepageData, Kind, Mode, View } from "./homepage";
 import { PERIODIC_KINDS, getAutorun } from "./periodic";
 import { CommandSuggestModal, FileSuggest, WorkspaceSuggest } from "./ui";
 
@@ -39,7 +39,6 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
 }
 
 export const DEFAULT_DATA: HomepageData = DEFAULT_SETTINGS.homepages[DEFAULT];
-export const UNCHANGEABLE: Kind[] = [Kind.Random, Kind.Graph, Kind.None, ...PERIODIC_KINDS];
 
 export class HomepageSettingTab extends PluginSettingTab {
 	plugin: HomepagePlugin;
