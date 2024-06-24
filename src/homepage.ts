@@ -104,7 +104,7 @@ export class Homepage {
 		}
 	}
 	
-	async launchWorkspace() {
+	async launchWorkspace(): Promise<void> {
 		const workspacePlugin = this.plugin.internalPlugins.workspaces?.instance;
 		
 		if(!(this.data.value in workspacePlugin.workspaces)) {
@@ -116,7 +116,7 @@ export class Homepage {
 		await sleep(100);
 	}
 	
-	async launchLeaf(mode: Mode) {
+	async launchLeaf(mode: Mode): Promise<void> {
 		let leaf: WorkspaceLeaf | undefined;
 
 		this.computedValue = await this.computeValue();
@@ -144,8 +144,13 @@ export class Homepage {
 			this.app.workspace.getActiveViewOfType(OView)?.leaf.setPinned(false);
 		}
 		if (mode === Mode.ReplaceAll) {
+			//The API is very finicky when the app is starting, so wait for things to initialise
+			if (this.app.workspace?.floatingSplit?.children) {
+				await sleep(0);
+				this.app.workspace.floatingSplit.children.forEach(c => c.win.close());
+			}
+			
 			//replacing leaf types we don't know can unexpected cause issues, so limit to known
-			//then let obsidian initialise the new empty leaf
 			CLOSED_LEAVES.forEach(t => this.app.workspace.detachLeavesOfType(t));
 			await sleep(0);
 		}

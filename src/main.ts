@@ -20,6 +20,7 @@ export default class HomepagePlugin extends Plugin {
 	executing: boolean = false;
 	
 	async onload(): Promise<void> {
+		
 		const appStartup = document.body.querySelector(".progress-bar") !== null;
 
 		this.patchReleaseNotes();

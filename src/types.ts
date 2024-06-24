@@ -30,6 +30,10 @@ declare module "obsidian" {
 		config: Record<string, any>;
 	}
 	
+	interface Workspace {
+		floatingSplit: WorkspaceSplit
+	}
+	
 	interface WorkspaceLeaf {
 		parentSplit: WorkspaceSplit;
 	}
