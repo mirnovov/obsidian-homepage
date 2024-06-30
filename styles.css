@@ -45,6 +45,10 @@
 	padding: 10px 0 0;
 }
 
+#nv-main-setting #nv-desc.mod-warning {
+	color: var(--text-error);
+}
+
 #nv-main-setting #nv-desc code {
 	font-family: var(--font-monospace);
 	font-size: var(--font-smaller);

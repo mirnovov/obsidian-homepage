@@ -40,6 +40,19 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
 
 export const DEFAULT_DATA: HomepageData = DEFAULT_SETTINGS.homepages[DEFAULT];
 
+const DESCRIPTIONS = {
+	[Kind.File]: "Enter a note or canvas to use.",
+	[Kind.Workspace]: "Enter an Obsidian workspace to use.",
+	[Kind.Graph]: "Your graph view will be used.",
+	[Kind.None]: "Nothing will occur by default. Any commands added will still take effect.",
+	[Kind.MomentDate]: "This type is deprecated and will eventually be removed. It is only available since you have previously chosen it. Use Daily/Weekly/Monthly/Yearly Note instead, which works natively with Daily and Periodic Notes.",
+	[Kind.Random]: "A random note or canvas from your Obsidian folder will be selected.",
+	[Kind.DailyNote]: "Your Daily Note or Periodic Daily Note will be used.",
+	[Kind.WeeklyNote]: "Your Periodic Weekly Note will be used.",
+	[Kind.MonthlyNote]: "Your Periodic Monthly Note will be used.",
+	[Kind.YearlyNote]: "Your Periodic Yearly Note will be used."
+}
+
 export class HomepageSettingTab extends PluginSettingTab {
 	plugin: HomepagePlugin;
 	settings: HomepageSettings;
@@ -66,12 +79,10 @@ export class HomepageSettingTab extends PluginSettingTab {
 		const autorun = getAutorun(this.plugin);
 		let pluginDisabled = false;
 		
-		const descContainer = document.createElement("article");
 		const suggestor = hasWorkspaces ? WorkspaceSuggest : FileSuggest;
 
 		this.containerEl.empty();
 		this.elements = {};
-		descContainer.id = "nv-desc";
 		
 		const mainSetting = new Setting(this.containerEl)
 			.setName("Homepage")
@@ -100,39 +111,13 @@ export class HomepageSettingTab extends PluginSettingTab {
 			});
 		
 		mainSetting.settingEl.id = "nv-main-setting";
-		mainSetting.settingEl.append(descContainer);
 		
-		switch (kind) {
-			case Kind.File:
-				descContainer.innerHTML = `Enter a note or canvas to use.`;
-				break;
-			case Kind.Workspace:
-				descContainer.innerHTML = `Enter an Obsidian workspace to use.`;
-				break;
-			case Kind.Graph:
-				descContainer.innerHTML = `Your graph view will be used.`;
-				break;
-			case Kind.None:
-				descContainer.innerHTML = `Nothing will occur by default. Any commands added will still take effect.`;
-				break;
-			case Kind.MomentDate:
-				descContainer.innerHTML = 
-				`<span class="mod-warning">This type is deprecated and will eventually be removed. It is only available since you have previously chosen it. Use Daily/Weekly/Monthly/Yearly Note instead, which works natively with Daily and Periodic Notes.</span><br>
-				Enter a note or canvas to use based on <a href="https://momentjs.com/docs/#/displaying/format/" target="_blank" rel="noopener">Moment date formatting</a>.`;
-				break;
-			case Kind.Random:
-				descContainer.innerHTML = `A random note or canvas from your Obsidian folder will be selected.`;
-				break;
-			case Kind.DailyNote:
-				descContainer.innerHTML = `Your Daily Note or Periodic Daily Note will be used.`;
-				break;
-			case Kind.WeeklyNote:
-			case Kind.MonthlyNote:
-			case Kind.YearlyNote:
-				descContainer.innerHTML = `Your Periodic ${this.plugin.homepage.data.kind} will be used.`;
-				break;
-		}
-		
+		const descContainer = mainSetting.settingEl.createEl("article", {
+			"text": DESCRIPTIONS[kind],
+			"attr": { "id": "nv-desc" },
+			"cls": kind == Kind.MomentDate ? "mod-warning" : ""
+		})
+
 		if (pluginDisabled) {
 			descContainer.createDiv({
 				text: `The plugin required for this homepage type isn't available.`, 

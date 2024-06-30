@@ -151,9 +151,8 @@ export class Homepage {
 			}
 			
 			//replacing leaf types we don't know can cause issues, so limit to known
-			detachLeavesOfTypes(this.app, this.app.workspace.rootSplit, CLOSED_LEAVES);
+			detachLeavesOfTypes(this.app, CLOSED_LEAVES);
 			await sleep(0);
-			
 			this.app.workspace.iterateRootLeaves(l => this.app.workspace.setActiveLeaf(l));
 		}
 		
