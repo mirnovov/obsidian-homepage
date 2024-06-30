@@ -1,4 +1,4 @@
-import { App, TFile, View as OView } from "obsidian";
+import { App, TFile, View as OView, WorkspaceParent, WorkspaceRoot } from "obsidian";
 
 export function trimFile(file: TFile): string {
 	if (!file) return "";
@@ -37,4 +37,11 @@ export function equalsCaseless(a: string, b: string): boolean {
 
 export function sleep(ms: number): Promise<void> {
 	return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export function detachLeavesOfTypes(app: App, split: WorkspaceRoot | WorkspaceParent, types: string[]): void {
+	app.workspace.iterateLeaves(split, leaf => {
+		if (!leaf.view || !types.contains(leaf.view.getViewType())) return;
+		leaf.detach();
+	})
 }

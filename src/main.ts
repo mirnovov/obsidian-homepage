@@ -1,4 +1,4 @@
-import { Keymap, ObsidianProtocolData, Platform, Plugin, addIcon } from "obsidian";
+import { Keymap, Platform, Plugin, addIcon } from "obsidian";
 import { DEFAULT, MOBILE, Homepage, Kind } from "./homepage";
 import { hasRequiredPeriodicity } from "./periodic";
 import { DEFAULT_SETTINGS, HomepageSettings, HomepageSettingTab } from "./settings";
@@ -20,7 +20,6 @@ export default class HomepagePlugin extends Plugin {
 	executing: boolean = false;
 	
 	async onload(): Promise<void> {
-		
 		const appStartup = document.body.querySelector(".progress-bar") !== null;
 
 		this.patchReleaseNotes();

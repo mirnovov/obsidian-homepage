@@ -1,7 +1,7 @@
 import { App, FileView, MarkdownView, Notice, View as OView, WorkspaceLeaf, moment } from "obsidian";
 import HomepagePlugin from "./main";
 import { PERIODIC_KINDS, getAutorun, getPeriodicNote } from "./periodic";
-import { emptyActiveView, equalsCaseless, randomFile, sleep, trimFile, untrimName } from "./utils";
+import { detachLeavesOfTypes,  emptyActiveView, equalsCaseless, randomFile, sleep, trimFile, untrimName } from "./utils";
 
 export const LEAF_TYPES: string[] = ["markdown", "canvas", "kanban"];
 export const CLOSED_LEAVES: string[] = [...LEAF_TYPES, "audio", "graph", "image", "pdf", "video"];
@@ -150,9 +150,11 @@ export class Homepage {
 				this.app.workspace.floatingSplit.children.forEach(c => c.win.close());
 			}
 			
-			//replacing leaf types we don't know can unexpected cause issues, so limit to known
-			CLOSED_LEAVES.forEach(t => this.app.workspace.detachLeavesOfType(t));
+			//replacing leaf types we don't know can cause issues, so limit to known
+			detachLeavesOfTypes(this.app, this.app.workspace.rootSplit, CLOSED_LEAVES);
 			await sleep(0);
+			
+			this.app.workspace.iterateRootLeaves(l => this.app.workspace.setActiveLeaf(l));
 		}
 		
 		if (this.data.kind === Kind.Graph) leaf = await this.launchGraph(mode);
