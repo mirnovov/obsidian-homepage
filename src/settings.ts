@@ -179,7 +179,8 @@ export class HomepageSettingTab extends PluginSettingTab {
 			"Use when opening normally", "Use homepage settings when opening it normally, such as from a link or the file browser.",
 			"alwaysApply"
 		);
-		new Setting(this.containerEl)
+		
+		const separateMobileSetting = new Setting(this.containerEl)
 			.setName("Separate mobile homepage")
 			.setDesc("For mobile devices, store the homepage and its settings separately.")
 			.addToggle(toggle => toggle
@@ -191,6 +192,18 @@ export class HomepageSettingTab extends PluginSettingTab {
 					this.display();
 				})
 			);
+		
+		if (this.plugin.settings.separateMobile) {
+			const keyword = Platform.isMobile ? "desktop" : "mobile";
+			const mobileInfo = document.createElement("div");
+
+			separateMobileSetting.setClass("nv-mobile-setting");			
+			mobileInfo.className = "mod-warning nv-mobile-info";
+			mobileInfo.innerHTML = `<b>Mobile settings are stored separately.</b> Therefore, changes to other settings will not affect 
+			${keyword} devices. To edit ${keyword} settings, use a ${keyword} device.`
+			
+			separateMobileSetting.settingEl.append(mobileInfo);
+		}
 					
 		this.addHeading("Commands", "commandsHeading");
 		this.containerEl.createDiv({ 

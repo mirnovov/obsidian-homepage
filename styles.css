@@ -133,3 +133,14 @@
 .is-phone .nv-command-pill button, .is-phone .nv-command-add-button {
 	width: auto;
 }
+
+.nv-mobile-setting {
+	flex-wrap: wrap;
+	row-gap: var(--size-2-2);
+}
+
+.nv-mobile-setting .nv-mobile-info {
+	font-size: var(--font-ui-smaller);
+	width: 100%;
+	margin-right: var(--size-4-18);
+}
