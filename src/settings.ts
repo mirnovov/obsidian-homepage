@@ -324,14 +324,14 @@ export class HomepageSettingTab extends PluginSettingTab {
 				});
 				
 			if (!command) {
-				pill.classList.add("mod-warning", "nv-command-invalid");
-				pill.prepend(getIcon("alert-triangle")!);
+				pill.classList.add("nv-command-invalid");
+				pill.prepend(getIcon("ban")!);
 				
 				setTooltip(
 					pill, 
-					"This command couldn't be found and won't be executed."
-					+ " This may be due to a disabled plugin.",
-					{ delay: 0 }
+					"This command can't be found, so it won't be executed."
+					+ " It may belong to a disabled plugin.",
+					{ delay: 0.001 }
 				);
 			}
 		}

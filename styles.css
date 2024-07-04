@@ -84,6 +84,10 @@
 	padding: var(--size-2-1) var(--size-2-3);
 }
 
+.nv-command-pill.nv-command-invalid {
+	color: var(--text-faint);
+}
+
 .nv-command-pill button {
 	display: inline-block;
 	padding: 0;
