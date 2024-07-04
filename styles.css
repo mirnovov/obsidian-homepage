@@ -91,9 +91,15 @@
 	vertical-align: bottom;
 }
 
-.nv-command-pill button svg {
+.nv-command-pill > .svg-icon, .nv-command-pill button svg {
 	height: 1em;
 	width: 1em;
+}
+
+.nv-command-pill > .svg-icon {
+	vertical-align: text-bottom;
+	position: relative;
+	margin: 0 var(--size-2-1) 0 0;
 }
 
 .nv-command-add-button {

@@ -1,4 +1,4 @@
-import { App, ButtonComponent, Notice, Platform, PluginSettingTab, Setting, normalizePath } from "obsidian";
+import { App, ButtonComponent, Notice, Platform, PluginSettingTab, Setting, getIcon, normalizePath, setTooltip } from "obsidian";
 import HomepagePlugin from "./main";
 import { UNCHANGEABLE, DEFAULT, HomepageData, Kind, Mode, View } from "./homepage";
 import { PERIODIC_KINDS, getAutorun } from "./periodic";
@@ -308,10 +308,11 @@ export class HomepageSettingTab extends PluginSettingTab {
 		this.commandBox.innerHTML = "";
 		
 		for (const [index, id] of this.plugin.homepage.data.commands.entries()) {
-			const command = this.app.commands.findCommand(id);
-			if (!command) continue;
-			
-			const pill = this.commandBox.createDiv({ cls: "nv-command-pill", text: command.name });
+			const command = this.app.commands.findCommand(id);			
+			const pill = this.commandBox.createDiv({ 
+				cls: "nv-command-pill", 
+				text: command?.name ?? id 
+			});
 			
 			new ButtonComponent(pill)
 				.setIcon("trash-2")
@@ -321,6 +322,18 @@ export class HomepageSettingTab extends PluginSettingTab {
 					this.plugin.homepage.save();
 					this.updateCommandBox();
 				});
+				
+			if (!command) {
+				pill.classList.add("mod-warning", "nv-command-invalid");
+				pill.prepend(getIcon("alert-triangle")!);
+				
+				setTooltip(
+					pill, 
+					"This command couldn't be found and won't be executed."
+					+ " This may be due to a disabled plugin.",
+					{ delay: 0 }
+				);
+			}
 		}
 		
 		new ButtonComponent(this.commandBox)
