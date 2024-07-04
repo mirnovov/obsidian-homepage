@@ -64,6 +64,12 @@ export class HomepageSettingTab extends PluginSettingTab {
 		super(app, plugin);
 		this.plugin = plugin;
 		this.settings = plugin.settings;
+		
+		this.plugin.addCommand({
+			id: "copy-debug-info",
+			name: "Copy debug info",
+			callback: async () => await this.copyDebugInfo()
+		});
 	}
 
 	sanitiseNote(value: string): string | null {

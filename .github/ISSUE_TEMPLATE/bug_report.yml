@@ -14,7 +14,7 @@ body:
       attributes:
         label: Debug information
         description: >
-          Click **Copy debug info** at [the bottom of the plugin settings](https://cdn.discordapp.com/attachments/830238837888253965/1096712095661297684/Untitled.png) and paste the result here. This helps narrow down any settings and conflicting plugins that may be causing your issue.
+          Use the **Homepage: Copy debug info** command and paste the result here. This helps narrow down any settings and conflicting plugins that may be causing your issue.
         render: shell              
     - type: checkboxes
       attributes:
@@ -22,4 +22,3 @@ body:
         options:
           - label: I updated to the latest version of the plugin.
             required: true
-
