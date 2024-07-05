@@ -40,8 +40,8 @@ export function sleep(ms: number): Promise<void> {
 }
 
 export function detachLeavesOfTypes(app: App, types: string[]): void {
-	app.workspace.iterateLeaves(app.workspace.rootSplit, leaf => {
+	app.workspace.iterateRootLeaves(leaf => {
 		if (!leaf.view || !types.contains(leaf.view.getViewType())) return;
 		leaf.detach();
-	})
+	});
 }
