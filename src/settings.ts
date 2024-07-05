@@ -220,9 +220,14 @@ export class HomepageSettingTab extends PluginSettingTab {
 			"manualOpenMode",
 			Mode
 		);
-		this.addToggle("Auto-create", "If the homepage doesn't exist, create a note with the specified name.", "autoCreate");
 		this.addToggle("Pin", "Pin the homepage when opening.", "pin");
 		this.addToggle("Hide release notes", "Never display release notes when Obsidian updates.", "hideReleaseNotes");
+		this.addToggle("Auto-create", "When the homepage doesn't exist, create a note with its name.", "autoCreate");
+		
+		this.elements.autoCreate.descEl.createDiv({
+			text: `If this vault is synced using unofficial services, this may lead to content being overwritten.`, 
+			attr: {class: "mod-warning"}
+		});
 		
 		this.addHeading("Opened view", "paneHeading");
 		this.addDropdown(
@@ -276,7 +281,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		this.elements[setting] = heading;
 	}
 	
-	addDropdown(name: string, desc: string, setting: HomepageKey, source: object, callback?: Callback<string>): void {
+	addDropdown(name: string, desc: string, setting: HomepageKey, source: object, callback?: Callback<string>): Setting {
 		const dropdown = new Setting(this.containerEl)
 			.setName(name).setDesc(desc)
 			.addDropdown(async dropdown => {
@@ -292,9 +297,10 @@ export class HomepageSettingTab extends PluginSettingTab {
 			});
 		
 		this.elements[setting] = dropdown;
+		return dropdown;
 	}
 	
-	addToggle(name: string, desc: string, setting: HomepageKey, callback?: Callback<boolean>): void {
+	addToggle(name: string, desc: string, setting: HomepageKey, callback?: Callback<boolean>): Setting {
 		const toggle = new Setting(this.containerEl)
 			.setName(name).setDesc(desc)
 			.addToggle(toggle => toggle
@@ -307,6 +313,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 			);
 		
 		this.elements[setting] = toggle;
+		return toggle;
 	}
 	
 	updateCommandBox(): void {
