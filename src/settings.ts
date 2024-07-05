@@ -27,7 +27,7 @@ export const DEFAULT_SETTINGS: HomepageSettings = {
 			revertView: true,
 			openWhenEmpty: false,
 			refreshDataview: false,
-			autoCreate: true,
+			autoCreate: false,
 			autoScroll: false,
 			pin: false,
 			commands: [],
