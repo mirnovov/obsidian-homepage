@@ -96,7 +96,12 @@ export class HomepageSettingTab extends PluginSettingTab {
 				for (const key of Object.values(Kind)) {
 					if (!this.plugin.hasRequiredPlugin(key)) {
 						if (key == this.plugin.homepage.data.kind) pluginDisabled = true;
-						else continue;
+						else {
+							dropdown.selectEl.createEl(
+								"option", { text: key, attr: { disabled: true } }
+							);
+							continue;
+						}
 					}
 					
 					let desc = key as string;
