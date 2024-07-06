@@ -1,4 +1,4 @@
-import { Plugin, TFile, moment } from "obsidian";
+import { Notice, Plugin, TFile, moment } from "obsidian";
 import HomepagePlugin from "./main";
 import { Kind } from "./homepage";
 import { trimFile } from "./utils";
@@ -51,6 +51,8 @@ export const PERIODIC_INFO: Record<string, KindInfo> = {
 export const PERIODIC_KINDS: Kind[] = [
 	Kind.DailyNote, Kind.WeeklyNote, Kind.MonthlyNote, Kind.YearlyNote
 ];
+
+export const LEGACY_MOMENT_KIND: string = "Date-dependent file";
 
 export async function getPeriodicNote(kind: Kind, plugin: HomepagePlugin): Promise<string> {
 	const periodicNotes = plugin.communityPlugins["periodic-notes"],

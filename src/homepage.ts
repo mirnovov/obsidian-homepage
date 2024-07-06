@@ -1,4 +1,4 @@
-import { App, FileView, MarkdownView, Notice, View as OView, WorkspaceLeaf, moment } from "obsidian";
+import { App, FileView, MarkdownView, Notice, View as OView, WorkspaceLeaf } from "obsidian";
 import HomepagePlugin from "./main";
 import { PERIODIC_KINDS, getAutorun, getPeriodicNote } from "./periodic";
 import { detachLeavesOfTypes,  emptyActiveView, equalsCaseless, randomFile, sleep, trimFile, untrimName } from "./utils";
@@ -50,10 +50,7 @@ export enum Kind {
 	DailyNote = "Daily Note",
 	WeeklyNote = "Weekly Note",
 	MonthlyNote = "Monthly Note",
-	YearlyNote = "Yearly Note",
-	
-	/** @deprecated will be removed in 4.0 */
-	MomentDate = "Date-dependent file"
+	YearlyNote = "Yearly Note"
 }
 
 export const UNCHANGEABLE: Kind[] = [Kind.Random, Kind.Graph, Kind.None, ...PERIODIC_KINDS];
@@ -80,13 +77,7 @@ export class Homepage {
 			new Notice("Homepage cannot be opened due to plugin unavailablity.");
 			return;
 		}
-		else if (this.data.kind === Kind.MomentDate) {
-			new Notice(
-				"Moment-based homepages are deprecated, and will be removed in a future version. "+ 
-				"Please change your homepage to a Daily or Periodic Notes type in the Homepage settings pane."
-			);
-		}
-		
+
 		if (this.data.kind === Kind.Workspace) {
 			await this.launchWorkspace();
 		}
@@ -262,9 +253,6 @@ export class Homepage {
 		let val = this.data.value;
 	
 		switch (this.data.kind) {
-			case Kind.MomentDate:
-				val = moment().format(this.data.value);
-				break;
 			case Kind.Random:
 				const file = randomFile(this.app);
 				if (file) val = file;

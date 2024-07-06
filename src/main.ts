@@ -121,10 +121,6 @@ export default class HomepagePlugin extends Plugin {
 				data.value = data.workspace;
 				data.kind = Kind.Workspace;
 			}
-			else if (settingsData.useMoment) {
-				data.value = data.momentFormat;
-				data.kind = Kind.MomentDate;
-			}
 			else {
 				data.value = data.defaultNote;
 				data.kind = Kind.File;

@@ -15,7 +15,7 @@ export interface HomepageSettings {
 }
 
 export const DEFAULT_SETTINGS: HomepageSettings = {
-	version: 3,
+	version: 4,
 	homepages: {
 		[DEFAULT]: {
 			value: "Home",
@@ -45,7 +45,6 @@ const DESCRIPTIONS = {
 	[Kind.Workspace]: "Enter an Obsidian workspace to use.",
 	[Kind.Graph]: "Your graph view will be used.",
 	[Kind.None]: "Nothing will occur by default. Any commands added will still take effect.",
-	[Kind.MomentDate]: "This type is deprecated and will eventually be removed. It is only available since you have previously chosen it. Use Daily/Weekly/Monthly/Yearly Note instead, which works natively with Daily and Periodic Notes.",
 	[Kind.Random]: "A random note or canvas from your Obsidian folder will be selected.",
 	[Kind.DailyNote]: "Your Daily Note or Periodic Daily Note will be used.",
 	[Kind.WeeklyNote]: "Your Periodic Weekly Note will be used.",
@@ -104,14 +103,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 						}
 					}
 					
-					let desc = key as string;
-					
-					if (key == Kind.MomentDate) {
-						if (!this.enableMomentOption()) continue; 
-						desc = "Moment (legacy)";
-					}
-					
-					dropdown.addOption(key, desc);
+					dropdown.addOption(key, key);
 				}
 				dropdown.setValue(this.plugin.homepage.data.kind);
 				dropdown.onChange(async option => {
@@ -125,14 +117,13 @@ export class HomepageSettingTab extends PluginSettingTab {
 		
 		const descContainer = mainSetting.settingEl.createEl("article", {
 			"text": DESCRIPTIONS[kind],
-			"attr": { "id": "nv-desc" },
-			"cls": kind == Kind.MomentDate ? "mod-warning" : ""
+			"attr": { "id": "nv-desc" }
 		})
 
 		if (pluginDisabled) {
 			descContainer.createDiv({
 				text: `The plugin required for this homepage type isn't available.`, 
-				attr: {class: "mod-warning"}
+				cls: "mod-warning"
 			});
 		}
 		
@@ -226,7 +217,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		
 		this.elements.autoCreate.descEl.createDiv({
 			text: `If this vault is synced using unofficial services, this may lead to content being overwritten.`, 
-			attr: {class: "mod-warning"}
+			cls: "mod-warning"
 		});
 		
 		this.addHeading("Opened view", "paneHeading");
@@ -356,10 +347,6 @@ export class HomepageSettingTab extends PluginSettingTab {
 				modal.open();
 			});
 	} 
-	
-	enableMomentOption(): boolean {
-		return this.plugin.homepage.data.kind == Kind.MomentDate || window.homepageLegacyOptionsEnabled;
-	}
 	
 	async copyDebugInfo(): Promise<void> {
 		const config = this.app.vault.config;
