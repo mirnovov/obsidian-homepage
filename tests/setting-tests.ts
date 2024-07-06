@@ -1,4 +1,5 @@
 import { Kind, Mode, View } from "src/homepage";
+import { LEGACY_MOMENT_KIND } from "src/periodic";
 import { HomepageSettings, DEFAULT_SETTINGS } from "src/settings";
 import { sleep } from "src/utils";
 import HomepageTestPlugin from "./harness";
@@ -54,6 +55,30 @@ export default class SettingTests {
 		sleep(100);
 		this.assert(document.getElementsByClassName("nv-debug-button").length > 0);
 		setting.close();
+	}
+	
+	async upgradeMomentSettings(this: HomepageTestPlugin) {
+		this.homepage.data.kind = LEGACY_MOMENT_KIND;
+		this.settings.version = 3;
+		this.homepage.save();
+
+		this.settings = await this.loadSettings();
+		this.homepage = this.getHomepage();
+		
+		this.homepage.open();
+		await sleep(200);
+		
+		const dailyNote = await this.internalPlugins["daily-notes"].instance.getDailyNote();
+		const file = this.app.workspace.getActiveFile();
+
+		this.assert(
+			file?.name == dailyNote.name &&
+			this.homepage.data.kind == Kind.DailyNote,
+			file,
+			this.homepage.data.kind
+		);
+		
+		this.app.vault.delete(dailyNote);
 	}
 	
 	async setToActiveFile(this: HomepageTestPlugin) {
