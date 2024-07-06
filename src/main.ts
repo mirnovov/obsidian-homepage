@@ -1,6 +1,6 @@
-import { Keymap, Platform, Plugin, addIcon } from "obsidian";
+import { Notice, Keymap, Platform, Plugin, addIcon } from "obsidian";
 import { DEFAULT, MOBILE, Homepage, Kind } from "./homepage";
-import { hasRequiredPeriodicity } from "./periodic";
+import { hasRequiredPeriodicity, LEGACY_MOMENT_KIND, MOMENT_MESSAGE } from "./periodic";
 import { DEFAULT_SETTINGS, HomepageSettings, HomepageSettingTab } from "./settings";
 
 declare const DEV: boolean;
@@ -102,41 +102,15 @@ export default class HomepagePlugin extends Plugin {
 	}
 	
 	async loadSettings(): Promise<HomepageSettings> {
-		const settingsData = await this.loadData();
+		const settingsData: HomepageSettings = await this.loadData();
 		
-		if (!settingsData || settingsData.version !== 2) {
-			return Object.assign({}, DEFAULT_SETTINGS, settingsData);
+		if (settingsData?.version !== 4) {
+			if (!settingsData) return Object.assign({}, DEFAULT_SETTINGS);
+			
+			return this.upgradeSettings(settingsData);
 		}
-		else {
-			//Upgrade settings from v2.x
-			const settings: HomepageSettings = {
-				version: 3,
-				homepages: {},
-				separateMobile: false
-			}
-			
-			const data = settingsData;
-			
-			if (settingsData.workspaceEnabled) {
-				data.value = data.workspace;
-				data.kind = Kind.Workspace;
-			}
-			else {
-				data.value = data.defaultNote;
-				data.kind = Kind.File;
-			}
-			
-			data.commands = [];
-			
-			delete data.workspace;
-			delete data.momentFormat;
-			delete data.defaultNote;
-			delete data.useMoment;
-			delete data.workspaceEnabled;
-			settings.homepages[DEFAULT] = data;
-			
-			return settings;
-		}
+		
+		return settingsData;
 	}
 	
 	async saveSettings(): Promise<void> {
@@ -211,5 +185,47 @@ export default class HomepagePlugin extends Plugin {
 		}
 		
 		this.app.showReleaseNotes = this.app.nvOrig_showReleaseNotes;
+	}
+	
+	upgradeSettings(data: any): HomepageSettings {
+		if (data.version == 3) {
+			const settings = data as HomepageSettings;
+			const momentPages = Object.keys(settings.homepages).filter(
+				k => settings.homepages[k].kind == LEGACY_MOMENT_KIND
+			);
+			
+			momentPages.forEach(k => settings.homepages[k].kind = Kind.DailyNote);
+			if (momentPages) new Notice(MOMENT_MESSAGE);
+			
+			data.version = 4;
+			return settings;
+		}
+
+		const settings: HomepageSettings = Object.assign({}, DEFAULT_SETTINGS);
+		
+		if (data.workspaceEnabled) {
+			data.value = data.workspace;
+			data.kind = Kind.Workspace;
+		}
+		else if (data.momentFormat) {
+			data.kind = Kind.DailyNote;	
+			new Notice(MOMENT_MESSAGE);
+		}
+		else {
+			data.value = data.defaultNote;
+			data.kind = Kind.File;
+		}
+		
+		data.commands = [];
+		
+		delete data.workspace;
+		delete data.momentFormat;
+		delete data.defaultNote;
+		delete data.useMoment;
+		delete data.workspaceEnabled;
+		settings.homepages[DEFAULT] = data;
+		
+		this.saveData(settings);
+		return settings;
 	}
 }

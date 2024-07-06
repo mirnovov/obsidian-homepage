@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "homepages": {
     "Main Homepage": {
       "value": "Home",
@@ -11,7 +11,7 @@
       "revertView": true,
       "openWhenEmpty": false,
       "refreshDataview": false,
-      "autoCreate": true,
+      "autoCreate": false,
       "autoScroll": false,
       "pin": false,
       "commands": [],

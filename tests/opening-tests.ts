@@ -81,6 +81,7 @@ export default class OpeningTests {
 	
 	async autoCreate(this: HomepageTestPlugin) {
 		this.homepage.data.value = "temp";
+		this.homepage.data.autoCreate = true;
 		this.homepage.save();
 
 		this.homepage.open();
@@ -123,7 +124,7 @@ export default class OpeningTests {
 		this.homepage.data.openWhenEmpty = true;
 		this.homepage.save();
 		
-		this.app.workspace.iterateAllLeaves(l => l.detach());
+		this.app.workspace.iterateRootLeaves(l => l.detach());
 		await sleep(500);
 		
 		const file = this.app.workspace.getActiveFile();
@@ -136,7 +137,7 @@ export default class OpeningTests {
 		this.homepage.data.manualOpenMode = Mode.ReplaceAll;
 		this.homepage.save();
 		
-		this.app.workspace.iterateAllLeaves(l => l.detach());
+		this.app.workspace.iterateRootLeaves(l => l.detach());
 		await sleep(500);
 		
 		const file = this.app.workspace.getActiveFile();

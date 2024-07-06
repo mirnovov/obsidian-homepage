@@ -16,29 +16,27 @@ export interface HomepageSettings {
 
 export const DEFAULT_SETTINGS: HomepageSettings = {
 	version: 4,
-	homepages: {
-		[DEFAULT]: {
-			value: "Home",
-			kind: Kind.File,
-			openOnStartup: true,
-			openMode: Mode.ReplaceAll,
-			manualOpenMode: Mode.Retain,
-			view: View.Default,
-			revertView: true,
-			openWhenEmpty: false,
-			refreshDataview: false,
-			autoCreate: false,
-			autoScroll: false,
-			pin: false,
-			commands: [],
-			alwaysApply: false,
-			hideReleaseNotes: false
-		}
-	},
+	homepages: {},
 	separateMobile: false
 }
 
-export const DEFAULT_DATA: HomepageData = DEFAULT_SETTINGS.homepages[DEFAULT];
+export const DEFAULT_DATA: HomepageData = {
+	value: "Home",
+	kind: Kind.File,
+	openOnStartup: true,
+	openMode: Mode.ReplaceAll,
+	manualOpenMode: Mode.Retain,
+	view: View.Default,
+	revertView: true,
+	openWhenEmpty: false,
+	refreshDataview: false,
+	autoCreate: false,
+	autoScroll: false,
+	pin: false,
+	commands: [],
+	alwaysApply: false,
+	hideReleaseNotes: false
+};
 
 const DESCRIPTIONS = {
 	[Kind.File]: "Enter a note or canvas to use.",

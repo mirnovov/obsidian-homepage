@@ -1,4 +1,4 @@
-import { Notice, Plugin, TFile, moment } from "obsidian";
+import { Plugin, TFile, moment } from "obsidian";
 import HomepagePlugin from "./main";
 import { Kind } from "./homepage";
 import { trimFile } from "./utils";
@@ -53,6 +53,7 @@ export const PERIODIC_KINDS: Kind[] = [
 ];
 
 export const LEGACY_MOMENT_KIND: string = "Date-dependent file";
+export const MOMENT_MESSAGE: string = "Date-dependent notes in Homepage have been removed. Set your Homepage as a Periodic or Daily Note instead.";
 
 export async function getPeriodicNote(kind: Kind, plugin: HomepagePlugin): Promise<string> {
 	const periodicNotes = plugin.communityPlugins["periodic-notes"],
@@ -90,11 +91,11 @@ export function hasRequiredPeriodicity(kind: Kind, plugin: HomepagePlugin): bool
 	
 	if (isLegacyPeriodicNotes(periodicNotes)) {
 		const adjective = PERIODIC_INFO[kind].adjective;
-		return plugin.communityPlugins["periodic-notes"].settings[adjective]?.enabled;
+		return periodicNotes.settings[adjective]?.enabled;
 	}
 	else {
 		const noun = PERIODIC_INFO[kind].noun;
-		return plugin.communityPlugins["periodic-notes"]?.calendarSetManager?.getActiveSet()[noun]?.enabled;
+		return periodicNotes?.calendarSetManager?.getActiveSet()[noun]?.enabled;
 	}
 }
 

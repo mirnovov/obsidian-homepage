@@ -13,7 +13,7 @@ export default class PluginTests {
 		await this.app.workspace.openLinkText("Note B", "", false);
 		this.internalPlugins.workspaces.instance.saveWorkspace("Home");
 		
-		this.app.workspace.iterateAllLeaves(l => l.detach());
+		this.app.workspace.iterateRootLeaves(l => l.detach());
 		this.homepage.data.kind = Kind.Workspace;
 		this.homepage.open();
 		await sleep(100);
@@ -46,7 +46,7 @@ export default class PluginTests {
 		this.homepage.save();
 	
 		this.homepage.open();
-		await sleep(100);
+		await sleep(200);
 		
 		const dailyNote = await this.internalPlugins["daily-notes"].instance.getDailyNote();
 		const file = this.app.workspace.getActiveFile();
@@ -67,10 +67,10 @@ export default class PluginTests {
 		this.homepage.data.commands = ["daily-notes"];
 		this.homepage.save();
 		
-		this.app.workspace.iterateAllLeaves(l => l.detach());
+		this.app.workspace.iterateRootLeaves(l => l.detach());
 		this.homepage.data.kind = Kind.Workspace;
 		this.homepage.open();
-		await sleep(100);
+		await sleep(200);
 	
 		const dailyNote = await this.internalPlugins["daily-notes"].instance.getDailyNote();
 		const file = this.app.workspace.getActiveFile();

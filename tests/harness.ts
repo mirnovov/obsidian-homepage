@@ -116,7 +116,7 @@ export default class HomepageTestPlugin extends HomepagePlugin {
 			//reset state
 			this.homepage.data = { ...DEFAULT_DATA };
 			this.homepage.save();
-			this.app.workspace.iterateAllLeaves(l => l.detach());
+			this.app.workspace.iterateRootLeaves(l => l.detach());
 			await sleep(50);
 						
 			try {
