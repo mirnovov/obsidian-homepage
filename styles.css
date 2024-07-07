@@ -106,6 +106,10 @@
 	margin: 0 var(--size-2-1) 0 0;
 }
 
+.nv-command-pill.nv-dragging {
+	background-color: transparent;
+}
+
 .nv-command-add-button {
 	font-size: var(--font-ui-small);
 	padding: var(--size-2-2) var(--size-4-2);

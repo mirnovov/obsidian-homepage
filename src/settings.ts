@@ -1,8 +1,8 @@
-import { App, ButtonComponent, Notice, Platform, PluginSettingTab, Setting, getIcon, normalizePath, setTooltip } from "obsidian";
+import { App, ButtonComponent, Notice, Platform, PluginSettingTab, Setting, normalizePath } from "obsidian";
 import HomepagePlugin from "./main";
-import { UNCHANGEABLE, DEFAULT, HomepageData, Kind, Mode, View } from "./homepage";
+import { UNCHANGEABLE, HomepageData, Kind, Mode, View } from "./homepage";
 import { PERIODIC_KINDS, getAutorun } from "./periodic";
-import { CommandSuggestModal, FileSuggest, WorkspaceSuggest } from "./ui";
+import { CommandBox, FileSuggest, WorkspaceSuggest } from "./ui";
 
 type HomepageKey = keyof HomepageData;
 type HomepageObject = { [key: string]: HomepageData }
@@ -55,7 +55,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 	settings: HomepageSettings;
 	elements: Record<string, Setting>;
 	
-	commandBox: HTMLElement;
+	commandBox: CommandBox;
 
 	constructor(app: App, plugin: HomepagePlugin) {
 		super(app, plugin);
@@ -195,8 +195,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 			cls: "nv-command-desc setting-item-description", 
 			text: "Select commands that will be executed when opening the homepage." }
 		);
-		this.commandBox = this.containerEl.createDiv({ cls: "nv-command-box" });
-		this.updateCommandBox();
+		this.commandBox = new CommandBox(this);
 		
 		this.addHeading("Vault environment", "vaultHeading");
 		this.addDropdown(
@@ -304,48 +303,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		this.elements[setting] = toggle;
 		return toggle;
 	}
-	
-	updateCommandBox(): void {
-		this.commandBox.innerHTML = "";
 		
-		for (const [index, id] of this.plugin.homepage.data.commands.entries()) {
-			const command = this.app.commands.findCommand(id);			
-			const pill = this.commandBox.createDiv({ 
-				cls: "nv-command-pill", 
-				text: command?.name ?? id 
-			});
-			
-			new ButtonComponent(pill)
-				.setIcon("trash-2")
-				.setClass("clickable-icon")
-				.onClick(() => {
-					this.plugin.homepage.data.commands.splice(index, 1);
-					this.plugin.homepage.save();
-					this.updateCommandBox();
-				});
-				
-			if (!command) {
-				pill.classList.add("nv-command-invalid");
-				pill.prepend(getIcon("ban")!);
-				
-				setTooltip(
-					pill, 
-					"This command can't be found, so it won't be executed."
-					+ " It may belong to a disabled plugin.",
-					{ delay: 0.001 }
-				);
-			}
-		}
-		
-		new ButtonComponent(this.commandBox)
-			.setClass("nv-command-add-button")
-			.setButtonText("Add...")
-			.onClick(() => {
-				const modal = new CommandSuggestModal(this);
-				modal.open();
-			});
-	} 
-	
 	async copyDebugInfo(): Promise<void> {
 		const config = this.app.vault.config;
 		const info = {

@@ -1,4 +1,4 @@
-import { App, AbstractInputSuggest, Command, FuzzySuggestModal, Notice, TAbstractFile, TFile } from "obsidian";
+import { App, AbstractInputSuggest, ButtonComponent, Command, FuzzySuggestModal, Notice, TAbstractFile, TFile, getIcon, setTooltip } from "obsidian";
 import { Homepage } from "./homepage";
 import { HomepageSettingTab } from "./settings"; 
 import { trimFile } from "./utils";
@@ -65,6 +65,117 @@ export class WorkspaceSuggest extends AbstractInputSuggest<string> {
 	}
 }
 
+export interface DragData {
+	element: HTMLElement,
+	commandId: string
+}
+
+export class CommandBox {
+	app: App;
+	homepage: Homepage;
+	tab: HomepageSettingTab;
+	
+	container: HTMLElement;
+	dropzone: HTMLElement;
+	activeDrag: DragData | null;
+
+	constructor(tab: HomepageSettingTab) {
+		this.app = tab.plugin.app;
+		this.homepage = tab.plugin.homepage;
+		this.tab = tab;
+		
+		this.container = tab.containerEl.createDiv({ cls: "nv-command-box" });		
+		this.dropzone = document.createElement("div");
+		
+		this.dropzone.className = "nv-command-pill nv-dropzone";
+		this.dropzone.addEventListener("dragenter", e => e.preventDefault());
+		this.dropzone.addEventListener("dragover", e => e.preventDefault());
+		this.dropzone.addEventListener("drop", () => this.terminateDrag());
+		
+		this.update();
+	}
+	
+	update(): void {
+		this.container.innerHTML = "";
+		this.activeDrag = null;
+		
+		for (const [index, id] of this.homepage.data.commands.entries()) {
+			const command = this.app.commands.findCommand(id);			
+			const pill = this.container.createDiv({ 
+				cls: "nv-command-pill", 
+				text: command?.name ?? id,
+				attr: { draggable: true } 
+			});
+			
+			pill.addEventListener("dragstart", event => {
+				event.dataTransfer!.effectAllowed = "move";
+				this.homepage.data.commands.splice(index, 1);
+
+				this.activeDrag = { element: pill, commandId: id };
+				this.dropzone.style.width = `${pill.clientWidth}px`;
+				this.dropzone.style.height = `${pill.clientHeight}px`;
+			});
+			
+			pill.addEventListener("dragover", e => this.moveDropzone(pill, e));
+			pill.addEventListener("drop", e => e.preventDefault());
+			pill.addEventListener("dragend", () => this.terminateDrag());
+			
+			new ButtonComponent(pill)
+				.setIcon("trash-2")
+				.setClass("clickable-icon")
+				.onClick(() => {
+					this.homepage.data.commands.splice(index, 1);
+					this.homepage.save();
+					this.update();
+				});
+				
+			if (!command) {
+				pill.classList.add("nv-command-invalid");
+				pill.prepend(getIcon("ban")!);
+				
+				setTooltip(pill, 
+					"This command can't be found, so it won't be executed."
+					+ " It may belong to a disabled plugin.",
+					{ delay: 0.001 }
+				);
+			}
+		}
+		
+		new ButtonComponent(this.container)
+			.setClass("nv-command-add-button")
+			.setButtonText("Add...")
+			.onClick(() => {
+				const modal = new CommandSuggestModal(this.tab);
+				modal.open();
+			});
+	} 
+	
+	moveDropzone(anchor: HTMLElement, event: DragEvent): void {
+		if (!this.activeDrag) return;
+		
+		this.activeDrag.element.hidden = true;
+		const rect = anchor.getBoundingClientRect();
+		
+		if (event.x < rect.left + (rect.width / 2)) {
+			this.container.insertBefore(this.dropzone, anchor);
+		}
+		else {
+			this.container.insertAfter(this.dropzone, anchor);
+		}
+		
+		event.preventDefault();
+	}
+	
+	terminateDrag(): void {
+		if (!this.activeDrag) return;
+
+		const position = Array.from(this.container.children).indexOf(this.dropzone);
+		this.homepage.data.commands.splice(position, 0, this.activeDrag.commandId);
+		this.homepage.save();
+		this.update();
+	}
+}
+
 export class CommandSuggestModal extends FuzzySuggestModal<unknown> {
 	app: App
 	homepage: Homepage;
@@ -96,6 +207,6 @@ export class CommandSuggestModal extends FuzzySuggestModal<unknown> {
 		
 		this.homepage.data.commands.push(item.id);
 		this.homepage.save();
-		this.tab.updateCommandBox();
+		this.tab.commandBox.update();
 	}
 }
