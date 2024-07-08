@@ -81,7 +81,7 @@
 	border: 1px solid var(--background-modifier-border-hover);
 	border-radius: var(--radius-s);
 	font-size: var(--font-ui-small);
-	padding: var(--size-2-1) var(--size-2-3);
+	padding: var(--size-2-1) var(--size-2-2) var(--size-2-1) var(--size-2-3) ;
 }
 
 .nv-command-pill.nv-command-invalid {
@@ -91,11 +91,29 @@
 .nv-command-pill button {
 	display: inline-block;
 	padding: 0;
-	margin: 0 0 0 var(--size-2-3);
+	margin: 0 0 0 3px;
 	vertical-align: bottom;
 }
 
-.nv-command-pill > .svg-icon, .nv-command-pill button svg {
+.nv-command-pill button:first-of-type {
+	margin-left: var(--size-4-2);
+}
+
+.nv-command-pill button.nv-command-selected {
+	margin-left: var(--size-2-3);
+	margin-right: var(--size-2-1);
+}
+
+.nv-command-pill button.nv-command-selected span {
+	color: var(--text-accent);
+	display: inline-block;
+	font-size: 0.9em;
+	vertical-align: top;
+	position: relative;
+	top: -1px;
+}
+
+.nv-command-pill > .svg-icon, .nv-command-pill button .svg-icon {
 	height: 1em;
 	width: 1em;
 }

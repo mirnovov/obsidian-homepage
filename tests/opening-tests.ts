@@ -1,5 +1,5 @@
 import { TAbstractFile } from "obsidian";
-import { Kind, Mode } from "src/homepage";
+import { Kind, Mode, Period } from "src/homepage";
 import { sleep } from "src/utils";
 import HomepageTestPlugin from "./harness";
 
@@ -70,9 +70,12 @@ export default class OpeningTests {
 			callback: () => this.test = true
 		});
 		
-		this.homepage.data.commands = ["homepage:nv-test-command"];
+		this.homepage.data.commands = [{
+			id: "homepage:nv-test-command",
+			period: Period.Both
+		}];
+		
 		this.homepage.save();
-	
 		this.homepage.open();
 		await sleep(100);
 		

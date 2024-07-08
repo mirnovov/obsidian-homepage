@@ -1,5 +1,5 @@
 import { Notice, Keymap, Platform, Plugin, addIcon } from "obsidian";
-import { DEFAULT, MOBILE, Homepage, Kind } from "./homepage";
+import { DEFAULT, MOBILE, Homepage, Kind, Period } from "./homepage";
 import { hasRequiredPeriodicity, LEGACY_MOMENT_KIND, MOMENT_MESSAGE } from "./periodic";
 import { DEFAULT_SETTINGS, HomepageSettings, HomepageSettingTab } from "./settings";
 
@@ -190,14 +190,23 @@ export default class HomepagePlugin extends Plugin {
 	upgradeSettings(data: any): HomepageSettings {
 		if (data.version == 3) {
 			const settings = data as HomepageSettings;
-			const momentPages = Object.keys(settings.homepages).filter(
-				k => settings.homepages[k].kind == LEGACY_MOMENT_KIND
-			);
+			let hasMoment = false;
 			
-			momentPages.forEach(k => settings.homepages[k].kind = Kind.DailyNote);
-			if (momentPages) new Notice(MOMENT_MESSAGE);
+			for (const homepage of Object.values(settings.homepages)) {
+				homepage.commands = (homepage.commands as unknown as string[]).map(id => { 
+					return { id: id, period: Period.Both }
+				});
+				
+				if (homepage.kind == LEGACY_MOMENT_KIND) {
+					hasMoment = true;
+					homepage.kind = Kind.DailyNote;
+				}
+			}
 			
-			data.version = 4;
+			if (hasMoment) new Notice(MOMENT_MESSAGE);
+			settings.version = 4;
+			
+			this.saveData(settings);
 			return settings;
 		}
 

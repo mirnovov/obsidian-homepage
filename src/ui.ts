@@ -1,5 +1,8 @@
-import { App, AbstractInputSuggest, ButtonComponent, Command, FuzzySuggestModal, Notice, TAbstractFile, TFile, getIcon, setTooltip } from "obsidian";
-import { Homepage } from "./homepage";
+import { 
+	App, AbstractInputSuggest, ButtonComponent, Command, FuzzySuggestModal, 
+	Menu, MenuItem, Notice, TAbstractFile, TFile, getIcon, setTooltip 
+} from "obsidian";
+import { CommandData, Homepage, Period } from "./homepage";
 import { HomepageSettingTab } from "./settings"; 
 import { trimFile } from "./utils";
 
@@ -65,11 +68,6 @@ export class WorkspaceSuggest extends AbstractInputSuggest<string> {
 	}
 }
 
-export interface DragData {
-	element: HTMLElement,
-	commandId: string
-}
-
 export class CommandBox {
 	app: App;
 	homepage: Homepage;
@@ -77,7 +75,8 @@ export class CommandBox {
 	
 	container: HTMLElement;
 	dropzone: HTMLElement;
-	activeDrag: DragData | null;
+	activeDrag: HTMLElement | null;
+	activeCommand: CommandData | null;
 
 	constructor(tab: HomepageSettingTab) {
 		this.app = tab.plugin.app;
@@ -98,20 +97,22 @@ export class CommandBox {
 	update(): void {
 		this.container.innerHTML = "";
 		this.activeDrag = null;
+		this.activeCommand = null;
 		
-		for (const [index, id] of this.homepage.data.commands.entries()) {
-			const command = this.app.commands.findCommand(id);			
+		for (const command of this.homepage.data.commands) {
+			const appCommand = this.app.commands.findCommand(command.id);			
 			const pill = this.container.createDiv({ 
 				cls: "nv-command-pill", 
-				text: command?.name ?? id,
-				attr: { draggable: true } 
+				text: appCommand?.name ?? command.id,
+				attr: { draggable: true, } 
 			});
 			
 			pill.addEventListener("dragstart", event => {
 				event.dataTransfer!.effectAllowed = "move";
-				this.homepage.data.commands.splice(index, 1);
-
-				this.activeDrag = { element: pill, commandId: id };
+				
+				this.activeCommand = this.homepage.data.commands.splice(this.indexOf(pill), 1)[0];
+				this.activeDrag = pill;
+				
 				this.dropzone.style.width = `${pill.clientWidth}px`;
 				this.dropzone.style.height = `${pill.clientHeight}px`;
 			});
@@ -120,16 +121,29 @@ export class CommandBox {
 			pill.addEventListener("drop", e => e.preventDefault());
 			pill.addEventListener("dragend", () => this.terminateDrag());
 			
+			const periodButton = new ButtonComponent(pill)
+				.setIcon("route")
+				.setClass("clickable-icon")
+				.setClass("nv-command-period")
+				.onClick(e => this.showMenu(command, e));
+				
+			if (command.period != Period.Both) {
+				periodButton.setClass("nv-command-selected");
+				periodButton.setIcon("");
+				
+				//if (command.period == Period.Manual) periodButton.setIcon("pointer");
+				//else periodButton.setIcon("power");
+				
+				periodButton.buttonEl.createSpan({ text: command.period });
+			}
+				
 			new ButtonComponent(pill)
 				.setIcon("trash-2")
 				.setClass("clickable-icon")
-				.onClick(() => {
-					this.homepage.data.commands.splice(index, 1);
-					this.homepage.save();
-					this.update();
-				});
+				.setClass("nv-command-delete")
+				.onClick(() => this.delete(command));
 				
-			if (!command) {
+			if (!appCommand) {
 				pill.classList.add("nv-command-invalid");
 				pill.prepend(getIcon("ban")!);
 				
@@ -150,10 +164,38 @@ export class CommandBox {
 			});
 	} 
 	
+	delete(command: CommandData) {
+		this.homepage.data.commands.remove(command);
+		this.homepage.save();
+		this.update();
+	}
+	
+	showMenu(command: CommandData, event: MouseEvent): void {
+		const menu = new Menu();
+		
+		for (const key of Object.values(Period)) {
+			menu.addItem(item => {
+				item.setTitle(key);
+				item.setChecked(command.period == key);
+				item.onClick(() => {
+					command.period = key;
+					this.homepage.save();
+					this.update();
+				});
+			});
+		}
+		
+		menu.showAtMouseEvent(event);
+	}
+
+	indexOf(pill: HTMLElement): number {
+		return Array.from(this.container.children).indexOf(pill);
+	}
+	
 	moveDropzone(anchor: HTMLElement, event: DragEvent): void {
 		if (!this.activeDrag) return;
 		
-		this.activeDrag.element.hidden = true;
+		this.activeDrag.hidden = true;
 		const rect = anchor.getBoundingClientRect();
 		
 		if (event.x < rect.left + (rect.width / 2)) {
@@ -167,10 +209,12 @@ export class CommandBox {
 	}
 	
 	terminateDrag(): void {
-		if (!this.activeDrag) return;
+		if (!this.activeCommand) return;
 
-		const position = Array.from(this.container.children).indexOf(this.dropzone);
-		this.homepage.data.commands.splice(position, 0, this.activeDrag.commandId);
+		this.homepage.data.commands.splice(
+			this.indexOf(this.dropzone), 0, this.activeCommand
+		);
+		
 		this.homepage.save();
 		this.update();
 	}
@@ -205,7 +249,10 @@ export class CommandSuggestModal extends FuzzySuggestModal<unknown> {
 			this.homepage.data.commands = [];
 		}
 		
-		this.homepage.data.commands.push(item.id);
+		this.homepage.data.commands.push({ 
+			id: item.id, period: Period.Both 
+		});
+		
 		this.homepage.save();
 		this.tab.commandBox.update();
 	}

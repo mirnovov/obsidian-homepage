@@ -23,10 +23,15 @@ export interface HomepageData {
 	autoCreate: boolean,
 	autoScroll: boolean,
 	pin: boolean,
-	commands: string[],
+	commands: CommandData[],
 	alwaysApply: boolean,
 	hideReleaseNotes: boolean
 } 
+
+export interface CommandData {
+	id: string,
+	period: Period
+}
 
 export enum Mode {
 	ReplaceAll = "Replace all open notes",
@@ -51,6 +56,12 @@ export enum Kind {
 	WeeklyNote = "Weekly Note",
 	MonthlyNote = "Monthly Note",
 	YearlyNote = "Yearly Note"
+}
+
+export enum Period {
+	Both = "Both",
+	Startup = "Startup only",
+	Manual = "Manual only"
 }
 
 export const UNCHANGEABLE: Kind[] = [Kind.Random, Kind.Graph, Kind.None, ...PERIODIC_KINDS];
@@ -89,9 +100,11 @@ export class Homepage {
 		}
 		
 		if (!this.data.commands) return;
+		const disallowed = this.plugin.loaded ? Period.Startup : Period.Manual;
 				
-		for (const command of this.data.commands) {
-			this.app.commands.executeCommandById(command);
+		for (const {id, period} of this.data.commands) {
+			if (period === disallowed) continue;
+			this.app.commands.executeCommandById(id);
 		}
 	}
 	

@@ -1,5 +1,5 @@
 import { MarkdownView, TFile, moment } from "obsidian";
-import { Kind, View } from "src/homepage";
+import { Kind, Period, View } from "src/homepage";
 import { sleep } from "src/utils";
 import HomepageTestPlugin from "./harness";
 
@@ -64,7 +64,10 @@ export default class PluginTests {
 		await this.app.workspace.openLinkText("Note B", "", false);
 		this.internalPlugins.workspaces.instance.saveWorkspace("Home");
 		
-		this.homepage.data.commands = ["daily-notes"];
+		this.homepage.data.commands = [{
+			id: "daily-notes",
+			period: Period.Both
+		}];
 		this.homepage.save();
 		
 		this.app.workspace.iterateRootLeaves(l => l.detach());
