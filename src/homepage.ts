@@ -1,6 +1,7 @@
 import { App, FileView, MarkdownView, Notice, View as OView, WorkspaceLeaf } from "obsidian";
 import HomepagePlugin from "./main";
 import { PERIODIC_KINDS, getAutorun, getPeriodicNote } from "./periodic";
+import { DEFAULT_DATA } from "./settings";
 import { detachLeavesOfTypes,  emptyActiveView, equalsCaseless, randomFile, sleep, trimFile, untrimName } from "./utils";
 
 export const LEAF_TYPES: string[] = ["markdown", "canvas", "kanban"];
@@ -80,7 +81,14 @@ export class Homepage {
 		this.name = name;
 		this.plugin = plugin;
 		this.app = plugin.app;
-		this.data = plugin.settings.homepages[name];
+		
+		const data = this.plugin.settings.homepages[name];
+		
+		if (data) this.data = Object.assign(DEFAULT_DATA, data);
+		else {
+			this.plugin.settings.homepages[name] = { ...DEFAULT_DATA };
+			this.data = this.plugin.settings.homepages[name];
+		}
 	}
 	
 	async open(alternate: boolean = false): Promise<void> {

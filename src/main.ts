@@ -93,7 +93,8 @@ export default class HomepagePlugin extends Plugin {
 	getHomepage(): Homepage {
 		if (this.settings.separateMobile && Platform.isMobile) {
 			if (!(MOBILE in this.settings.homepages)) {
-				this.settings.homepages[MOBILE] = { ...this.settings.homepages[DEFAULT] };
+				this.settings.homepages[MOBILE] = { ...this.settings.homepages?.[DEFAULT] };
+				this.settings.homepages[MOBILE].commands = [ ...this.settings.homepages?.[DEFAULT]?.commands ];
 			}
 			
 			return new Homepage(MOBILE, this);
