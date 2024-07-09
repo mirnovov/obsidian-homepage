@@ -100,8 +100,8 @@
 }
 
 .nv-command-pill button.nv-command-selected {
-	margin-left: var(--size-2-3);
-	margin-right: var(--size-2-1);
+	margin-left: var(--size-2-2);
+	padding: 0 var(--size-2-1);
 }
 
 .nv-command-pill button.nv-command-selected span {
