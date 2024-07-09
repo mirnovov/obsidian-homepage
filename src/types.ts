@@ -46,6 +46,7 @@ declare module "obsidian" {
 declare global {
 	interface Window {
 		OBS_ACT: string | any;
+		i18next: any;
 		Capacitor: any;
 		electron: any;
 		electronWindow: any;

@@ -19,10 +19,13 @@ export default class HomepagePlugin extends Plugin {
 	loaded: boolean = false;
 	executing: boolean = false;
 	
+	interstitial: HTMLElement;
+	
 	async onload(): Promise<void> {
-		const appStartup = document.body.querySelector(".progress-bar") !== null;
+		const progressBar = document.body.querySelector(".progress-bar");
 
 		this.patchReleaseNotes();
+		this.showInterstitial(progressBar as HTMLElement);
 		
 		this.settings = await this.loadSettings();
 		this.internalPlugins = this.app.internalPlugins.plugins;
@@ -32,7 +35,7 @@ export default class HomepagePlugin extends Plugin {
 		this.app.workspace.onLayoutReady(async () => {
 			const openInitially = (
 				this.homepage.data.openOnStartup &&
-				appStartup && !(await this.hasUrlParams())
+				progressBar && !(await this.hasUrlParams())
 			);
 			
 			this.patchNewTabPage();
@@ -41,6 +44,7 @@ export default class HomepagePlugin extends Plugin {
 			this.loaded = true;
 			
 			this.unpatchReleaseNotes();
+			this.interstitial?.detach();
 		});
 
 		addIcon("homepage", ICON);
@@ -116,6 +120,13 @@ export default class HomepagePlugin extends Plugin {
 	
 	async saveSettings(): Promise<void> {
 		await this.saveData(this.settings);
+	}
+	
+	showInterstitial(progressBar: HTMLElement | null): void {
+		if (!progressBar) return;
+		
+		this.interstitial = createDiv({ cls: "progress-bar nv-homepage-interstitial" });
+		document.body.insertBefore(this.interstitial, progressBar);
 	}
 	
 	async hasUrlParams(): Promise<boolean> {
