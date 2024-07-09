@@ -1,6 +1,6 @@
 import { 
 	App, AbstractInputSuggest, ButtonComponent, Command, FuzzySuggestModal, 
-	Menu, MenuItem, Notice, TAbstractFile, TFile, getIcon, setTooltip 
+	Menu, Notice, TAbstractFile, TFile, getIcon, setTooltip 
 } from "obsidian";
 import { CommandData, Homepage, Period } from "./homepage";
 import { HomepageSettingTab } from "./settings"; 
@@ -131,9 +131,6 @@ export class CommandBox {
 				periodButton.setClass("nv-command-selected");
 				periodButton.setIcon("");
 				
-				//if (command.period == Period.Manual) periodButton.setIcon("pointer");
-				//else periodButton.setIcon("power");
-				
 				periodButton.buttonEl.createSpan({ text: command.period });
 			}
 				
@@ -164,7 +161,7 @@ export class CommandBox {
 			});
 	} 
 	
-	delete(command: CommandData) {
+	delete(command: CommandData): void {
 		this.homepage.data.commands.remove(command);
 		this.homepage.save();
 		this.update();

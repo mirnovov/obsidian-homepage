@@ -75,12 +75,6 @@ export default class HomepagePlugin extends Plugin {
 				this.homepage.setToActiveFile();
 			}
 		});
-
-		console.log(
-			`Homepage: ${this.homepage.data.value} `+
-			`(method: ${this.homepage.data.openMode}, view: ${this.homepage.data.view}, `+
-			`kind: ${this.homepage.data.kind})`
-		);
 	}
 	
 	async onunload(): Promise<void> {
