@@ -103,7 +103,6 @@ export class CommandBox {
 			const appCommand = this.app.commands.findCommand(command.id);			
 			const pill = this.container.createDiv({ 
 				cls: "nv-command-pill", 
-				text: appCommand?.name ?? command.id,
 				attr: { draggable: true, } 
 			});
 			
@@ -121,11 +120,16 @@ export class CommandBox {
 			pill.addEventListener("drop", e => e.preventDefault());
 			pill.addEventListener("dragend", () => this.terminateDrag());
 			
+			pill.createSpan({ 
+				cls: "nv-command-text",
+				text: appCommand?.name ?? command.id,
+			});
+			
 			const periodButton = new ButtonComponent(pill)
 				.setIcon("route")
 				.setClass("clickable-icon")
 				.setClass("nv-command-period")
-				.onClick(e => this.showMenu(command, e));
+				.onClick(e => this.showMenu(command, e, periodButton));
 				
 			if (command.period != Period.Both) {
 				periodButton.setClass("nv-command-selected");
@@ -167,9 +171,9 @@ export class CommandBox {
 		this.update();
 	}
 	
-	showMenu(command: CommandData, event: MouseEvent): void {
+	showMenu(command: CommandData, event: MouseEvent, button: ButtonComponent): void {
 		const menu = new Menu();
-		
+
 		for (const key of Object.values(Period)) {
 			menu.addItem(item => {
 				item.setTitle(key);
@@ -182,7 +186,8 @@ export class CommandBox {
 			});
 		}
 		
-		menu.showAtMouseEvent(event);
+		const rect = button.buttonEl.getBoundingClientRect();
+		menu.showAtPosition({ x: rect.x - 22, y: rect.y + rect.height + 8 });
 	}
 
 	indexOf(pill: HTMLElement): number {

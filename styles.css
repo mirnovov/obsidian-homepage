@@ -63,6 +63,17 @@
 	padding: 5px 0 0;
 }
 
+.nv-mobile-setting {
+	flex-wrap: wrap;
+	row-gap: var(--size-2-2);
+}
+
+.nv-mobile-setting .nv-mobile-info {
+	font-size: var(--font-ui-smaller);
+	width: 100%;
+	margin-right: var(--size-4-18);
+}
+
 .nv-command-desc {
 	padding: 1.2em 0 0;
 	border-top: 1px solid var(--background-modifier-border);
@@ -166,17 +177,45 @@
 	max-width: auto;
 }
 
-.is-phone .nv-command-pill button, .is-phone .nv-command-add-button {
-	width: auto;
+.is-phone .nv-mobile-setting {
+	row-gap: var(--size-4-2);
 }
 
-.nv-mobile-setting {
-	flex-wrap: wrap;
-	row-gap: var(--size-2-2);
+.is-phone .nv-mobile-setting .setting-item-info {
+	max-width: calc(100% - 100px);
 }
 
-.nv-mobile-setting .nv-mobile-info {
-	font-size: var(--font-ui-smaller);
+.is-phone .nv-mobile-setting {
+	row-gap: var(--size-4-2);
+}
+
+.is-phone .nv-mobile-setting .setting-item-info {
+	max-width: calc(100% - 100px);
+}
+
+.is-phone .nv-command-pill {
 	width: 100%;
-	margin-right: var(--size-4-18);
+	border: none;
+	background: none;
+	padding: 0 0 var(--size-4-2);
+	display: flex;
+	gap: var(--size-4-4);
+	align-items: baseline;
+}
+
+.is-phone .nv-command-pill .nv-command-text {
+	flex-grow: 1;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.is-phone .nv-command-pill, .is-phone .nv-command-add-button {
+	font-size: var(--font-ui-medium);
+	justify-content: space-between;
+}
+
+.is-phone .nv-command-pill button {
+	line-height: var(--font-ui-medium);
+	height: 100%;
+	margin: 0 !important;
 }
