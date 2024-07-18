@@ -45,3 +45,19 @@ export function detachLeavesOfTypes(app: App, types: string[]): void {
 		leaf.detach();
 	});
 }
+
+export function hasLayoutChange(app: App): Promise<void> {
+	const layoutWait = new Promise<void>(resolve => {
+		const wrapped = async () => {
+			resolve();
+			app.workspace.off("layout-change", wrapped);
+		};
+		
+		app.workspace.on("layout-change", wrapped);
+	});
+	
+	return Promise.race([
+		layoutWait, 
+		new Promise<void>(resolve => setTimeout(resolve, 2000))]
+	);
+}

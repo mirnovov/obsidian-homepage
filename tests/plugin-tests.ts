@@ -68,12 +68,11 @@ export default class PluginTests {
 			id: "daily-notes",
 			period: Period.Both
 		}];
-		this.homepage.save();
+		await this.homepage.save();
 		
 		this.app.workspace.iterateRootLeaves(l => l.detach());
 		this.homepage.data.kind = Kind.Workspace;
-		this.homepage.open();
-		await sleep(200);
+		await this.homepage.open();
 	
 		const dailyNote = await this.internalPlugins["daily-notes"].instance.getDailyNote();
 		const file = this.app.workspace.getActiveFile();

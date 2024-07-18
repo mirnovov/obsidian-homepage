@@ -2,7 +2,7 @@ import { App, FileView, MarkdownView, Notice, View as OView, WorkspaceLeaf } fro
 import HomepagePlugin from "./main";
 import { PERIODIC_KINDS, getAutorun, getPeriodicNote } from "./periodic";
 import { DEFAULT_DATA } from "./settings";
-import { detachLeavesOfTypes,  emptyActiveView, equalsCaseless, randomFile, sleep, trimFile, untrimName } from "./utils";
+import { detachLeavesOfTypes, emptyActiveView, equalsCaseless, hasLayoutChange, randomFile, sleep, trimFile, untrimName } from "./utils";
 
 export const LEAF_TYPES: string[] = ["markdown", "canvas", "kanban"];
 export const CLOSED_LEAVES: string[] = [...LEAF_TYPES, "audio", "graph", "image", "pdf", "video"];
@@ -109,7 +109,9 @@ export class Homepage {
 		
 		if (!this.data.commands) return;
 		const disallowed = this.plugin.loaded ? Period.Startup : Period.Manual;
-				
+		
+		await hasLayoutChange(this.app);
+		
 		for (const {id, period} of this.data.commands) {
 			if (period === disallowed) continue;
 			this.app.commands.executeCommandById(id);

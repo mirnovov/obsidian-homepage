@@ -75,9 +75,8 @@ export default class OpeningTests {
 			period: Period.Both
 		}];
 		
-		this.homepage.save();
-		this.homepage.open();
-		await sleep(100);
+		await this.homepage.save();
+		await this.homepage.open();
 		
 		this.assert(this.test, this);
 	}
