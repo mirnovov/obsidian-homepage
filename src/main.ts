@@ -75,11 +75,15 @@ export default class HomepagePlugin extends Plugin {
 				this.homepage.setToActiveFile();
 			}
 		});
+		
+		if (DEV) window.homepage = this;
 	}
 	
 	async onunload(): Promise<void> {
 		this.app.workspace.off("layout-change", this.onLayoutChange)
 		this.unpatchNewTabPage();
+		
+		if (DEV) delete window.homepage;
 	}
 	
 	onLayoutChange = async (): Promise<void> => {

@@ -1,4 +1,5 @@
 import "obsidian";
+import HomepagePlugin from "./main";
 
 declare module "obsidian" {
 	interface App {
@@ -50,7 +51,7 @@ declare global {
 		Capacitor: any;
 		electron: any;
 		electronWindow: any;
-		homepageLegacyOptionsEnabled: boolean;
+		homepage?: HomepagePlugin;
 		homepageLoadDebugInfo: (info: any) => Promise<void>;
 		homepageEnsurePlugins: (plugins: string[], enable: boolean) => Promise<void>;
 	}
