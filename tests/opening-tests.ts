@@ -9,10 +9,8 @@ export default class OpeningTests {
 		await this.app.workspace.openLinkText("Note B", "", true);
 		
 		this.homepage.data.manualOpenMode = Mode.ReplaceAll;
-		this.homepage.save();
-		
-		this.homepage.open();
-		await sleep(200);
+		await this.homepage.save();
+		await this.homepage.open();
 		
 		const file = this.app.workspace.getActiveFile();
 		const leaves = this.app.workspace.getLeavesOfType("markdown");
@@ -24,10 +22,8 @@ export default class OpeningTests {
 		await this.app.workspace.openLinkText("Image.png", "", true);
 		
 		this.homepage.data.manualOpenMode = Mode.ReplaceAll;
-		this.homepage.save();
-		
-		this.homepage.open();
-		await sleep(200);
+		await this.homepage.save();
+		await this.homepage.open();
 		
 		const leaves = this.app.workspace.getLeavesOfType("image");
 		this.assert(leaves.length == 0, leaves);
@@ -38,10 +34,8 @@ export default class OpeningTests {
 		await this.app.workspace.openLinkText("Note B", "", true);
 		
 		this.homepage.data.manualOpenMode = Mode.ReplaceLast;
-		this.homepage.save();
-
-		this.homepage.open();
-		await sleep(100);
+		await this.homepage.save();
+		await this.homepage.open();
 		
 		const file = this.app.workspace.getActiveFile();
 		const leaves = this.app.workspace.getLeavesOfType("markdown");
@@ -53,10 +47,8 @@ export default class OpeningTests {
 		await this.app.workspace.openLinkText("Note B", "", true);
 		
 		this.homepage.data.manualOpenMode = Mode.Retain;
-		this.homepage.save();
-	
-		this.homepage.open();
-		await sleep(100);
+		await this.homepage.save();
+		await this.homepage.open();
 		
 		const file = this.app.workspace.getActiveFile();
 		const leaves = this.app.workspace.getLeavesOfType("markdown");
@@ -84,10 +76,8 @@ export default class OpeningTests {
 	async autoCreate(this: HomepageTestPlugin) {
 		this.homepage.data.value = "temp";
 		this.homepage.data.autoCreate = true;
-		this.homepage.save();
-
-		this.homepage.open();
-		await sleep(100);
+		await this.homepage.save();
+		await this.homepage.open();
 		
 		let file = this.app.workspace.getActiveFile();
 		this.assert(file?.name == "temp.md", file);
@@ -95,10 +85,8 @@ export default class OpeningTests {
 		this.app.vault.delete(file as TAbstractFile);
 		
 		this.homepage.data.autoCreate = false;
-		this.homepage.save();
-	
-		this.homepage.open();
-		await sleep(100);
+		await this.homepage.save();
+		await this.homepage.open();
 		
 		file = this.app.workspace.getActiveFile();
 		this.assert(file?.name != "temp.md", file);
@@ -106,14 +94,13 @@ export default class OpeningTests {
 	
 	async random(this: HomepageTestPlugin) {
 		this.homepage.data.kind = Kind.Random;
-		this.homepage.save();
+		await this.homepage.save();
 		
 		//check that the files are different at least 1/10 times
 		let name = null, newname;
 		
 		for (let i = 0; i < 10; i++) {
-			this.homepage.open();
-			await sleep(70);
+			await this.homepage.open();
 			newname = this.app.workspace.getActiveFile()?.name;
 			
 			if (i > 0 && newname !== name) return;
@@ -124,7 +111,7 @@ export default class OpeningTests {
 	
 	async openWhenEmpty(this: HomepageTestPlugin) {
 		this.homepage.data.openWhenEmpty = true;
-		this.homepage.save();
+		await this.homepage.save();
 		
 		this.app.workspace.iterateRootLeaves(l => l.detach());
 		await sleep(500);
@@ -137,7 +124,7 @@ export default class OpeningTests {
 	async openWhenEmptyReplaceAll(this: HomepageTestPlugin) {
 		this.homepage.data.openWhenEmpty = true;
 		this.homepage.data.manualOpenMode = Mode.ReplaceAll;
-		this.homepage.save();
+		await this.homepage.save();
 		
 		this.app.workspace.iterateRootLeaves(l => l.detach());
 		await sleep(500);

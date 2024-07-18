@@ -52,7 +52,7 @@ export default class SettingTests {
 		
 		setting.open();
 		setting.openTabById("homepage");
-		sleep(100);
+		await sleep(100);
 		this.assert(document.getElementsByClassName("nv-debug-button").length > 0);
 		setting.close();
 	}
@@ -65,8 +65,7 @@ export default class SettingTests {
 		this.settings = await this.loadSettings();
 		this.homepage = this.getHomepage();
 		
-		this.homepage.open();
-		await sleep(200);
+		await this.homepage.open();
 		
 		const dailyNote = await this.internalPlugins["daily-notes"].instance.getDailyNote();
 		const file = this.app.workspace.getActiveFile();
@@ -89,8 +88,7 @@ export default class SettingTests {
 		
 		this.assert(this.homepage.data.value == "Note A", this.homepage.data.value);
 		
-		this.homepage.open();
-		await sleep(100);
+		await this.homepage.open();
 		
 		const file = this.app.workspace.getActiveFile();
 		this.assert(file?.name == "Note A.md", file);

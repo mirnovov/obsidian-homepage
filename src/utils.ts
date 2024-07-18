@@ -58,6 +58,6 @@ export function hasLayoutChange(app: App): Promise<void> {
 	
 	return Promise.race([
 		layoutWait, 
-		new Promise<void>(resolve => setTimeout(resolve, 2000))]
+		new Promise<void>(resolve => setTimeout(resolve, 1500))]
 	);
 }

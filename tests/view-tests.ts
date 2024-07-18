@@ -6,10 +6,9 @@ import HomepageTestPlugin from "./harness";
 export default class ViewTests {
 	async autoScroll(this: HomepageTestPlugin) {
 		this.homepage.data.autoScroll = true;
-		this.homepage.save();
+		await this.homepage.save();
 		
-		this.homepage.open();
-		await sleep(100);
+		await this.homepage.open();
 		
 		const view = this.app.workspace.getActiveViewOfType(MarkdownView)!;
 		const count = view.editor.lineCount() - 1;
@@ -20,10 +19,9 @@ export default class ViewTests {
 	
 	async isPinned(this: HomepageTestPlugin) {
 		this.homepage.data.pin = true;
-		this.homepage.save();
+		await this.homepage.save();
 	
-		this.homepage.open();
-		await sleep(100);
+		await this.homepage.open();
 		const leaf = this.app.workspace.getActiveViewOfType(MarkdownView)?.leaf;
 		
 		this.assert(leaf! && leaf.getViewState()!.pinned!, leaf);
@@ -31,19 +29,17 @@ export default class ViewTests {
 	
 	async hasView(this: HomepageTestPlugin) {
 		this.homepage.data.view = View.Reading;
-		this.homepage.save();
+		await this.homepage.save();
 	
-		this.homepage.open();
-		await sleep(100);
+		await this.homepage.open();
 		let state = this.app.workspace.getActiveViewOfType(MarkdownView)?.getState();
 		
 		this.assert(state?.mode == "preview", state);
 		
 		this.homepage.data.view = View.Source;
-		this.homepage.save();
+		await this.homepage.save();
 		
-		this.homepage.open();
-		await sleep(100);
+		await this.homepage.open();
 		state = this.app.workspace.getActiveViewOfType(MarkdownView)?.getState();
 		
 		this.assert(state?.mode == "source" && state.source, state);

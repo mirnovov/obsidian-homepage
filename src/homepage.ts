@@ -84,7 +84,7 @@ export class Homepage {
 		
 		const data = this.plugin.settings.homepages[name];
 		
-		if (data) this.data = Object.assign(DEFAULT_DATA, data);
+		if (data) this.data = Object.assign({}, DEFAULT_DATA, data);
 		else {
 			this.plugin.settings.homepages[name] = { ...DEFAULT_DATA };
 			this.data = this.plugin.settings.homepages[name];
@@ -107,7 +107,7 @@ export class Homepage {
 			await this.launchLeaf(mode as Mode);
 		}
 		
-		if (!this.data.commands) return;
+		if (this.data.commands.length < 1) return;
 		const disallowed = this.plugin.loaded ? Period.Startup : Period.Manual;
 		
 		await hasLayoutChange(this.app);

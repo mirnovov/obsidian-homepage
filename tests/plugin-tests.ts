@@ -15,8 +15,7 @@ export default class PluginTests {
 		
 		this.app.workspace.iterateRootLeaves(l => l.detach());
 		this.homepage.data.kind = Kind.Workspace;
-		this.homepage.open();
-		await sleep(100);
+		await this.homepage.open();
 		
 		const split = this.app.workspace.rootSplit.children[0];
 		const upper = split.children[0].children[0].view;
@@ -31,10 +30,8 @@ export default class PluginTests {
 	
 	async openCanvas(this: HomepageTestPlugin) {
 		this.homepage.data.value = "Canvas.canvas";
-		this.homepage.save();
-		
-		this.homepage.open();
-		await sleep(100);
+		await this.homepage.save();
+		await this.homepage.open();
 		
 		const file = this.app.workspace.getActiveFile();
 		const leaves = this.app.workspace.getLeavesOfType("canvas");
@@ -43,10 +40,8 @@ export default class PluginTests {
 	
 	async dailyNote(this: HomepageTestPlugin) {
 		this.homepage.data.kind = Kind.DailyNote;
-		this.homepage.save();
-	
-		this.homepage.open();
-		await sleep(200);
+		await this.homepage.save();
+		await this.homepage.open();
 		
 		const dailyNote = await this.internalPlugins["daily-notes"].instance.getDailyNote();
 		const file = this.app.workspace.getActiveFile();
@@ -78,18 +73,16 @@ export default class PluginTests {
 		const file = this.app.workspace.getActiveFile();
 		
 		this.assert(file?.name == dailyNote.name, file, dailyNote);
+		await sleep(100);
 		this.app.vault.delete(dailyNote);
 	}
 
 	async periodicDailyNote(this: HomepageTestPlugin) {
 		await this.app.plugins.enablePluginAndSave("periodic-notes");
-		await sleep(100);
 	
 		this.homepage.data.kind = Kind.DailyNote;
-		this.homepage.save();
-	
-		this.homepage.open();
-		await sleep(100);
+		await this.homepage.save();
+		await this.homepage.open();
 		
 		const file = this.app.workspace.getActiveFile();
 		const name = moment().format("YYYY-MM-DD") + ".md";
@@ -102,16 +95,14 @@ export default class PluginTests {
 	
 	async periodicNoteExtant(this: HomepageTestPlugin) {
 		await this.app.plugins.enablePluginAndSave("periodic-notes");
-		await sleep(100);
 	
 		this.homepage.data.kind = Kind.DailyNote;
-		this.homepage.save();
+		await this.homepage.save();
 		
 		const name = moment().format("YYYY-MM-DD") + ".md";
 		this.app.vault.create(name, "test");
 	
-		this.homepage.open();
-		await sleep(100);
+		await this.homepage.open();
 		
 		const file = this.app.workspace.getActiveFile();
 		
@@ -126,10 +117,8 @@ export default class PluginTests {
 		await sleep(100);
 	
 		this.homepage.data.kind = Kind.WeeklyNote;
-		this.homepage.save();
-	
-		this.homepage.open();
-		await sleep(100);
+		await this.homepage.save();
+		await this.homepage.open();
 		
 		const file = this.app.workspace.getActiveFile();
 		const name = moment().format("gggg-[W]ww") + ".md";
@@ -151,7 +140,7 @@ export default class PluginTests {
 		let previous = "";
 		
 		for (let i = 0; i < 5; i++) {
-			this.homepage.open();
+			await this.homepage.open();
 			await sleep(100);
 			
 			const current = document.getElementsByClassName(
@@ -178,10 +167,8 @@ export default class PluginTests {
 		await sleep(200);
 
 		this.homepage.data.value = "Kanban.md";
-		this.homepage.save();
-		
-		this.homepage.open();
-		await sleep(100);
+		await this.homepage.save();
+		await this.homepage.open();
 		
 		const file = this.app.workspace.getActiveFile();
 		const leaves = this.app.workspace.getLeavesOfType("kanban");
@@ -193,9 +180,8 @@ export default class PluginTests {
 	
 	async openGraph(this: HomepageTestPlugin) {
 		this.homepage.data.kind = Kind.Graph;
-		this.homepage.save();
-		
-		this.homepage.open();
+		await this.homepage.save();
+		await this.homepage.open();
 		await sleep(100);
 		
 		const leaves = this.app.workspace.getLeavesOfType("graph");
