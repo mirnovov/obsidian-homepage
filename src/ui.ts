@@ -176,7 +176,7 @@ export class CommandBox {
 
 		for (const key of Object.values(Period)) {
 			menu.addItem(item => {
-				item.setTitle(key);
+				item.setTitle(key as string);
 				item.setChecked(command.period == key);
 				item.onClick(() => {
 					command.period = key;

@@ -264,12 +264,13 @@ export class Homepage {
 		
 		const leaves = LEAF_TYPES.flatMap(i => this.app.workspace.getLeavesOfType(i));
 
-		return leaves.filter(
-			leaf => equalsCaseless(
-				trimFile((leaf.view as FileView).file!), 
+		return leaves.filter(leaf => {
+			const name = leaf.view.getState().file as string;
+			return equalsCaseless(
+				name.endsWith("md") ? name.slice(0, -3) : name, 
 				this.computedValue
-			)
-		);
+			);
+		});
 	}
 	
 	async computeValue(): Promise<string> {

@@ -22,7 +22,7 @@ export default class HomepagePlugin extends Plugin {
 	interstitial: HTMLElement;
 	
 	async onload(): Promise<void> {
-		const progressBar = document.body.querySelector(".progress-bar");
+		const progressBar = document.body.querySelector(".progress-bar, .app-container.no-transition");
 		
 		this.showInterstitial(progressBar as HTMLElement);
 		this.patchReleaseNotes();
@@ -123,7 +123,7 @@ export default class HomepagePlugin extends Plugin {
 	showInterstitial(progressBar: HTMLElement | null): void {
 		if (!progressBar) return;
 		
-		this.interstitial = createDiv({ cls: "progress-bar nv-homepage-interstitial" });
+		this.interstitial = createDiv({ cls: "nv-homepage-interstitial" });
 		document.body.insertBefore(this.interstitial, progressBar);
 		window.addEventListener("error", this.hideInterstitial);
 	}

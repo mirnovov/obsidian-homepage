@@ -1,3 +1,20 @@
+.nv-homepage-interstitial {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100vw;
+	height: 100vh;
+	background: var(--background-primary);
+	z-index: 9999;
+	animation: 0.02s ease-in 0.5s forwards nv-interstitial-destroy;
+	pointer-events: none;
+}
+
+@keyframes nv-interstitial-destroy {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
 .setting-item[nv-greyed] {
 	opacity: .5; 
 	pointer-events: none !important;
