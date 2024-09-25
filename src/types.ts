@@ -1,4 +1,5 @@
 import "obsidian";
+import { App } from "obsidian";
 import HomepagePlugin from "./main";
 
 declare module "obsidian" {
@@ -59,4 +60,6 @@ declare global {
 	interface URLSearchParams {
 		keys: () => Iterable<string>
 	}
+	
+	var app: App;
 }

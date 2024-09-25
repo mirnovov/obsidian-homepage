@@ -42,7 +42,7 @@ export default class ViewTests {
 		await this.homepage.open();
 		state = this.app.workspace.getActiveViewOfType(MarkdownView)?.getState();
 		
-		this.assert(state?.mode == "source" && state.source, state);
+		this.assert(state?.mode == "source" && state.source as boolean, state);
 	}
 	
 	async alwaysApply(this: HomepageTestPlugin) {
