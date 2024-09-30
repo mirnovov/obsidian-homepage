@@ -2,10 +2,9 @@ import { App, FileView, MarkdownView, Notice, View as OView, WorkspaceLeaf } fro
 import HomepagePlugin from "./main";
 import { PERIODIC_KINDS, getAutorun, getPeriodicNote } from "./periodic";
 import { DEFAULT_DATA } from "./settings";
-import { detachLeavesOfTypes, emptyActiveView, equalsCaseless, hasLayoutChange, randomFile, sleep, trimFile, untrimName } from "./utils";
+import { detachAllLeaves, emptyActiveView, equalsCaseless, hasLayoutChange, randomFile, sleep, trimFile, untrimName } from "./utils";
 
 export const LEAF_TYPES: string[] = ["markdown", "canvas", "kanban"];
-export const CLOSED_LEAVES: string[] = [...LEAF_TYPES, "audio", "graph", "image", "pdf", "video"];
 
 export const DEFAULT: string = "Main Homepage";
 export const MOBILE: string = "Mobile Homepage";
@@ -164,10 +163,8 @@ export class Homepage {
 				this.app.workspace.floatingSplit.children.forEach(c => c.win.close());
 			}
 			
-			//replacing leaf types we don't know can cause issues, so limit to known
-			detachLeavesOfTypes(this.app, CLOSED_LEAVES);
+			detachAllLeaves(this.app);
 			await sleep(0);
-			this.app.workspace.iterateRootLeaves(l => this.app.workspace.setActiveLeaf(l));
 		}
 		
 		if (this.data.kind === Kind.Graph) leaf = await this.launchGraph(mode);

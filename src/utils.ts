@@ -39,11 +39,30 @@ export function sleep(ms: number): Promise<void> {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function detachLeavesOfTypes(app: App, types: string[]): void {
-	app.workspace.iterateRootLeaves(leaf => {
-		if (!leaf.view || !types.contains(leaf.view.getViewType())) return;
-		leaf.detach();
-	});
+export function detachAllLeaves(app: App): void {
+	const layout = app.workspace.getLayout();
+
+	layout.main = {
+		"id": "5324373015726ba8",
+		"type": "split",
+		"children": [ 
+			{
+				"id": "4509724f8bf84da7",
+				"type": "tabs",
+				"children": [
+					{
+						"id": "e7a7b303c61786dc",
+						"type": "leaf",
+						"state": {"type": "empty", "state": {}, "icon": "lucide-file", "title": "New tab"}
+					}
+				]
+			}
+		],
+		"direction": "vertical"
+	}
+	layout.active = "e7a7b303c61786dc";
+	
+	app.workspace.changeLayout(layout);
 }
 
 export function hasLayoutChange(app: App): Promise<void> {

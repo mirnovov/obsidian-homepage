@@ -1,8 +1,8 @@
 import { ButtonComponent, Modal, getIcon } from "obsidian";
-import { CLOSED_LEAVES, HomepageData } from "src/homepage";
+import { HomepageData } from "src/homepage";
 import HomepagePlugin from "src/main";
 import { DEFAULT_DATA } from "src/settings";
-import { detachLeavesOfTypes, sleep } from "src/utils";
+import { detachAllLeaves, sleep } from "src/utils";
 
 type Result = {
 	name: string,
@@ -117,7 +117,7 @@ export default class HomepageTestPlugin extends HomepagePlugin {
 			//reset state
 			this.homepage.data = { ...DEFAULT_DATA };
 			await this.homepage.save();
-			detachLeavesOfTypes(this.app, CLOSED_LEAVES);
+			detachAllLeaves(this.app);
 			await sleep(50);
 			
 			try {
