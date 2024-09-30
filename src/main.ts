@@ -124,7 +124,7 @@ export default class HomepagePlugin extends Plugin {
 		if (!progressBar) return;
 		
 		this.interstitial = createDiv({ cls: "nv-homepage-interstitial" });
-		document.body.insertBefore(this.interstitial, progressBar);
+		document.body.append(this.interstitial);
 		window.addEventListener("error", this.hideInterstitial);
 	}
 	
