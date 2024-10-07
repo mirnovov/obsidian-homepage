@@ -2,20 +2,41 @@ name: Bug report
 description: Report something that isn't working correctly
 labels: bug
 body:
+    - type: markdown
+      attributes:
+        value: |
+          **Thanks for filing an issue!**
+          Before submitting, try to provide as much detail as possible to ensure that the issue can be reproduced accurately and fixed.
+          
+          If possible, ensure your issue doesn't appear without Homepage. For instance, if your homepage is a Daily Note, check that your issue doesn't occur when opening a Daily Note manually. 
+          
+          If it's related to another plugin, it may be worth checking if that plugin works with Workspaces, as Homepage uses the same logic to replace previously opened notes.  
+          
     - type: textarea
       attributes:
         label: Details
-        description: Any additional info about the bug.
+        description: Information about the bug.
     - type: textarea
       attributes:
         label: Steps to reproduce
-        description: If the bug isn't easily replicable, detail exactly how it can be reproduced.
+        description: Detail exactly how your issue can be reproduced.
     - type: textarea
       attributes:
         label: Debug information
         description: >
           Use the **Homepage: Copy debug info** command and paste the result here. This helps narrow down any settings and conflicting plugins that may be causing your issue.
-        render: shell              
+        render: shell
+    - type: dropdown
+      attributes:
+        description: What operating systems you have experienced this issue on.
+        multiple: true
+        label: Operating systems
+        options:
+          - Windows
+          - macOS
+          - Linux
+          - iOS
+          - Android
     - type: checkboxes
       attributes:
         label: Checklist
