@@ -214,6 +214,7 @@ export class Homepage {
 		
 		if (!(view instanceof MarkdownView)) {
 			if (this.data.pin) view.leaf.setPinned(true);	
+			this.configurePlugins();
 			return;	
 		}
 		
@@ -236,24 +237,31 @@ export class Homepage {
 		}	
 		
 		if (this.data.pin) view.leaf.setPinned(true);	
-		if (this.data.view == View.Default) return;
-	
-		switch(this.data.view) {
-			case View.LivePreview:
-			case View.Source:
-				state.mode = "source";
-				state.source = this.data.view != View.LivePreview;
-				break;
-			case View.Reading:
-				state.mode = "preview";
-				break;
-		}
-	
-		await view.leaf.setViewState({type: "markdown", state: state});
 		
+		if (this.data.view !== View.Default) {
+			switch(this.data.view) {
+				case View.LivePreview:
+				case View.Source:
+					state.mode = "source";
+					state.source = this.data.view != View.LivePreview;
+					break;
+				case View.Reading:
+					state.mode = "preview";
+					break;
+			}
+		
+			await view.leaf.setViewState({type: "markdown", state: state});
+		}
+		
+		this.configurePlugins();
+	}
+	
+	configurePlugins(): void {
 		if (this.plugin.loaded && this.data.refreshDataview) { 
 			this.plugin.communityPlugins.dataview?.index.touch();
 		}
+
+		this.plugin.communityPlugins["obsidian-file-color"]?.generateColorStyles();
 	}
 	
 	getOpened(): WorkspaceLeaf[] {
