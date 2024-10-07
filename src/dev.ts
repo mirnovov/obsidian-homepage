@@ -1,18 +1,18 @@
 import { DEFAULT_SETTINGS } from "./settings";
+import HomepagePlugin from "./main";
 
-window.homepageLoadDebugInfo = async (info: any) => {
-	const homepage = app.plugins.plugins.homepage;
+(HomepagePlugin.prototype as HomepageDebugPlugin).loadDebugInfo = async function (this: HomepageDebugPlugin, info: any): Promise<void> {
 	if (info.version !== DEFAULT_SETTINGS.version) console.warn("Version not supported");
 
-	app.vault.config = { 
-		...app.vault.config,
+	this.app.vault.config = { 
+		...this.app.vault.config,
 		livePreview: info._livePreview !== "default" ? info._livePreview : true,
 		focusNewTab: info._focusNewTab !== "default" ? info._livePreview : true,
 		defaultViewMode: info._focusNewTab !== "default" ? info._livePreview : "editing"
 	};
 
-	for (const pluginName in homepage.internalPlugins) {
-		const plugin = homepage.internalPlugins[pluginName];
+	for (const pluginName in this.internalPlugins) {
+		const plugin = this.internalPlugins[pluginName];
 		const present = info._internalPlugins.includes(pluginName);
 		
 		if (present) plugin.enable();
@@ -23,20 +23,20 @@ window.homepageLoadDebugInfo = async (info: any) => {
 		);
 	}
 	
-	await window.homepageEnsurePlugins(info._plugins, true);
+	await this.ensurePlugins(info._plugins, true);
 	
-	homepage.settings = info;
-	homepage.saveSettings();
-	homepage.homepage = homepage.getHomepage();
+	this.settings = info;
+	this.saveSettings();
+	this.homepage = this.getHomepage();
 	
 	console.log("Settings updated!");
-}
+};
 
-window.homepageEnsurePlugins = async (plugins: string[], enable: boolean) => {
+(HomepagePlugin.prototype as HomepageDebugPlugin).ensurePlugins = async function (this: HomepageDebugPlugin, plugins: string[], enable: boolean): Promise<void> {
 	const pluginList = await fetch(
 		`https://raw.githubusercontent.com/obsidianmd/obsidian-releases/master/community-plugins.json`
 	).then(r => r.json());
-	const pluginRegistry = app.plugins;
+	const pluginRegistry = this.app.plugins;
 	
 	const keyedPluginList: Record<string, any> = {};
 	for (const item of pluginList) keyedPluginList[item.id] = item;
@@ -63,4 +63,4 @@ window.homepageEnsurePlugins = async (plugins: string[], enable: boolean) => {
 		
 		console.log(`${manifest.name} ${manifest.version} installed for testing`);
 	}
-}
+};

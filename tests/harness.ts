@@ -88,7 +88,7 @@ export default class HomepageTestPlugin extends HomepagePlugin {
 		
 		super.onload();
 		this.app.workspace.onLayoutReady(async () => {
-			await window.homepageEnsurePlugins(PLUGINS, false);
+			await (this as unknown as HomepageDebugPlugin).ensurePlugins(PLUGINS, false);
 			await this.execute();
 		});
 	}

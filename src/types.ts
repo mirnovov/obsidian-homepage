@@ -1,5 +1,4 @@
 import "obsidian";
-import { App } from "obsidian";
 import HomepagePlugin from "./main";
 
 declare module "obsidian" {
@@ -53,13 +52,14 @@ declare global {
 		electron: any;
 		electronWindow: any;
 		homepage?: HomepagePlugin;
-		homepageLoadDebugInfo: (info: any) => Promise<void>;
-		homepageEnsurePlugins: (plugins: string[], enable: boolean) => Promise<void>;
 	}
 	
 	interface URLSearchParams {
 		keys: () => Iterable<string>
 	}
-	
-	var app: App;
+
+	interface HomepageDebugPlugin extends HomepagePlugin {
+		loadDebugInfo: (info: any) => Promise<void>;
+	    ensurePlugins: (plugins: string[], enable: boolean) => Promise<void>;
+	}
 }
