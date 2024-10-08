@@ -315,7 +315,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 			_internalPlugins: Object.values(this.plugin.internalPlugins).flatMap(
 				p => p.enabled ? [p.instance.id] : []
 			),
-			_obsidianVersion: window.electron.ipcRenderer.sendSync("version")
+			_obsidianVersion: window.electron?.ipcRenderer.sendSync("version") || "unknown"
 		};
 		
 		await navigator.clipboard.writeText(JSON.stringify(info));

@@ -10,64 +10,6 @@ type Result = {
 	passed: boolean
 }
 
-const TEST_CSS = `
-	.nv-modal {
-		overflow: hidden;
-	}
-	
-	.nv-results {
-		overflow: scroll;
-		max-height: 70vh;
-	}
-	
-	.nv-results h1 {
-		font-weight: var(--font-bold);
-		font-size: var(--font-smallest);
-		color: var(--text-muted);
-		padding: 20px 0 6px;
-		margin: 0;
-	}
-	
-	.nv-results h1:first-child {
-		padding-top: 4px;
-	}
-	
-	.nv-results div {
-		border-top: 1px solid var(--hr-color);
-		padding: 4px 0;
-	}
-	
-	.nv-results .svg-icon, .nv-result-summary .svg-icon {
-		stroke: var(--color-green); 
-		stroke-width: 4px; 
-		width: 1em;
-		height: 1em;
-		vertical-align: text-bottom;
-	}
-	
-	.nv-results .svg-icon {
-		margin-right: 5px;
-	}
-	
-	.nv-results .lucide-x, .nv-result-summary .lucide-x {
-		stroke: var(--color-red);
-	}
-	
-	.nv-results code {
-		display: block;
-		color: var(--text-muted);
-		font-family: var(--font-monospace);
-		font-size: 0.8em;
-		padding: 3px 0 0;
-	}
-	
-	.nv-devtools {
-		align-self: flex-end;
-		padding: 0;
-		margin: 5px 0 0;
-	}
-`;
-
 const TEST_SUITES = [
 	import("./opening-tests"),
 	import("./plugin-tests"),
@@ -156,7 +98,6 @@ class TestResultModal extends Modal {
 	
 	async onOpen() {
 		this.modalEl.addClass("nv-modal");		
-		this.modalEl.createEl("style", { text: TEST_CSS });
 		let success = 0, failure = 0;
 		
 		this.contentEl.addClass("nv-results");
