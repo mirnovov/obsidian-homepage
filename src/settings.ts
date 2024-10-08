@@ -4,7 +4,7 @@ import { UNCHANGEABLE, HomepageData, Kind, Mode, View } from "./homepage";
 import { PERIODIC_KINDS, getAutorun } from "./periodic";
 import { CommandBox, FileSuggest, WorkspaceSuggest } from "./ui";
 
-type HomepageKey = keyof HomepageData;
+type HomepageKey<T> = { [K in keyof HomepageData]: HomepageData[K] extends T ? K : never }[keyof HomepageData];
 type HomepageObject = { [key: string]: HomepageData }
 type Callback<T> = (v: T) => void;
 
@@ -269,7 +269,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		this.elements[setting] = heading;
 	}
 	
-	addDropdown(name: string, desc: string, setting: HomepageKey, source: object, callback?: Callback<string>): Setting {
+	addDropdown(name: string, desc: string, setting: HomepageKey<string>, source: object, callback?: Callback<string>): Setting {
 		const dropdown = new Setting(this.containerEl)
 			.setName(name).setDesc(desc)
 			.addDropdown(async dropdown => {
@@ -288,13 +288,13 @@ export class HomepageSettingTab extends PluginSettingTab {
 		return dropdown;
 	}
 	
-	addToggle(name: string, desc: string, setting: HomepageKey, callback?: Callback<boolean>): Setting {
+	addToggle(name: string, desc: string, setting: HomepageKey<boolean>, callback?: Callback<boolean>): Setting {
 		const toggle = new Setting(this.containerEl)
 			.setName(name).setDesc(desc)
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.homepage.data[setting])
 				.onChange(async value => {
-					this.plugin.homepage.data[setting] = value;
+					this.plugin.homepage.data[setting] = value; 
 					await this.plugin.homepage.save();
 					if (callback) callback(value);
 				})

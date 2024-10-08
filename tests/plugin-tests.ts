@@ -1,4 +1,4 @@
-import { MarkdownView, TFile, moment } from "obsidian";
+import { MarkdownView, TFile, WorkspaceLeaf, WorkspaceSplit, moment } from "obsidian";
 import { Kind, Period, View } from "src/homepage";
 import { sleep } from "src/utils";
 import HomepageTestPlugin from "./harness";
@@ -17,13 +17,13 @@ export default class PluginTests {
 		this.homepage.data.kind = Kind.Workspace;
 		await this.homepage.open();
 		
-		const split = this.app.workspace.rootSplit.children[0];
-		const upper = split.children[0].children[0].view;
-		const lower = split.children[1].children[0].view;
+		const split = this.app.workspace.rootSplit.children[0] as WorkspaceSplit;
+		const upper = (split.children[0].children[0] as WorkspaceLeaf).view as MarkdownView;
+		const lower = (split.children[1].children[0] as WorkspaceLeaf).view as MarkdownView;
 	
 		this.assert(
 			split.direction == "horizontal" &&
-			upper.file.name == "Note A.md" && lower.file.name == "Note B.md",
+			upper.file!.name == "Note A.md" && lower.file!.name == "Note B.md",
 			split, upper, lower
 		);
 	}

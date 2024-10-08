@@ -1,4 +1,4 @@
-import { App, FileView, MarkdownView, Notice, View as OView, WorkspaceLeaf } from "obsidian";
+import { App, FileView, MarkdownView, Notice, View as OView, WorkspaceLeaf, WorkspaceWindow } from "obsidian";
 import HomepagePlugin from "./main";
 import { PERIODIC_KINDS, getAutorun, getPeriodicNote } from "./periodic";
 import { DEFAULT_DATA } from "./settings";
@@ -10,7 +10,6 @@ export const DEFAULT: string = "Main Homepage";
 export const MOBILE: string = "Mobile Homepage";
 
 export interface HomepageData {
-	[member: string]: any,
 	value: string,
 	kind: string,
 	openOnStartup: boolean,
@@ -87,7 +86,7 @@ export class Homepage {
 		else {
 			this.plugin.settings.homepages[name] = { ...DEFAULT_DATA };
 			this.data = this.plugin.settings.homepages[name];
-		}
+		}		
 	}
 	
 	async open(alternate: boolean = false): Promise<void> {
@@ -160,7 +159,7 @@ export class Homepage {
 			//The API is very finicky when the app is starting, so wait for things to initialise
 			if (this.app.workspace?.floatingSplit?.children) {
 				await sleep(0);
-				this.app.workspace.floatingSplit.children.forEach(c => c.win.close());
+				(this.app.workspace.floatingSplit.children as WorkspaceWindow[]).forEach(c => c.win!.close());
 			}
 			
 			detachAllLeaves(this.app);

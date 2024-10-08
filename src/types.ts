@@ -1,5 +1,6 @@
 import "obsidian";
 import HomepagePlugin from "./main";
+import { HomepageSettings } from "./settings";
 
 declare module "obsidian" {
 	interface App {
@@ -35,19 +36,23 @@ declare module "obsidian" {
 		floatingSplit: WorkspaceSplit
 	}
 	
+	interface WorkspaceItem {
+		children: WorkspaceItem[];
+	}
+	
 	interface WorkspaceLeaf {
 		parentSplit: WorkspaceSplit;
 	}
 	
 	interface WorkspaceSplit {
-		children: any[];
+		children: WorkspaceItem[];
+		direction: SplitDirection;
 	}
 }
 
 declare global {
 	interface Window {
 		OBS_ACT: string | any;
-		i18next: any;
 		Capacitor: any;
 		electron: any;
 		electronWindow: any;
@@ -59,7 +64,14 @@ declare global {
 	}
 
 	interface HomepageDebugPlugin extends HomepagePlugin {
-		loadDebugInfo: (info: any) => Promise<void>;
+		loadDebugInfo: (info: HomepageDebugSettings) => Promise<void>;
 	    ensurePlugins: (plugins: string[], enable: boolean) => Promise<void>;
+	}
+	
+	interface HomepageDebugSettings extends HomepageSettings {
+		_livePreview: string;
+		_focusNewTab: string | boolean;
+		_internalPlugins: string[];
+		_plugins: string[];
 	}
 }

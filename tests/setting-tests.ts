@@ -35,7 +35,7 @@ export default class SettingTests {
 			autoCreate: true,
 			autoScroll: false,
 			pin: false
-		} as any;
+		} as unknown as HomepageSettings;
 		
 		this.saveSettings();
 		this.settings = await this.loadSettings();

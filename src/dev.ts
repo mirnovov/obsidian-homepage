@@ -2,7 +2,9 @@ import { requestUrl } from "obsidian";
 import { DEFAULT_SETTINGS } from "./settings";
 import HomepagePlugin from "./main";
 
-(HomepagePlugin.prototype as HomepageDebugPlugin).loadDebugInfo = async function (this: HomepageDebugPlugin, info: any): Promise<void> {
+type KeyedPluginList = Record<string, { repo: string }>;
+
+(HomepagePlugin.prototype as HomepageDebugPlugin).loadDebugInfo = async function (this: HomepageDebugPlugin, info: HomepageDebugSettings): Promise<void> {
 	if (info.version !== DEFAULT_SETTINGS.version) console.warn("Version not supported");
 
 	this.app.vault.config = { 
@@ -39,7 +41,7 @@ import HomepagePlugin from "./main";
 	).then(r => r.json);
 	const pluginRegistry = this.app.plugins;
 	
-	const keyedPluginList: Record<string, any> = {};
+	const keyedPluginList: KeyedPluginList = {};
 	for (const item of pluginList) keyedPluginList[item.id] = item;
 	
 	for (const id of plugins) {

@@ -78,7 +78,7 @@ export default class HomepageTestPlugin extends HomepagePlugin {
 		await this.homepage.save();
 	}
 	
-	assert(cond: boolean, ...args: any[]) {
+	assert(cond: boolean, ...args: unknown[]) {
 		if (!cond) {
 			const e = new TestAssertionError(args.toString());
 			console.error("Assertion failed: ", args.length ? args : null);

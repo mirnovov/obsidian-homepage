@@ -1,4 +1,4 @@
-import { Notice, Keymap, Platform, Plugin, addIcon } from "obsidian";
+import { Notice, Keymap, Platform, Plugin, WorkspaceLeaf, addIcon } from "obsidian";
 import { DEFAULT, MOBILE, Homepage, Kind, Period } from "./homepage";
 import { hasRequiredPeriodicity, LEGACY_MOMENT_KIND, MOMENT_MESSAGE } from "./periodic";
 import { DEFAULT_SETTINGS, HomepageSettings, HomepageSettingTab } from "./settings";
@@ -175,7 +175,7 @@ export default class HomepagePlugin extends Plugin {
 		if (!ntp) return;
 		
 		ntp.nvOrig_checkForNewTab = ntp.checkForNewTab;
-		ntp.checkForNewTab = async (e: any) => {
+		ntp.checkForNewTab = async (e: WeakSet<WorkspaceLeaf>) => {
 			if (this && this.executing) { return; }
 			return await ntp.nvOrig_checkForNewTab(e);
 		}; 
