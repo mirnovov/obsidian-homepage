@@ -1,3 +1,4 @@
+import { requestUrl } from "obsidian";
 import { DEFAULT_SETTINGS } from "./settings";
 import HomepagePlugin from "./main";
 
@@ -33,9 +34,9 @@ import HomepagePlugin from "./main";
 };
 
 (HomepagePlugin.prototype as HomepageDebugPlugin).ensurePlugins = async function (this: HomepageDebugPlugin, plugins: string[], enable: boolean): Promise<void> {
-	const pluginList = await fetch(
+	const pluginList = await requestUrl(
 		`https://raw.githubusercontent.com/obsidianmd/obsidian-releases/master/community-plugins.json`
-	).then(r => r.json());
+	).then(r => r.json);
 	const pluginRegistry = this.app.plugins;
 	
 	const keyedPluginList: Record<string, any> = {};
@@ -45,9 +46,9 @@ import HomepagePlugin from "./main";
 		if (id === "homepage" || !(id in keyedPluginList)) continue;
 		
 		const repo = keyedPluginList[id]?.repo;
-		const manifest = await fetch(
+		const manifest = await requestUrl(
 			`https://raw.githubusercontent.com/${repo}/HEAD/manifest.json`
-		).then(r => r.json());
+		).then(r => r.json);
 		const version = manifest.version;
 		
 		if (version !== pluginRegistry.manifests[id]?.version) {
