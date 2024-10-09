@@ -12,3 +12,8 @@
 <!---->
 * Run any Obsidian command upon opening the homepage, allowing integration with hundreds of plugins. 
 * Works effectively with tools such as [Dataview](https://github.com/blacksmithgu/obsidian-dataview) to create advanced landing pages.
+
+
+----
+
+<p align="center"><a href="https://ko-fi.com/novov"><img src="https://www.ko-fi.com/img/donate_sm.png"/></a></p>
