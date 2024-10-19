@@ -1,4 +1,4 @@
-import { App, TFile, View as OView } from "obsidian";
+import { App, Platform, TFile, View as OView, WorkspaceMobileDrawer } from "obsidian";
 
 export function trimFile(file: TFile): string {
 	if (!file) return "";
@@ -39,7 +39,7 @@ export function sleep(ms: number): Promise<void> {
 	return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function detachAllLeaves(app: App): void {
+export async function detachAllLeaves(app: App): Promise<void> {
 	const layout = app.workspace.getLayout();
 
 	layout.main = {
@@ -62,7 +62,25 @@ export function detachAllLeaves(app: App): void {
 	}
 	layout.active = "e7a7b303c61786dc";
 	
-	app.workspace.changeLayout(layout);
+	await app.workspace.changeLayout(layout);
+	
+	if (Platform.isMobile) {
+		(app.workspace.rightSplit as WorkspaceMobileDrawer)?.updateInfo();
+		addSyncButton(app);
+	}
+}
+
+function addSyncButton(app: App): void {
+	let sync = app.internalPlugins.plugins["sync"]?.instance;
+	if (!sync) return;
+
+	app.workspace.onLayoutReady(() => {
+		sync.statusIconEl = (app.workspace.rightSplit as WorkspaceMobileDrawer).addHeaderButton(
+			"sync-small", sync.openStatusIconMenu.bind(sync)
+		);
+		sync.statusIconEl.addEventListener("contextmenu", sync.openStatusIconMenu.bind(sync));
+		sync.statusIconEl.addClass("sync-status-icon");
+	});
 }
 
 export function hasLayoutChange(app: App): Promise<void> {

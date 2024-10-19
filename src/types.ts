@@ -44,6 +44,11 @@ declare module "obsidian" {
 		parentSplit: WorkspaceSplit;
 	}
 	
+	interface WorkspaceMobileDrawer {
+		addHeaderButton(name: string, callback: Function): Element;
+		updateInfo(): void;
+	}
+	
 	interface WorkspaceSplit {
 		children: WorkspaceItem[];
 		direction: SplitDirection;

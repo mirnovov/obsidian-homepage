@@ -162,7 +162,7 @@ export class Homepage {
 				(this.app.workspace.floatingSplit.children as WorkspaceWindow[]).forEach(c => c.win!.close());
 			}
 			
-			detachAllLeaves(this.app);
+			await detachAllLeaves(this.app);
 			await sleep(0);
 		}
 		
