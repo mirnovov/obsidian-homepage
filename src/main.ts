@@ -32,20 +32,23 @@ export default class HomepagePlugin extends Plugin {
 		this.communityPlugins = this.app.plugins.plugins;
 		this.homepage = this.getHomepage();
 		
-		this.app.workspace.onLayoutReady(async () => {
-			const openInitially = (
-				this.homepage.data.openOnStartup &&
-				!layoutReady && !(await this.hasUrlParams())
-			);
-			
-			this.patchNewTabPage();
-					
-			if (openInitially) await this.homepage.open();
-			this.loaded = true;
-			
-			this.unpatchReleaseNotes();
-			this.hideInterstitial();
-		});
+		// Delay the execution of homepage opening and other initialization
+		setTimeout(() => {
+			this.app.workspace.onLayoutReady(async () => {
+				const openInitially = (
+					this.homepage.data.openOnStartup &&
+					!layoutReady && !(await this.hasUrlParams())
+				);
+				
+				this.patchNewTabPage();
+						
+				if (openInitially) await this.homepage.open();
+				this.loaded = true;
+				
+				this.unpatchReleaseNotes();
+				this.hideInterstitial();
+			});
+		}, 1000); // Delay for 1 second
 
 		addIcon("homepage", ICON);
 		this.addRibbonIcon(
