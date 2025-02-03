@@ -49,6 +49,7 @@ export enum Kind {
 	File = "File",
 	Workspace = "Workspace",
 	Random = "Random file",
+	RandomFolder = "Random in folder",
 	Graph = "Graph view",
 	None = "Nothing",
 	DailyNote = "Daily Note",
@@ -279,10 +280,15 @@ export class Homepage {
 	
 	async computeValue(): Promise<string> {
 		let val = this.data.value;
+		let file;
 	
 		switch (this.data.kind) {
 			case Kind.Random:
-				const file = randomFile(this.app);
+				file = randomFile(this.app);
+				if (file) val = file;
+				break;
+			case Kind.RandomFolder:
+				file = randomFile(this.app, val);
 				if (file) val = file;
 				break;
 			case Kind.DailyNote:

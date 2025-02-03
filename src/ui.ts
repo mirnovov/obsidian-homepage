@@ -1,10 +1,12 @@
 import { 
 	App, AbstractInputSuggest, ButtonComponent, Command, FuzzySuggestModal, 
-	Menu, Notice, TAbstractFile, TFile, getIcon, setTooltip 
+	Menu, Notice, TAbstractFile, TFile, TFolder, getIcon, setTooltip 
 } from "obsidian";
 import { CommandData, Homepage, Period } from "./homepage";
 import { HomepageSettingTab } from "./settings"; 
 import { trimFile } from "./utils";
+
+export type Suggestor = typeof FileSuggest | typeof FolderSuggest | typeof WorkspaceSuggest;
 
 export class FileSuggest extends AbstractInputSuggest<TFile> {
 	textInputEl: HTMLInputElement;
@@ -46,6 +48,29 @@ export class FileSuggest extends AbstractInputSuggest<TFile> {
 		this.close();
 	}
 }
+
+export class FolderSuggest extends AbstractInputSuggest<TFolder> {
+	textInputEl: HTMLInputElement;
+	
+	getSuggestions(inputStr: string): TFolder[] {
+		const inputLower = inputStr.toLowerCase();
+
+		return this.app.vault.getAllFolders().filter(f =>
+			f.path.toLowerCase().contains(inputLower)
+		);
+	}
+	
+	renderSuggestion(folder: TFolder, el: HTMLElement) {
+		el.setText(folder.path);
+	}
+
+	selectSuggestion(folder: TFolder) {
+		this.textInputEl.value = folder.path;
+		this.textInputEl.trigger("input");
+		this.close();
+	}
+}
+
 
 export class WorkspaceSuggest extends AbstractInputSuggest<string> {
 	textInputEl: HTMLInputElement;

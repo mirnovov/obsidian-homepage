@@ -1,4 +1,4 @@
-import { App, Platform, TFile, View as OView, WorkspaceMobileDrawer } from "obsidian";
+import { App, Platform, TFolder, TFile, View as OView, WorkspaceMobileDrawer } from "obsidian";
 
 export function trimFile(file: TFile): string {
 	if (!file) return "";
@@ -14,10 +14,16 @@ export function wrapAround(value: number, size: number): number {
 	return ((value % size) + size) % size;
 }
 
-export function randomFile(app: App): string | undefined {
-	const files = app.vault.getFiles().filter(
-		(f: TFile) => ["md", "canvas"].contains(f.extension)
-	);
+export function randomFile(app: App, root: string | undefined = undefined): string | undefined {
+	let files = app.vault.getFiles();
+	
+	if (root) {
+		const resolvedRoot = app.vault.getFolderByPath(root);
+		if (!resolvedRoot) return undefined;
+		files = getFilesInFolder(resolvedRoot)
+	}
+
+	files.filter((f: TFile) => ["md", "canvas"].contains(f.extension));
 	
 	if (files.length) {
 		const indice = Math.floor(Math.random() * files.length);
@@ -25,6 +31,18 @@ export function randomFile(app: App): string | undefined {
 	}
 
 	return undefined;
+}
+
+function getFilesInFolder(folder: TFolder): TFile[] {
+	let files: TFile[] = [];
+	
+	for (const item of folder.children) {
+		if (!(item instanceof TFolder)) files.push(item as TFile);
+		
+		else files.push(...getFilesInFolder(item as TFolder))
+	}
+	
+	return files;
 }
 
 export function emptyActiveView(app: App): boolean {

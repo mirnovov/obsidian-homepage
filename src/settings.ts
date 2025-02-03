@@ -2,7 +2,7 @@ import { App, ButtonComponent, Notice, Platform, PluginSettingTab, Setting, norm
 import HomepagePlugin from "./main";
 import { UNCHANGEABLE, HomepageData, Kind, Mode, View } from "./homepage";
 import { PERIODIC_KINDS, getAutorun } from "./periodic";
-import { CommandBox, FileSuggest, WorkspaceSuggest } from "./ui";
+import { CommandBox, Suggestor, FileSuggest, FolderSuggest, WorkspaceSuggest } from "./ui";
 
 type HomepageKey<T> = { [K in keyof HomepageData]: HomepageData[K] extends T ? K : never }[keyof HomepageData];
 type HomepageObject = { [key: string]: HomepageData }
@@ -44,6 +44,7 @@ const DESCRIPTIONS = {
 	[Kind.Graph]: "Your graph view will be used.",
 	[Kind.None]: "Nothing will occur by default. Any commands added will still take effect.",
 	[Kind.Random]: "A random note or canvas from your Obsidian folder will be selected.",
+	[Kind.RandomFolder]: "Enter a folder. A random note or canvas from it will be selected.",
 	[Kind.DailyNote]: "Your Daily Note or Periodic Daily Note will be used.",
 	[Kind.WeeklyNote]: "Your Periodic Weekly Note will be used.",
 	[Kind.MonthlyNote]: "Your Periodic Monthly Note will be used.",
@@ -82,7 +83,9 @@ export class HomepageSettingTab extends PluginSettingTab {
 		const autorun = getAutorun(this.plugin);
 		let pluginDisabled = false;
 		
-		const suggestor = hasWorkspaces ? WorkspaceSuggest : FileSuggest;
+		let suggestor: Suggestor = FileSuggest;
+		if (kind == Kind.RandomFolder) suggestor = FolderSuggest;
+		else if (hasWorkspaces) suggestor = WorkspaceSuggest;
 
 		this.containerEl.empty();
 		this.elements = {};
@@ -106,6 +109,8 @@ export class HomepageSettingTab extends PluginSettingTab {
 				dropdown.setValue(this.plugin.homepage.data.kind);
 				dropdown.onChange(async option => {
 					this.plugin.homepage.data.kind = option;
+					if (option == Kind.Random) this.plugin.homepage.data.value = "";
+					
 					await this.plugin.homepage.save();
 					this.display();
 				});

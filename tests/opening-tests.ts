@@ -109,6 +109,21 @@ export default class OpeningTests {
 		this.assert(false);
 	}
 	
+	async randomFolder(this: HomepageTestPlugin) {
+		this.homepage.data.kind = Kind.RandomFolder;
+		this.homepage.data.value = "TestFolder";
+		await this.homepage.save();
+		
+		//check that the files are in the correct folder for 10 runs
+		let path;
+		
+		for (let i = 0; i < 10; i++) {
+			await this.homepage.open();
+			path = this.app.workspace.getActiveFile()?.path;
+			this.assert(path?.startsWith(this.homepage.data.value)!);
+		}
+	}
+	
 	async openWhenEmpty(this: HomepageTestPlugin) {
 		this.homepage.data.openWhenEmpty = true;
 		await this.homepage.save();
