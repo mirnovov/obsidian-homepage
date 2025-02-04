@@ -71,6 +71,7 @@ export async function getPeriodicNote(kind: Kind, plugin: HomepagePlugin): Promi
 			note = info.get(date, all) || await info.create(date);	
 		}
 		
+		if (!note) note = info.get(date, all);
 	}
 	else {
 		periodicNotes.cache.initialize();

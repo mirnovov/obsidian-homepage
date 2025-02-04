@@ -101,18 +101,30 @@ function addSyncButton(app: App): void {
 	});
 }
 
-export function hasLayoutChange(app: App): Promise<void> {
-	const layoutWait = new Promise<void>(resolve => {
+export function hasLayoutChange(app: App): Promise<void | void[]> {
+	const sync = app.internalPlugins.plugins.sync;
+	let promises = [new Promise<void>(resolve => {
 		const wrapped = async () => {
 			resolve();
 			app.workspace.off("layout-change", wrapped);
 		};
 		
 		app.workspace.on("layout-change", wrapped);
-	});
+	})];
+	
+	if (sync.enabled && sync.instance.syncing) {	
+		promises.push(new Promise<void>(resolve => {
+			const wrapped = async () => {
+				resolve();
+				sync.instance.off("status-change", wrapped);
+			};
+			
+			sync.instance.on("status-change", wrapped);
+		}));
+	}
 	
 	return Promise.race([
-		layoutWait, 
-		new Promise<void>(resolve => setTimeout(resolve, 1500))]
-	);
+		Promise.all(promises), 
+		new Promise<void>(resolve => setTimeout(resolve, 1500))
+	]);
 }
