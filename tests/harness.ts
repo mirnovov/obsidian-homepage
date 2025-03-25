@@ -17,7 +17,7 @@ const TEST_SUITES = [
 	import("./view-tests")
 ];
 
-const PLUGINS = ["dataview", "obsidian-kanban", "periodic-notes"];
+const PLUGINS = ["dataview", "journals", "obsidian-kanban", "periodic-notes"];
 
 export default class HomepageTestPlugin extends HomepagePlugin {
 	testResults: Record<string, Result[]> = {};

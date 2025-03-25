@@ -160,6 +160,8 @@ export default class HomepagePlugin extends Plugin {
 				return this.internalPlugins["workspaces"]?.enabled;
 			case Kind.Graph:
 				return this.internalPlugins["graph"]?.enabled;
+			case Kind.Journal:
+				return this.communityPlugins["journals"];
 			case Kind.DailyNote:
 			case Kind.WeeklyNote:
 			case Kind.MonthlyNote:

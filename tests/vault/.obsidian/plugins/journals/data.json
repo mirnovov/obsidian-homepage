@@ -1,0 +1,101 @@
+{
+  "version": 3,
+  "ui": {
+    "calendarShelf": null
+  },
+  "pendingMigrations": [],
+  "dismissedNotifications": [
+    "v2-commands-change"
+  ],
+  "useShelves": false,
+  "showReloadHint": false,
+  "openOnStartup": "",
+  "journals": {
+    "Test": {
+      "name": "Test",
+      "shelves": [],
+      "write": {
+        "type": "day"
+      },
+      "confirmCreation": false,
+      "nameTemplate": "{{date}}",
+      "dateFormat": "j-YYYY-MM-DD",
+      "folder": "",
+      "templates": [],
+      "start": "2025-03-25",
+      "end": {
+        "type": "never"
+      },
+      "index": {
+        "enabled": false,
+        "anchorDate": "2025-03-25",
+        "anchorIndex": 1,
+        "allowBefore": false,
+        "type": "increment",
+        "resetAfter": 2
+      },
+      "autoCreate": false,
+      "commands": [],
+      "decorations": [],
+      "navBlock": {
+        "type": "create",
+        "decorateWholeBlock": false,
+        "rows": []
+      },
+      "calendarViewBlock": {
+        "rows": [],
+        "decorateWholeBlock": false
+      },
+      "frontmatter": {
+        "dateField": "",
+        "addStartDate": false,
+        "startDateField": "",
+        "addEndDate": false,
+        "endDateField": "",
+        "indexField": ""
+      }
+    }
+  },
+  "shelves": {},
+  "commands": [
+    {
+      "name": "Open today's note",
+      "writeType": "day",
+      "type": "same",
+      "openMode": "tab",
+      "showInRibbon": false,
+      "icon": ""
+    }
+  ],
+  "calendar": {
+    "dow": -1,
+    "doy": 1,
+    "global": false
+  },
+  "calendarView": {
+    "display": "month",
+    "leaf": "right",
+    "weeks": "left",
+    "todayMode": "navigate",
+    "pickMode": "create",
+    "todayStyle": {
+      "color": {
+        "type": "theme",
+        "name": "text-accent"
+      },
+      "background": {
+        "type": "transparent"
+      }
+    },
+    "activeStyle": {
+      "color": {
+        "type": "theme",
+        "name": "text-on-accent"
+      },
+      "background": {
+        "type": "theme",
+        "name": "interactive-accent"
+      }
+    }
+  }
+}

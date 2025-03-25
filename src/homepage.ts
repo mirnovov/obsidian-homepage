@@ -1,6 +1,6 @@
 import { App, FileView, MarkdownView, Notice, View as OView, WorkspaceLeaf, WorkspaceWindow } from "obsidian";
 import HomepagePlugin from "./main";
-import { PERIODIC_KINDS, getAutorun, getPeriodicNote } from "./periodic";
+import { PERIODIC_KINDS, getAutorun, getJournalNote, getPeriodicNote, hasJournal } from "./periodic";
 import { DEFAULT_DATA } from "./settings";
 import { detachAllLeaves, emptyActiveView, equalsCaseless, hasLayoutChange, randomFile, sleep, trimFile, untrimName } from "./utils";
 
@@ -52,6 +52,7 @@ export enum Kind {
 	RandomFolder = "Random in folder",
 	Graph = "Graph view",
 	None = "Nothing",
+	Journal = "Journal",
 	DailyNote = "Daily Note",
 	WeeklyNote = "Weekly Note",
 	MonthlyNote = "Monthly Note",
@@ -93,6 +94,10 @@ export class Homepage {
 	async open(alternate: boolean = false): Promise<void> {
 		if (!this.plugin.hasRequiredPlugin(this.data.kind as Kind)) {
 			new Notice("Homepage cannot be opened due to plugin unavailablity.");
+			return;
+		}
+		else if (this.data.kind === Kind.Journal && !hasJournal(this)) {
+			new Notice(`Cannot find the journal "${this.data.value}" to use as the homepage.`);
 			return;
 		}
 
@@ -290,6 +295,9 @@ export class Homepage {
 			case Kind.RandomFolder:
 				file = randomFile(this.app, val);
 				if (file) val = file;
+				break;
+			case Kind.Journal:
+				val = await getJournalNote(val, this.plugin);
 				break;
 			case Kind.DailyNote:
 			case Kind.WeeklyNote:

@@ -1,6 +1,6 @@
-import { Plugin, TFile, moment } from "obsidian";
+import { Notice, Plugin, TFile, moment } from "obsidian";
 import HomepagePlugin from "./main";
-import { Kind } from "./homepage";
+import { Homepage, Kind } from "./homepage";
 import { trimFile } from "./utils";
 import { 
 	createDailyNote, getDailyNote, getAllDailyNotes,
@@ -8,6 +8,8 @@ import {
 	createMonthlyNote, getWeeklyNote, getAllWeeklyNotes,
 	createYearlyNote, getYearlyNote, getAllYearlyNotes  	
 } from "obsidian-daily-notes-interface";
+
+const JOURNAL_CUSTOM_LOCALE = "custom-journal-locale";
 
 interface KindInfo {
 	noun: string,
@@ -107,4 +109,26 @@ export function getAutorun(plugin: HomepagePlugin): boolean {
 
 function isLegacyPeriodicNotes(periodicNotes: Plugin): boolean {
 	return (periodicNotes?.manifest.version || "0").startsWith("0");
+}
+
+export function hasJournal(homepage: Homepage): boolean { 
+	const journals = homepage.plugin.communityPlugins["journals"];	
+	return !!journals.getJournal(homepage.data.value);
+}
+
+export async function getJournalNote(journalName: string, plugin: HomepagePlugin) {
+	const journals = plugin.communityPlugins["journals"];	
+	const journal = journals.getJournal(journalName);
+	const origAutoCreate = journal.config.value.autoCreate;
+	
+	// this is hacky, but the core logic is in private methods
+	journals.reprocessNotes();
+	journal.config.value.autoCreate = true; 
+	await journal.autoCreate();
+	journal.config.value.autoCreate = origAutoCreate;
+	
+	const today = moment().locale(JOURNAL_CUSTOM_LOCALE).startOf("day");
+	const path = journal.getNotePath(journal?.get(today));
+	
+	return path.replace(/\.md$/, "");
 }

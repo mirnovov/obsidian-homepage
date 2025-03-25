@@ -186,5 +186,24 @@ export default class PluginTests {
 		
 		const leaves = this.app.workspace.getLeavesOfType("graph");
 		this.assert(leaves.length == 1, leaves);
-	}	
+	}
+	
+	async openJournal(this: HomepageTestPlugin) {
+		await this.app.plugins.enablePluginAndSave("journals");
+		await sleep(200);
+		
+		this.homepage.data.kind = Kind.Journal;
+		this.homepage.data.value = "Test";
+		await this.homepage.save();
+		await this.homepage.open();
+		
+		const file = this.app.workspace.getActiveFile();
+		const name = "j-" + moment().format("YYYY-MM-DD") + ".md";
+		
+		this.assert(file?.name == name, file, name);
+		this.app.vault.delete(this.app.vault.getAbstractFileByPath(name) as TFile);
+		
+		await this.app.plugins.disablePluginAndSave("journals");
+		await sleep(100);
+	}		
 }

@@ -2,7 +2,7 @@ import { App, ButtonComponent, Notice, Platform, PluginSettingTab, Setting, norm
 import HomepagePlugin from "./main";
 import { UNCHANGEABLE, HomepageData, Kind, Mode, View } from "./homepage";
 import { PERIODIC_KINDS, getAutorun } from "./periodic";
-import { CommandBox, Suggestor, FileSuggest, FolderSuggest, WorkspaceSuggest } from "./ui";
+import { SUGGESTORS, CommandBox } from "./ui";
 
 type HomepageKey<T> = { [K in keyof HomepageData]: HomepageData[K] extends T ? K : never }[keyof HomepageData];
 type HomepageObject = { [key: string]: HomepageData }
@@ -45,6 +45,7 @@ const DESCRIPTIONS = {
 	[Kind.None]: "Nothing will occur by default. Any commands added will still take effect.",
 	[Kind.Random]: "A random note or canvas from your Obsidian folder will be selected.",
 	[Kind.RandomFolder]: "Enter a folder. A random note or canvas from it will be selected.",
+	[Kind.Journal]: "Enter a Journal to use.",
 	[Kind.DailyNote]: "Your Daily Note or Periodic Daily Note will be used.",
 	[Kind.WeeklyNote]: "Your Periodic Weekly Note will be used.",
 	[Kind.MonthlyNote]: "Your Periodic Monthly Note will be used.",
@@ -78,14 +79,11 @@ export class HomepageSettingTab extends PluginSettingTab {
 	}
 	
 	display(): void {
-		const hasWorkspaces = this.plugin.homepage.data.kind == Kind.Workspace;
 		const kind = this.plugin.homepage.data.kind as Kind;
 		const autorun = getAutorun(this.plugin);
-		let pluginDisabled = false;
 		
-		let suggestor: Suggestor = FileSuggest;
-		if (kind == Kind.RandomFolder) suggestor = FolderSuggest;
-		else if (hasWorkspaces) suggestor = WorkspaceSuggest;
+		let pluginDisabled = false;
+		let suggestor = SUGGESTORS[kind];
 
 		this.containerEl.empty();
 		this.elements = {};
@@ -137,7 +135,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 		}
 		else {
 			mainSetting.addText(text => {
-				new suggestor(this.app, text.inputEl);
+				new suggestor!(this.app, text.inputEl);
 				text.setPlaceholder(DEFAULT_DATA.value)
 					text.setValue(DEFAULT_DATA.value == this.plugin.homepage.data.value ? "" : this.plugin.homepage.data.value)
 					text.onChange(async (value) => {
@@ -251,14 +249,14 @@ export class HomepageSettingTab extends PluginSettingTab {
 				.onClick(async () => await this.copyDebugInfo());
 		}
 		
-		if (hasWorkspaces || kind === Kind.None) {
+		if ([Kind.Workspace, Kind.None].includes(kind)) {
 			this.disableSettings("openWhenEmpty", "alwaysApply", "vaultHeading", "openMode", "manualOpenMode", "autoCreate", "pin");
 		}
-		if (hasWorkspaces || [Kind.None, Kind.Graph].includes(kind)) {
+		if ([Kind.Workspace, Kind.None, Kind.Graph].includes(kind)) {
 			this.disableSettings("paneHeading", "view", "revertView", "autoScroll", "refreshDataview");
 		}
 		if (!this.plugin.homepage.data.openOnStartup || autorun) this.disableSetting("openMode");
-		if (PERIODIC_KINDS.includes(this.plugin.homepage.data.kind as Kind)) this.disableSetting("autoCreate");
+		if (PERIODIC_KINDS.includes(kind as Kind) || kind === Kind.Journal) this.disableSetting("autoCreate");
 	}
 	
 	disableSetting(setting: string): void {

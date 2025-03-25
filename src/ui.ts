@@ -2,13 +2,13 @@ import {
 	App, AbstractInputSuggest, ButtonComponent, Command, FuzzySuggestModal, 
 	Menu, Notice, TAbstractFile, TFile, TFolder, getIcon, setTooltip 
 } from "obsidian";
-import { CommandData, Homepage, Period } from "./homepage";
+import { CommandData, Homepage, Kind, Period } from "./homepage";
 import { HomepageSettingTab } from "./settings"; 
 import { trimFile } from "./utils";
 
-export type Suggestor = typeof FileSuggest | typeof FolderSuggest | typeof WorkspaceSuggest;
+type Suggestor = typeof FileSuggest | typeof FolderSuggest | typeof JournalSuggest | typeof WorkspaceSuggest;
 
-export class FileSuggest extends AbstractInputSuggest<TFile> {
+class FileSuggest extends AbstractInputSuggest<TFile> {
 	textInputEl: HTMLInputElement;
 	
 	getSuggestions(inputStr: string): TFile[] {
@@ -49,7 +49,7 @@ export class FileSuggest extends AbstractInputSuggest<TFile> {
 	}
 }
 
-export class FolderSuggest extends AbstractInputSuggest<TFolder> {
+class FolderSuggest extends AbstractInputSuggest<TFolder> {
 	textInputEl: HTMLInputElement;
 	
 	getSuggestions(inputStr: string): TFolder[] {
@@ -72,7 +72,7 @@ export class FolderSuggest extends AbstractInputSuggest<TFolder> {
 }
 
 
-export class WorkspaceSuggest extends AbstractInputSuggest<string> {
+class WorkspaceSuggest extends AbstractInputSuggest<string> {
 	textInputEl: HTMLInputElement;
 	
 	getSuggestions(inputStr: string): string[] {
@@ -92,6 +92,36 @@ export class WorkspaceSuggest extends AbstractInputSuggest<string> {
 		this.close();
 	}
 }
+
+class JournalSuggest extends AbstractInputSuggest<string> {
+	textInputEl: HTMLInputElement;
+	
+	getSuggestions(inputStr: string): string[] {
+		const journals: string[] = this.app.plugins.plugins.journals.journals.map(
+			(a: any): string => a.name
+		);
+		const inputLower = inputStr.toLowerCase();
+
+		return journals.filter(j => j.toLowerCase().contains(inputLower));
+	}
+
+	renderSuggestion(journal: string, el: HTMLElement) {
+		el.setText(journal);
+	}
+
+	selectSuggestion(workspace: string) {
+		this.textInputEl.value = workspace;
+		this.textInputEl.trigger("input");
+		this.close();
+	}
+}
+
+export const SUGGESTORS: Partial<Record<Kind, Suggestor>> = {
+	[Kind.File]: FileSuggest,
+	[Kind.Workspace]: WorkspaceSuggest,
+	[Kind.RandomFolder]: FolderSuggest,
+	[Kind.Journal]: JournalSuggest
+} 
 
 export class CommandBox {
 	app: App;
