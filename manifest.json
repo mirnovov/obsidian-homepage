@@ -1,7 +1,7 @@
 {
 	"id": "homepage",
 	"name": "Homepage",
-	"version": "4.1",
+	"version": "4.2",
 	"minAppVersion": "1.4.10",
 	"description": "Open a specified note, canvas, or workspace on startup, or set it for quick access later.",
 	"author": "novov",
