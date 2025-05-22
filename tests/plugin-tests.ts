@@ -205,5 +205,16 @@ export default class PluginTests {
 		
 		await this.app.plugins.disablePluginAndSave("journals");
 		await sleep(100);
-	}		
+	}
+	
+	async openBase(this: HomepageTestPlugin) {
+		this.homepage.data.kind = Kind.File;
+		this.homepage.data.value = "Base.base";
+		await this.homepage.save();
+		await this.homepage.open();
+		
+		const file = this.app.workspace.getActiveFile();
+		const leaves = this.app.workspace.getLeavesOfType("bases-query");
+		this.assert(file?.name == "Base.base" && leaves.length == 1, file, leaves);
+	}
 }

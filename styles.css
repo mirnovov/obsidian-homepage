@@ -80,6 +80,12 @@
 	padding: 5px 0 0;
 }
 
+.nv-homepage-file-tag {
+	display: inline-block;
+	vertical-align: middle;
+	margin-left: var(--size-2-2);
+}
+
 .nv-mobile-setting {
 	flex-wrap: wrap;
 	row-gap: var(--size-2-2);

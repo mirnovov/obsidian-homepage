@@ -39,12 +39,12 @@ export const DEFAULT_DATA: HomepageData = {
 };
 
 const DESCRIPTIONS = {
-	[Kind.File]: "Enter a note or canvas to use.",
+	[Kind.File]: "Enter a note, base, or canvas to use.",
 	[Kind.Workspace]: "Enter an Obsidian workspace to use.",
 	[Kind.Graph]: "Your graph view will be used.",
 	[Kind.None]: "Nothing will occur by default. Any commands added will still take effect.",
-	[Kind.Random]: "A random note or canvas from your Obsidian folder will be selected.",
-	[Kind.RandomFolder]: "Enter a folder. A random note or canvas from it will be selected.",
+	[Kind.Random]: "A random note, base, or canvas from your Obsidian folder will be selected.",
+	[Kind.RandomFolder]: "Enter a folder. A random note, base, or canvas from it will be selected.",
 	[Kind.Journal]: "Enter a Journal to use.",
 	[Kind.DailyNote]: "Your Daily Note or Periodic Daily Note will be used.",
 	[Kind.WeeklyNote]: "Your Periodic Weekly Note will be used.",

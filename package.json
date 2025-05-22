@@ -1,7 +1,7 @@
 {
 	"name": "obsidian-homepage",
 	"version": "4.2",
-	"description": "Open a specified note, canvas, or workspace upon launching Obsidian, or set it for quick access later.",
+	"description": "Open a specified note, canvas, base, or workspace upon launching Obsidian, or set it for quick access later.",
 	"main": "main.js",
 	"scripts": {
 		"dev": "node build.mjs",

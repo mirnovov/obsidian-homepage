@@ -1,8 +1,8 @@
 <h1 align="center">Homepage</h1>
-<p align="center">Open a specified note, canvas, or workspace upon launching <a href="https://obsidian.md">Obsidian</a>.</p>
+<p align="center">Open a specified note, canvas, base, or workspace upon launching <a href="https://obsidian.md">Obsidian</a>.</p>
 <br>
 
-* Use any note, canvas, or workspace as a homepage. Alternatively, choose a random note, or use your Daily or Periodic Notes.
+* Use any note, canvas, base, or workspace as a homepage. Alternatively, choose a random note, or use your Daily or Periodic Notes.
 * Decide what happens to old tabs that were left open - keep them, replace the last note, or remove them all.
 
 <!---->

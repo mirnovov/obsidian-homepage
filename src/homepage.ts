@@ -4,7 +4,7 @@ import { PERIODIC_KINDS, getAutorun, getJournalNote, getPeriodicNote, hasJournal
 import { DEFAULT_DATA } from "./settings";
 import { detachAllLeaves, emptyActiveView, equalsCaseless, hasLayoutChange, randomFile, sleep, trimFile, untrimName } from "./utils";
 
-export const LEAF_TYPES: string[] = ["markdown", "canvas", "kanban"];
+export const LEAF_TYPES: string[] = ["markdown", "canvas", "kanban", "bases-query"];
 
 export const DEFAULT: string = "Main Homepage";
 export const MOBILE: string = "Mobile Homepage";
