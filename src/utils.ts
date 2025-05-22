@@ -23,7 +23,7 @@ export function randomFile(app: App, root: string | undefined = undefined): stri
 		files = getFilesInFolder(resolvedRoot)
 	}
 
-	files.filter((f: TFile) => ["md", "canvas"].contains(f.extension));
+	files.filter((f: TFile) => ["md", "canvas", "base"].contains(f.extension));
 	
 	if (files.length) {
 		const indice = Math.floor(Math.random() * files.length);
