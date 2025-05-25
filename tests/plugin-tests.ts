@@ -214,7 +214,7 @@ export default class PluginTests {
 		await this.homepage.open();
 		
 		const file = this.app.workspace.getActiveFile();
-		const leaves = this.app.workspace.getLeavesOfType("bases-query");
+		const leaves = this.app.workspace.getLeavesOfType("bases");
 		this.assert(file?.name == "Base.base" && leaves.length == 1, file, leaves);
 	}
 }
