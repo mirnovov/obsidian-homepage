@@ -22,30 +22,13 @@ export default class HomepagePlugin extends Plugin {
 	interstitial: HTMLElement;
 	
 	async onload(): Promise<void> {
-		const layoutReady = this.app.workspace.layoutReady;
-		if (!layoutReady) this.showInterstitial();
-		
 		this.patchReleaseNotes();
+		this.patchOpeningBehaviour();
 		
 		this.settings = await this.loadSettings();
 		this.internalPlugins = this.app.internalPlugins.plugins;
 		this.communityPlugins = this.app.plugins.plugins;
 		this.homepage = this.getHomepage();
-		
-		this.app.workspace.onLayoutReady(async () => {
-			const openInitially = (
-				this.homepage.data.openOnStartup &&
-				!layoutReady && !(await this.hasUrlParams())
-			);
-			
-			this.patchNewTabPage();
-					
-			if (openInitially) await this.homepage.open();
-			this.loaded = true;
-			
-			this.unpatchReleaseNotes();
-			this.hideInterstitial();
-		});
 
 		addIcon("homepage", ICON);
 		this.addRibbonIcon(
@@ -82,6 +65,7 @@ export default class HomepagePlugin extends Plugin {
 	async onunload(): Promise<void> {
 		this.app.workspace.off("layout-change", this.onLayoutChange)
 		this.unpatchNewTabPage();
+		this.unpatchOpeningBehaviour();
 		
 		if (DEV) delete window.homepage;
 	}
@@ -118,17 +102,6 @@ export default class HomepagePlugin extends Plugin {
 	
 	async saveSettings(): Promise<void> {
 		await this.saveData(this.settings);
-	}
-	
-	showInterstitial(): void {
-		this.interstitial = createDiv({ cls: "nv-homepage-interstitial" });
-		document.body.append(this.interstitial);
-		window.addEventListener("error", this.hideInterstitial);
-	}
-	
-	hideInterstitial = (): void => {
-		this.interstitial?.detach();
-		window.removeEventListener("error", this.hideInterstitial);
 	}
 	
 	async hasUrlParams(): Promise<boolean> {
@@ -201,6 +174,28 @@ export default class HomepagePlugin extends Plugin {
 		}
 		
 		this.app.showReleaseNotes = this.app.nvOrig_showReleaseNotes;
+	}
+	
+	patchOpeningBehaviour(): void {
+		this.app.nvOrig_runOpeningBehavior = this.app.runOpeningBehavior;
+		this.app.runOpeningBehavior = async (path: string) => {
+			const openInitially = (
+				this.homepage.data.openOnStartup && !(await this.hasUrlParams())
+			);
+			
+			this.patchNewTabPage();
+					
+			if (openInitially) await this.homepage.open();
+			else this.app.nvOrig_runOpeningBehavior(path);
+			
+			this.loaded = true;
+			
+			this.unpatchReleaseNotes();
+		};
+	}
+	
+	unpatchOpeningBehaviour(): void {
+		this.app.runOpeningBehavior = this.app.nvOrig_runOpeningBehavior;
 	}
 	
 	upgradeSettings(data: any): HomepageSettings {

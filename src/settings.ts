@@ -1,7 +1,7 @@
 import { App, ButtonComponent, Notice, Platform, PluginSettingTab, Setting, normalizePath } from "obsidian";
 import HomepagePlugin from "./main";
 import { UNCHANGEABLE, HomepageData, Kind, Mode, View } from "./homepage";
-import { PERIODIC_KINDS, getAutorun } from "./periodic";
+import { PERIODIC_KINDS } from "./periodic";
 import { SUGGESTORS, CommandBox } from "./ui";
 
 type HomepageKey<T> = { [K in keyof HomepageData]: HomepageData[K] extends T ? K : never }[keyof HomepageData];
@@ -80,7 +80,6 @@ export class HomepageSettingTab extends PluginSettingTab {
 	
 	display(): void {
 		const kind = this.plugin.homepage.data.kind as Kind;
-		const autorun = getAutorun(this.plugin);
 		
 		let pluginDisabled = false;
 		let suggestor = SUGGESTORS[kind];
@@ -150,14 +149,11 @@ export class HomepageSettingTab extends PluginSettingTab {
 			"openOnStartup",
 			(_) => this.display()
 		);
-		
-		if (autorun) {
-			this.elements.openOnStartup.descEl.createDiv({
-				text: `This setting has been disabled, as it isn't compatible with Daily Notes' "Open daily note on startup" functionality. To use it, disable the Daily Notes setting.`, 
-				attr: {class: "mod-warning"}
-			});
-			this.disableSetting("openOnStartup");
-		}
+				
+		this.elements.openOnStartup.descEl.createDiv({
+			text: `This will override the built-in "Default file to open" setting.`, 
+			attr: {class: "mod-warning"}
+		});
 		
 		this.addToggle(
 			"Open when empty", "When there are no tabs open, open the homepage.", 

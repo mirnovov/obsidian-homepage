@@ -8,6 +8,8 @@ declare module "obsidian" {
 		plugins: PluginRegistry;
 		internalPlugins: PluginRegistry;
 		setting: any;
+		runOpeningBehavior: (path: string) => void;
+		nvOrig_runOpeningBehavior: (path: string) => void;
 		showReleaseNotes: () => void;
 		nvOrig_showReleaseNotes: () => void;
 	}

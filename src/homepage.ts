@@ -1,6 +1,6 @@
 import { App, FileView, MarkdownView, Notice, View as OView, WorkspaceLeaf, WorkspaceWindow } from "obsidian";
 import HomepagePlugin from "./main";
-import { PERIODIC_KINDS, getAutorun, getJournalNote, getPeriodicNote, hasJournal } from "./periodic";
+import { PERIODIC_KINDS, getJournalNote, getPeriodicNote, hasJournal } from "./periodic";
 import { DEFAULT_DATA } from "./settings";
 import { detachAllLeaves, emptyActiveView, equalsCaseless, hasLayoutChange, randomFile, sleep, trimFile, untrimName } from "./utils";
 
@@ -139,10 +139,6 @@ export class Homepage {
 
 		this.computedValue = await this.computeValue();
 		this.plugin.executing = true;
-		
-		if (getAutorun(this.plugin) && !this.plugin.loaded) {
-			return;
-		}
 
 		if (mode !== Mode.ReplaceAll) {
 			const alreadyOpened = this.getOpened();
