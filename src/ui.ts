@@ -1,6 +1,6 @@
 import { 
 	App, AbstractInputSuggest, ButtonComponent, Command, FuzzySuggestModal, 
-	Menu, Notice, TAbstractFile, TFile, TFolder, getIcon, setTooltip 
+	Menu, Notice, 	Setting, SettingGroup, TAbstractFile, TFile, TFolder, getIcon, setTooltip, 
 } from "obsidian";
 import { CommandData, Homepage, Kind, Period } from "./homepage";
 import { HomepageSettingTab } from "./settings"; 
@@ -127,18 +127,26 @@ export class CommandBox {
 	app: App;
 	homepage: Homepage;
 	tab: HomepageSettingTab;
+	setting: Setting;
 	
 	container: HTMLElement;
 	dropzone: HTMLElement;
 	activeDrag: HTMLElement | null;
 	activeCommand: CommandData | null;
 
-	constructor(tab: HomepageSettingTab) {
+	constructor(tab: HomepageSettingTab, group: SettingGroup) {
 		this.app = tab.plugin.app;
 		this.homepage = tab.plugin.homepage;
 		this.tab = tab;
 		
-		this.container = tab.containerEl.createDiv({ cls: "nv-command-box" });		
+		group.addSetting(setting => {
+			setting.settingEl.addClass("nv-command-setting");
+			setting.descEl.addClass("nv-command-desc");
+			setting.descEl.innerText = "Select commands that will be executed when opening the homepage.";
+
+			this.container = setting.settingEl.createDiv({ cls: "nv-command-box" });
+		});
+		
 		this.dropzone = document.createElement("div");
 		
 		this.dropzone.className = "nv-command-pill nv-dropzone";

@@ -12,7 +12,7 @@
 	"author": "novov",
 	"license": "MIT",
 	"dependencies": {
-		"obsidian": "^1.4.10",
+		"obsidian": "^1.11.0",
 		"obsidian-daily-notes-interface": "^0.9.4"
 	},
 	"devDependencies": {

@@ -10,11 +10,10 @@
 
 #nv-main-setting {
 	flex-wrap: wrap;
-	margin-bottom: 30px;
 }
 
 #nv-main-setting .setting-item-control {
-	padding-top: var(--size-4-2);
+	padding-top: var(--size-4-1);
 	flex-basis: 100%;
 	align-items: stretch;
 }
@@ -74,7 +73,7 @@
 	margin-left: var(--size-2-2);
 }
 
-.nv-mobile-setting {
+.nv-mobile-setting, .nv-command-setting {
 	flex-wrap: wrap;
 	row-gap: var(--size-2-2);
 }
@@ -86,21 +85,20 @@
 }
 
 .nv-command-desc {
-	padding: 1.2em 0 0;
-	border-top: 1px solid var(--background-modifier-border);
+	padding: 0;
 }
 
 .nv-command-box {
-	margin: 1em 0 1.75em;
+	margin: 1em 0 0;
 	display: flex;
 	flex-wrap: wrap;
 	gap: 12px;
 	align-items: center;
+	width: 100%;
 }
 
 .nv-command-pill {
-	background-color: var(--background-secondary);
-	border: 1px solid var(--background-modifier-border-hover);
+	background-color: var(--background-modifier-hover);
 	border-radius: var(--radius-s);
 	font-size: var(--font-ui-small);
 	padding: var(--size-2-1) var(--size-2-2) var(--size-2-1) var(--size-2-3) ;
@@ -138,6 +136,7 @@
 .nv-command-pill > .svg-icon, .nv-command-pill button .svg-icon {
 	height: 1em;
 	width: 1em;
+	opacity: 1;
 }
 
 .nv-command-pill > .svg-icon {

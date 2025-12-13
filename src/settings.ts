@@ -1,4 +1,4 @@
-import { App, ButtonComponent, Notice, Platform, PluginSettingTab, Setting, normalizePath } from "obsidian";
+import { App, ButtonComponent, Notice, Platform, PluginSettingTab, Setting, SettingGroup, normalizePath } from "obsidian";
 import HomepagePlugin from "./main";
 import { UNCHANGEABLE, HomepageData, Kind, Mode, View } from "./homepage";
 import { PERIODIC_KINDS } from "./periodic";
@@ -53,10 +53,10 @@ const DESCRIPTIONS = {
 }
 
 export class HomepageSettingTab extends PluginSettingTab {
+	icon = "homepage";
+	
 	plugin: HomepagePlugin;
 	settings: HomepageSettings;
-	elements: Record<string, Setting>;
-	
 	commandBox: CommandBox;
 
 	constructor(app: App, plugin: HomepagePlugin) {
@@ -80,160 +80,160 @@ export class HomepageSettingTab extends PluginSettingTab {
 	
 	display(): void {
 		const kind = this.plugin.homepage.data.kind as Kind;
-		
 		let pluginDisabled = false;
 		let suggestor = SUGGESTORS[kind];
 
 		this.containerEl.empty();
-		this.elements = {};
 		
-		const mainSetting = new Setting(this.containerEl)
-			.setName("Homepage")
-			.addDropdown(async dropdown => {
-				for (const key of Object.values(Kind)) {
-					if (!this.plugin.hasRequiredPlugin(key)) {
-						if (key == this.plugin.homepage.data.kind) pluginDisabled = true;
-						else {
-							dropdown.selectEl.createEl(
-								"option", { text: key, attr: { disabled: true } }
-							);
-							continue;
+		const mainGroup = new HomepageSettingGroup(this)
+			.addSetting(setting => {
+				setting
+				.setName("Homepage")
+				.addDropdown(async dropdown => {
+					for (const key of Object.values(Kind)) {
+						if (!this.plugin.hasRequiredPlugin(key)) {
+							if (key == this.plugin.homepage.data.kind) pluginDisabled = true;
+							else {
+								dropdown.selectEl.createEl(
+									"option", { text: key, attr: { disabled: true } }
+								);
+								continue;
+							}
 						}
+						
+						dropdown.addOption(key, key);
 					}
-					
-					dropdown.addOption(key, key);
-				}
-				dropdown.setValue(this.plugin.homepage.data.kind);
-				dropdown.onChange(async option => {
-					this.plugin.homepage.data.kind = option;
-					if (option == Kind.Random) this.plugin.homepage.data.value = "";
-					
-					await this.plugin.homepage.save();
-					this.display();
-				});
-			});
-		
-		mainSetting.settingEl.id = "nv-main-setting";
-		
-		const descContainer = mainSetting.settingEl.createEl("article", {
-			"text": DESCRIPTIONS[kind],
-			"attr": { "id": "nv-desc" }
-		})
-
-		if (pluginDisabled) {
-			descContainer.createDiv({
-				text: `The plugin required for this homepage type isn't available.`, 
-				cls: "mod-warning"
-			});
-		}
-		
-		if (UNCHANGEABLE.includes(kind)) {
-			mainSetting.addText(text => {
-				text.setDisabled(true);
-			});
-		}
-		else {
-			mainSetting.addText(text => {
-				new suggestor!(this.app, text.inputEl);
-				text.setPlaceholder(DEFAULT_DATA.value)
-					text.setValue(DEFAULT_DATA.value == this.plugin.homepage.data.value ? "" : this.plugin.homepage.data.value)
-					text.onChange(async (value) => {
-						this.plugin.homepage.data.value = this.sanitiseNote(value) || DEFAULT_DATA.value;
+					dropdown.setValue(this.plugin.homepage.data.kind);
+					dropdown.onChange(async option => {
+						this.plugin.homepage.data.kind = option;
+						if (option == Kind.Random) this.plugin.homepage.data.value = "";
+						
 						await this.plugin.homepage.save();
+						this.display();
 					});
-			});
-		}
-		
-		this.addToggle(
-			"Open on startup", "When launching Obsidian, open the homepage.",
-			"openOnStartup",
-			(_) => this.display()
-		);
+				});
+			
+				setting.settingEl.id = "nv-main-setting";
 				
-		this.elements.openOnStartup.descEl.createDiv({
+				const descContainer = setting.settingEl.createEl("article", {
+					"text": DESCRIPTIONS[kind],
+					"attr": { "id": "nv-desc" }
+				})
+		
+				if (pluginDisabled) {
+					descContainer.createDiv({
+						text: `The plugin required for this homepage type isn't available.`, 
+						cls: "mod-warning"
+					});
+				}
+				
+				if (UNCHANGEABLE.includes(kind)) {
+					setting.addText(text => {
+						text.setDisabled(true);
+					});
+				}
+				else {
+					setting.addText(text => {
+						new suggestor!(this.app, text.inputEl);
+						text.setPlaceholder(DEFAULT_DATA.value)
+							text.setValue(DEFAULT_DATA.value == this.plugin.homepage.data.value ? "" : this.plugin.homepage.data.value)
+							text.onChange(async (value) => {
+								this.plugin.homepage.data.value = this.sanitiseNote(value) || DEFAULT_DATA.value;
+								await this.plugin.homepage.save();
+							});
+					});
+				}
+			});
+		
+		const primaryGroup = new HomepageSettingGroup(this)
+			.addToggle(
+				"Open on startup", "When launching Obsidian, open the homepage.",
+				"openOnStartup",
+				(_) => this.display()
+			)
+			.addToggle(
+				"Open when empty", "When there are no tabs open, open the homepage.", 
+				"openWhenEmpty"
+			)
+			.addToggle(
+				"Use when opening normally", "Use homepage settings when opening it normally, such as from a link or the file browser.",
+				"alwaysApply"
+			)
+			.addSetting(setting => {
+				setting
+				.setName("Separate mobile homepage")
+					.setDesc("For mobile devices, store the homepage and its settings separately.")
+					.addToggle(toggle => toggle
+						.setValue(this.plugin.settings.separateMobile)
+						.onChange(async value => {
+							this.plugin.settings.separateMobile = value;
+							this.plugin.homepage = this.plugin.getHomepage();
+							await this.plugin.saveSettings();
+							this.display();
+						})
+					);
+				
+				if (this.plugin.settings.separateMobile) {
+					const keyword = Platform.isMobile ? "desktop" : "mobile";
+					const mobileInfo = document.createElement("div");
+				
+					setting.setClass("nv-mobile-setting");			
+					mobileInfo.className = "mod-warning nv-mobile-info";
+					mobileInfo.innerHTML = `<b>Mobile settings are stored separately.</b> Therefore, changes to other settings will not affect 
+					${keyword} devices. To edit ${keyword} settings, use a ${keyword} device.`
+					
+					setting.settingEl.append(mobileInfo);
+				}
+			});
+				
+		primaryGroup.elements.openOnStartup.descEl.createDiv({
 			text: `This will override the built-in "Default file to open" setting.`, 
 			attr: {class: "mod-warning"}
 		});
 		
-		this.addToggle(
-			"Open when empty", "When there are no tabs open, open the homepage.", 
-			"openWhenEmpty"
-		);
-		this.addToggle(
-			"Use when opening normally", "Use homepage settings when opening it normally, such as from a link or the file browser.",
-			"alwaysApply"
-		);
+		this.commandBox = new CommandBox(this, new HomepageSettingGroup(this, "Commands"));
 		
-		const separateMobileSetting = new Setting(this.containerEl)
-			.setName("Separate mobile homepage")
-			.setDesc("For mobile devices, store the homepage and its settings separately.")
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.settings.separateMobile)
-				.onChange(async value => {
-					this.plugin.settings.separateMobile = value;
-					this.plugin.homepage = this.plugin.getHomepage();
-					await this.plugin.saveSettings();
-					this.display();
-				})
-			);
+		const vaultGroup = new HomepageSettingGroup(this, "Vault environment")
+			.addDropdown(
+				"Opening method", "Determine how extant tabs and views are affected on startup.", 
+				"openMode",
+				Mode
+			)
+			.addDropdown(
+				"Manual opening method", "Determine how extant tabs and views are affected when opening with commands or the ribbon button.", 
+				"manualOpenMode",
+				Mode
+			)
+			.addToggle("Pin", "Pin the homepage when opening.", "pin")
+			.addToggle("Hide release notes", "Never display release notes when Obsidian updates.", "hideReleaseNotes")
+			.addToggle("Auto-create", "When the homepage doesn't exist, create a note with its name.", "autoCreate")
 		
-		if (this.plugin.settings.separateMobile) {
-			const keyword = Platform.isMobile ? "desktop" : "mobile";
-			const mobileInfo = document.createElement("div");
-
-			separateMobileSetting.setClass("nv-mobile-setting");			
-			mobileInfo.className = "mod-warning nv-mobile-info";
-			mobileInfo.innerHTML = `<b>Mobile settings are stored separately.</b> Therefore, changes to other settings will not affect 
-			${keyword} devices. To edit ${keyword} settings, use a ${keyword} device.`
-			
-			separateMobileSetting.settingEl.append(mobileInfo);
-		}
-					
-		this.addHeading("Commands", "commandsHeading");
-		this.containerEl.createDiv({ 
-			cls: "nv-command-desc setting-item-description", 
-			text: "Select commands that will be executed when opening the homepage." }
-		);
-		this.commandBox = new CommandBox(this);
-		
-		this.addHeading("Vault environment", "vaultHeading");
-		this.addDropdown(
-			"Opening method", "Determine how extant tabs and views are affected on startup.", 
-			"openMode",
-			Mode
-		);
-		this.addDropdown(
-			"Manual opening method", "Determine how extant tabs and views are affected when opening with commands or the ribbon button.", 
-			"manualOpenMode",
-			Mode
-		);
-		this.addToggle("Pin", "Pin the homepage when opening.", "pin");
-		this.addToggle("Hide release notes", "Never display release notes when Obsidian updates.", "hideReleaseNotes");
-		this.addToggle("Auto-create", "When the homepage doesn't exist, create a note with its name.", "autoCreate");
-		
-		this.elements.autoCreate.descEl.createDiv({
+		vaultGroup.elements.autoCreate.descEl.createDiv({
 			text: `If this vault is synced using unofficial services, this may lead to content being overwritten.`, 
 			cls: "mod-warning"
 		});
 		
-		this.addHeading("Opened view", "paneHeading");
-		this.addDropdown(
-			"Homepage view", "Choose what view to open the homepage in.", 
-			"view",
-			View
-		);
-		this.addToggle(
-			"Revert view on close", "When navigating away from the homepage, restore the default view.", 
-			"revertView"
-		);
-		this.addToggle("Auto-scroll", "When opening the homepage, scroll to the bottom and focus on the last line.", "autoScroll");
+		const openingGroup = new HomepageSettingGroup(this, "Opened view")
+			.addDropdown(
+				"Homepage view", "Choose what view to open the homepage in.", 
+				"view",
+				View
+			)
+			.addToggle(
+				"Revert view on close", "When navigating away from the homepage, restore the default view.", 
+				"revertView"
+			)
+			.addToggle(
+				"Auto-scroll", "When opening the homepage, scroll to the bottom and focus on the last line.", 
+				"autoScroll"
+			);
 		
 		if ("dataview" in this.plugin.communityPlugins) {
-			this.addToggle(
+			openingGroup.addToggle(
 				"Refresh Dataview", "Always attempt to reload Dataview views when opening the homepage.", "refreshDataview"
 			);
 			
-			this.elements.refreshDataview.descEl.createDiv({
+			openingGroup.elements.refreshDataview.descEl.createDiv({
 				text: "Requires Dataview auto-refresh to be enabled.", attr: {class: "mod-warning"}
 			});
 		}
@@ -246,63 +246,23 @@ export class HomepageSettingTab extends PluginSettingTab {
 		}
 		
 		if ([Kind.Workspace, Kind.None].includes(kind)) {
-			this.disableSettings("openWhenEmpty", "alwaysApply", "vaultHeading", "openMode", "manualOpenMode", "autoCreate", "pin");
+			primaryGroup.disableSettings("openWhenEmpty", "alwaysApply");
+			vaultGroup.disableSettings("openMode", "manualOpenMode", "autoCreate", "pin")
 		}
+		
 		if ([Kind.Workspace, Kind.None, Kind.Graph].includes(kind)) {
-			this.disableSettings("paneHeading", "view", "revertView", "autoScroll", "refreshDataview");
+			openingGroup.disableAll();
 		}
-		if (!this.plugin.homepage.data.openOnStartup || autorun) this.disableSetting("openMode");
-		if (PERIODIC_KINDS.includes(kind as Kind) || kind === Kind.Journal) this.disableSetting("autoCreate");
-	}
-	
-	disableSetting(setting: string): void {
-		this.elements[setting]?.settingEl.setAttribute("nv-greyed", "");
-	}
-	
-	disableSettings(...settings: string[]): void {
-		settings.forEach(s => this.disableSetting(s));
-	}
-	
-	addHeading(name: string, setting: string): void {
-		const heading = new Setting(this.containerEl).setHeading().setName(name);
-		this.elements[setting] = heading;
-	}
-	
-	addDropdown(name: string, desc: string, setting: HomepageKey<string>, source: object, callback?: Callback<string>): Setting {
-		const dropdown = new Setting(this.containerEl)
-			.setName(name).setDesc(desc)
-			.addDropdown(async dropdown => {
-				for (const key of Object.values(source)) {
-					dropdown.addOption(key, key);
-				}
-				dropdown.setValue(this.plugin.homepage.data[setting]);
-				dropdown.onChange(async option => {
-					this.plugin.homepage.data[setting] = option;
-					await this.plugin.homepage.save();
-					if (callback) callback(option);
-				});
-			});
 		
-		this.elements[setting] = dropdown;
-		return dropdown;
+		if (!this.plugin.homepage.data.openOnStartup) {
+			vaultGroup.disableSettings("openMode");
+		}
+		
+		if (PERIODIC_KINDS.includes(kind as Kind) || kind === Kind.Journal) {
+			vaultGroup.disableSettings("autoCreate");
+		}
 	}
 	
-	addToggle(name: string, desc: string, setting: HomepageKey<boolean>, callback?: Callback<boolean>): Setting {
-		const toggle = new Setting(this.containerEl)
-			.setName(name).setDesc(desc)
-			.addToggle(toggle => toggle
-				.setValue(this.plugin.homepage.data[setting])
-				.onChange(async value => {
-					this.plugin.homepage.data[setting] = value; 
-					await this.plugin.homepage.save();
-					if (callback) callback(value);
-				})
-			);
-		
-		this.elements[setting] = toggle;
-		return toggle;
-	}
-		
 	async copyDebugInfo(): Promise<void> {
 		const config = this.app.vault.config;
 		const info = {
@@ -319,5 +279,71 @@ export class HomepageSettingTab extends PluginSettingTab {
 		
 		await navigator.clipboard.writeText(JSON.stringify(info));
 		new Notice("Copied homepage debug information to clipboard");
+	}
+}
+
+class HomepageSettingGroup extends SettingGroup {
+	elements: Record<string, Setting> = {};
+	plugin: HomepagePlugin;
+	settings: HomepageSettings;
+	
+	constructor(tab: HomepageSettingTab, name?: string) {
+		super(tab.containerEl);
+		if (name) this.setHeading(name);
+		
+		this.plugin = tab.plugin;
+		this.settings = tab.settings;
+	}
+	
+	addDropdown(name: string, desc: string, setting: HomepageKey<string>, source: object, callback?: Callback<string>): HomepageSettingGroup {
+		this.addSetting(s => {
+			s
+			.setName(name)
+			.setDesc(desc)
+			.addDropdown(async dropdown => {
+				for (const key of Object.values(source)) {
+					dropdown.addOption(key, key);
+				}
+				dropdown.setValue(this.plugin.homepage.data[setting]);
+				dropdown.onChange(async option => {
+					this.plugin.homepage.data[setting] = option;
+					await this.plugin.homepage.save();
+					if (callback) callback(option);
+				});
+			});
+			
+			this.elements[setting] = s;
+		});
+		
+		return this;
+	}
+	
+	addToggle(name: string, desc: string, key: HomepageKey<boolean>, callback?: Callback<boolean>): HomepageSettingGroup {
+		this.addSetting(setting => {
+			setting
+			.setName(name).setDesc(desc)
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.homepage.data[key])
+				.onChange(async value => {
+					this.plugin.homepage.data[key] = value; 
+					await this.plugin.homepage.save();
+					if (callback) callback(value);
+				})
+			);
+		
+			this.elements[key] = setting;
+		});
+		
+		return this;
+	}
+	
+	disableAll(): void {
+		this.disableSettings(...Object.keys(this.elements));
+	}
+	
+	disableSettings(...settings: string[]): void {
+		settings.forEach(s => {
+			this.elements[s]?.settingEl.setAttribute("nv-greyed", "");
+		});
 	}
 }
