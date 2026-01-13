@@ -55,7 +55,6 @@ export const PERIODIC_KINDS: Kind[] = [
 ];
 
 export const LEGACY_MOMENT_KIND: string = "Date-dependent file";
-export const MOMENT_MESSAGE: string = "Date-dependent notes in Homepage have been removed. Set your Homepage as a Periodic or Daily Note instead.";
 
 export async function getPeriodicNote(kind: Kind, plugin: HomepagePlugin): Promise<string> {
 	const periodicNotes = plugin.communityPlugins["periodic-notes"],

@@ -5,6 +5,7 @@ import {
 import { CommandData, Homepage, Kind, Period } from "./homepage";
 import { HomepageSettingTab } from "./settings"; 
 import { trimFile } from "./utils";
+import { tr } from "./locale";
 
 type Suggestor = typeof FileSuggest | typeof FolderSuggest | typeof JournalSuggest | typeof WorkspaceSuggest;
 
@@ -142,7 +143,7 @@ export class CommandBox {
 		group.addSetting(setting => {
 			setting.settingEl.addClass("nv-command-setting");
 			setting.descEl.addClass("nv-command-desc");
-			setting.descEl.innerText = "Select commands that will be executed when opening the homepage.";
+			setting.descEl.innerText = tr("commandsDesc");
 
 			this.container = setting.settingEl.createDiv({ cls: "nv-command-box" });
 		});
@@ -198,7 +199,7 @@ export class CommandBox {
 				periodButton.setClass("nv-command-selected");
 				periodButton.setIcon("");
 				
-				periodButton.buttonEl.createSpan({ text: command.period });
+				periodButton.buttonEl.createSpan({ text: tr(command.period) });
 			}
 				
 			new ButtonComponent(pill)
@@ -211,17 +212,13 @@ export class CommandBox {
 				pill.classList.add("nv-command-invalid");
 				pill.prepend(getIcon("ban")!);
 				
-				setTooltip(pill, 
-					"This command can't be found, so it won't be executed."
-					+ " It may belong to a disabled plugin.",
-					{ delay: 0.001 }
-				);
+				setTooltip(pill, tr("commandUnavailable"), { delay: 0.001 });
 			}
 		}
 		
 		new ButtonComponent(this.container)
 			.setClass("nv-command-add-button")
-			.setButtonText("Add...")
+			.setButtonText(tr("commandsAddButton"))
 			.onClick(() => {
 				const modal = new CommandSuggestModal(this.tab);
 				modal.open();
@@ -239,7 +236,7 @@ export class CommandBox {
 
 		for (const key of Object.values(Period)) {
 			menu.addItem(item => {
-				item.setTitle(key as string);
+				item.setTitle(tr(key as string));
 				item.setChecked(command.period == key);
 				item.onClick(() => {
 					command.period = key;
@@ -307,7 +304,7 @@ export class CommandSuggestModal extends FuzzySuggestModal<unknown> {
 
 	onChooseItem(item: Command) {
 		if (item.id === "homepage:open-homepage") {
-			new Notice("Really?");
+			new Notice(tr("commandsReally"));
 			return;
 		}
 		else if (!this.homepage.data.commands) {

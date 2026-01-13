@@ -1,7 +1,8 @@
 import { Notice, Keymap, Platform, Plugin, WorkspaceLeaf, addIcon } from "obsidian";
 import { DEFAULT, MOBILE, Homepage, Kind, Period } from "./homepage";
-import { hasRequiredPeriodicity, LEGACY_MOMENT_KIND, MOMENT_MESSAGE } from "./periodic";
+import { hasRequiredPeriodicity, LEGACY_MOMENT_KIND } from "./periodic";
 import { DEFAULT_SETTINGS, HomepageSettings, HomepageSettingTab } from "./settings";
+import { tr } from "./locale";
 
 declare const DEV: boolean;
 if (DEV) import("./dev");
@@ -46,13 +47,13 @@ export default class HomepagePlugin extends Plugin {
 
 		this.addCommand({
 			id: "open-homepage",
-			name: "Open homepage",
+			name: tr("openHomepage"),
 			callback: () => this.homepage.open(),
 		});
 		
 		this.addCommand({
 			id: "set-to-active-file",
-			name: "Set to active file",
+			name: tr("setToActiveFile"),
 			checkCallback: checking => {
 				if (checking) return this.homepage.canSetToFile();
 				this.homepage.setToActiveFile();
@@ -214,7 +215,7 @@ export default class HomepagePlugin extends Plugin {
 				}
 			}
 			
-			if (hasMoment) new Notice(MOMENT_MESSAGE);
+			if (hasMoment) new Notice(tr("momentUpgradeNotice"));
 			settings.version = 4;
 			
 			this.saveData(settings);
@@ -229,7 +230,7 @@ export default class HomepagePlugin extends Plugin {
 		}
 		else if (data.momentFormat) {
 			data.kind = Kind.DailyNote;	
-			new Notice(MOMENT_MESSAGE);
+			new Notice(tr("momentUpgradeNotice"));
 		}
 		else {
 			data.value = data.defaultNote;

@@ -1,6 +1,7 @@
 import { App, FileView, MarkdownView, Notice, View as OView, WorkspaceLeaf, WorkspaceWindow } from "obsidian";
 import HomepagePlugin from "./main";
 import { PERIODIC_KINDS, getJournalNote, getPeriodicNote, hasJournal } from "./periodic";
+import { tr } from "./locale";
 import { DEFAULT_DATA } from "./settings";
 import { detachAllLeaves, emptyActiveView, equalsCaseless, hasLayoutChange, randomFile, sleep, trimFile, untrimName } from "./utils";
 
@@ -93,11 +94,11 @@ export class Homepage {
 	
 	async open(alternate: boolean = false): Promise<void> {
 		if (!this.plugin.hasRequiredPlugin(this.data.kind as Kind)) {
-			new Notice("Homepage cannot be opened due to plugin unavailablity.");
+			new Notice(t("pluginUnavailable"));
 			return;
 		}
 		else if (this.data.kind === Kind.Journal && !hasJournal(this)) {
-			new Notice(`Cannot find the journal "${this.data.value}" to use as the homepage.`);
+			new Notice(tr("journalUnavailable", this.data.value));
 			return;
 		}
 
@@ -126,7 +127,7 @@ export class Homepage {
 		const workspacePlugin = this.plugin.internalPlugins.workspaces?.instance;
 		
 		if(!(this.data.value in workspacePlugin.workspaces)) {
-			new Notice(`Cannot find the workspace "${this.data.value}" to use as the homepage.`);
+			new Notice(tr("workspaceUnavailable", this.data.value));
 			return;
 		}
 		
@@ -190,7 +191,7 @@ export class Homepage {
 		
 		if (!file) {
 			if (!this.data.autoCreate) {
-				new Notice(`Homepage "${this.computedValue}" does not exist.`);
+				new Notice(tr("noteUnavailable", this.computedValue));
 				return undefined;
 			}
 			
@@ -315,7 +316,7 @@ export class Homepage {
 		this.data.value = trimFile(this.app.workspace.getActiveFile()!);
 		await this.save();
 		
-		new Notice(`The homepage has been changed to "${this.data.value}".`);
+		new Notice(tr("homepageChanged", this.data.value));
 	}
 	
 	canSetToFile(): boolean {
