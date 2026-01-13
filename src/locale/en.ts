@@ -38,12 +38,12 @@ export const EN: Record<string, string> = {
 	copyDebugInfo: "Copy debug info",
 	
 	//General UI messages
-	pluginUnavailable: `Homepage cannot be opened due to plugin unavailablity.`,
+	pluginUnavailable: `The active homepage cannot be opened due to plugin unavailablity.`,
 	journalUnavailable: `Cannot find the journal "?0" to use as the homepage.`,
 	workspaceUnavailable: `Cannot find the workspace "?0" to use as the homepage.`,
 	noteUnavailable: `Cannot find the file "?0" to use as the homepage.`,
 	homepageChanged: `The homepage has been changed to "?0".`,
-	momentUpgradeNotice: `Date-dependent notes in Homepage have been removed. Set your Homepage as a Periodic or Daily Note instead.`,
+	momentUpgradeNotice: `Date-dependent notes in Homepage have been removed. Set your homepage as a Periodic or Daily Note instead.`,
 	
 	//Settings items
 	openOnStartup: "Open on startup",
