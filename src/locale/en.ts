@@ -92,7 +92,7 @@ export const EN: Record<string, string> = {
 	//Settings UI messages
 	"FileDesc": "Enter a note, base, or canvas to use.",
 	"WorkspaceDesc": "Enter an Obsidian workspace to use.",
-	"New noteDesc": "A new note will be created to use.",
+	"New noteDesc": "Enter a prefix to use. A note using that prefix will be created for each Obsidian session.",
 	"Graph viewDesc": "Your graph view will be used.",
 	"NothingDesc": "Nothing will occur by default. Any commands added will still take effect.",
 	"Random fileDesc": "A random note, base, or canvas from your Obsidian folder will be selected.",

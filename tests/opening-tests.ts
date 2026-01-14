@@ -127,12 +127,16 @@ export default class OpeningTests {
 	async newNote(this: HomepageTestPlugin) {
 		this.homepage.data.kind = Kind.NewNote;
 		await this.homepage.save();
-
-		await this.homepage.open();
-		const file = this.app.workspace.getActiveFile()!;
 		
-		this.assert(file.path === "Untitled.md");
-		this.app.vault.delete(file);
+		let file;
+		
+		for (let i = 0; i < 2; i++) {
+			await this.homepage.open();
+			file = this.app.workspace.getActiveFile()!;
+			this.assert(file.path === "Home 1.md");
+		}
+		
+		this.app.vault.delete(file!);
 	}
 	
 	async openWhenEmpty(this: HomepageTestPlugin) {

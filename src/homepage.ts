@@ -67,7 +67,7 @@ export enum Period {
 	Manual = "Manual only"
 }
 
-export const UNCHANGEABLE: Kind[] = [Kind.Random, Kind.NewNote, Kind.Graph, Kind.None, ...PERIODIC_KINDS];
+export const UNCHANGEABLE: Kind[] = [Kind.Random, Kind.Graph, Kind.None, ...PERIODIC_KINDS];
 
 export class Homepage {
 	plugin: HomepagePlugin;
@@ -78,6 +78,7 @@ export class Homepage {
 	lastView?: WeakRef<MarkdownView> = undefined;
 	openedViews: WeakMap<FileView, string> = new WeakMap();
 	computedValue: string;
+	cachedNewFile?: string;
 	
 	constructor(name: string, plugin: HomepagePlugin) {
 		this.name = name;
@@ -295,7 +296,11 @@ export class Homepage {
 				if (file) val = file;
 				break;
 			case Kind.NewNote:
-				val = trimFile(await this.app.fileManager.createNewFile(""));
+				if (!this.cachedNewFile) {
+					this.cachedNewFile = trimFile(await this.app.fileManager.createNewFile("", val));
+				}
+				
+				val = this.cachedNewFile;
 				break;
 			case Kind.Journal:
 				val = await getJournalNote(val, this.plugin);

@@ -121,6 +121,7 @@ export const SUGGESTORS: Partial<Record<Kind, Suggestor>> = {
 	[Kind.File]: FileSuggest,
 	[Kind.Workspace]: WorkspaceSuggest,
 	[Kind.RandomFolder]: FolderSuggest,
+	[Kind.NewNote]: FileSuggest,
 	[Kind.Journal]: JournalSuggest
 } 
 
