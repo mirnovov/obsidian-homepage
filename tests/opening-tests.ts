@@ -124,6 +124,17 @@ export default class OpeningTests {
 		}
 	}
 	
+	async newNote(this: HomepageTestPlugin) {
+		this.homepage.data.kind = Kind.NewNote;
+		await this.homepage.save();
+
+		await this.homepage.open();
+		const file = this.app.workspace.getActiveFile()!;
+		
+		this.assert(file.path === "Untitled.md");
+		this.app.vault.delete(file);
+	}
+	
 	async openWhenEmpty(this: HomepageTestPlugin) {
 		this.homepage.data.openWhenEmpty = true;
 		await this.homepage.save();
