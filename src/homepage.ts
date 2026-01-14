@@ -51,6 +51,7 @@ export enum Kind {
 	Workspace = "Workspace",
 	Random = "Random file",
 	RandomFolder = "Random in folder",
+	NewNote = "New note",
 	Graph = "Graph view",
 	None = "Nothing",
 	Journal = "Journal",
@@ -66,7 +67,7 @@ export enum Period {
 	Manual = "Manual only"
 }
 
-export const UNCHANGEABLE: Kind[] = [Kind.Random, Kind.Graph, Kind.None, ...PERIODIC_KINDS];
+export const UNCHANGEABLE: Kind[] = [Kind.Random, Kind.NewNote, Kind.Graph, Kind.None, ...PERIODIC_KINDS];
 
 export class Homepage {
 	plugin: HomepagePlugin;
@@ -94,7 +95,7 @@ export class Homepage {
 	
 	async open(alternate: boolean = false): Promise<void> {
 		if (!this.plugin.hasRequiredPlugin(this.data.kind as Kind)) {
-			new Notice(t("pluginUnavailable"));
+			new Notice(tr("pluginUnavailable"));
 			return;
 		}
 		else if (this.data.kind === Kind.Journal && !hasJournal(this)) {
@@ -292,6 +293,9 @@ export class Homepage {
 			case Kind.RandomFolder:
 				file = randomFile(this.app, val);
 				if (file) val = file;
+				break;
+			case Kind.NewNote:
+				val = trimFile(await this.app.fileManager.createNewFile(""));
 				break;
 			case Kind.Journal:
 				val = await getJournalNote(val, this.plugin);

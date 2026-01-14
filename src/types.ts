@@ -20,6 +20,10 @@ declare module "obsidian" {
 		commands: Record<string, Command>;
 	}
 	
+	interface FileManager {
+		createNewFile: (folder: string, path?: string, ext?: string) => Promise<TFile>;
+	}
+	
 	interface PluginRegistry {
 		manifests: Record<string, PluginManifest>;
 		plugins: Record<string, any>;

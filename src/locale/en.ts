@@ -19,6 +19,7 @@ export const EN: Record<string, string> = {
 	[Kind.Workspace]: "Workspace",
 	[Kind.Random]: "Random file",
 	[Kind.RandomFolder]: "Random in folder",
+	[Kind.NewNote]: "New note",
 	[Kind.Graph]: "Graph view",
 	[Kind.None]: "Nothing",
 	[Kind.Journal]: "Journal",
@@ -91,6 +92,7 @@ export const EN: Record<string, string> = {
 	//Settings UI messages
 	"FileDesc": "Enter a note, base, or canvas to use.",
 	"WorkspaceDesc": "Enter an Obsidian workspace to use.",
+	"New noteDesc": "A new note will be created to use.",
 	"Graph viewDesc": "Your graph view will be used.",
 	"NothingDesc": "Nothing will occur by default. Any commands added will still take effect.",
 	"Random fileDesc": "A random note, base, or canvas from your Obsidian folder will be selected.",
