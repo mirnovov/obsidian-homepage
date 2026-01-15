@@ -1,9 +1,11 @@
 import { EN } from "./locale/en";
+import { RU } from "./locale/ru";
 
 type LocaleData = Partial<typeof EN>;
 
 const LOCALE_DATA: { [k: string]: LocaleData } = {
-	"en": EN
+	"en": EN,
+	"ru": RU
 }
 
 let activeLocale: LocaleData | undefined = undefined;
