@@ -60,6 +60,26 @@ export default class HomepagePlugin extends Plugin {
 			}
 		});
 		
+		this?.registerCliHandler(
+			"homepage",
+			tr("cliOpenHomepageDesc"),
+			null,
+			async () => {
+				await this.homepage.open();
+				return tr("cliOpenHomepageResult");
+			}
+		);
+		
+		this?.registerCliHandler(
+			"homepage:read",
+			tr("cliReadHomepageDesc"),
+			null,
+			async () => {
+				const result = await this.homepage.read();
+				return result !== undefined ? result : tr("cliReadHomepageIllegible");
+			}
+		);
+		
 		if (DEV) window.homepage = this;
 	}
 	

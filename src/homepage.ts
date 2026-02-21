@@ -68,6 +68,7 @@ export enum Period {
 }
 
 export const UNCHANGEABLE: Kind[] = [Kind.Random, Kind.Graph, Kind.None, ...PERIODIC_KINDS];
+export const ILLEGIBLE: Kind[] = [Kind.None, Kind.Graph, Kind.Workspace];
 
 export class Homepage {
 	plugin: HomepagePlugin;
@@ -384,5 +385,19 @@ export class Homepage {
 		) {
 			await this.configure(currentView.leaf);
 		}
+	}
+	
+	async read(): Promise<string | undefined> {
+		if (ILLEGIBLE.includes(this.data.kind as Kind)) {
+			return undefined;
+		}
+		
+		const file = this.app.metadataCache.getFirstLinkpathDest(await this.computeValue(), "/");
+
+		if (!file) {
+			return undefined;
+		}
+
+		return this.app.vault.cachedRead(file);
 	}
 }

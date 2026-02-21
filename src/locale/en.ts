@@ -38,6 +38,12 @@ export const EN: Record<string, string> = {
 	setToActiveFile: "Set to active file",
 	copyDebugInfo: "Copy debug info",
 	
+	//CLI commands
+	cliOpenHomepageDesc: "Open the homepage",
+	cliOpenHomepageResult: "Opened the homepage",
+	cliReadHomepageDesc: "Read homepage contents",
+	cliReadHomepageIllegible: "The current homepage cannot be viewed, as it does not match an file",
+	
 	//General UI messages
 	pluginUnavailable: `The active homepage cannot be opened due to plugin unavailablity.`,
 	journalUnavailable: `Cannot find the journal "?0" to use as the homepage.`,
