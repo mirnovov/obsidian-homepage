@@ -47,6 +47,7 @@ declare module "obsidian" {
 	}
 	
 	interface WorkspaceLeaf {
+		history: Object;
 		parentSplit: WorkspaceSplit;
 	}
 	

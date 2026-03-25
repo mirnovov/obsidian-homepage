@@ -203,6 +203,7 @@ export class Homepage {
 		
 		const content = await this.app.vault.cachedRead(file);
 		const leaf = this.app.workspace.getLeaf(mode == Mode.Retain);
+		
 		await leaf.openFile(file);
 		this.app.workspace.setActiveLeaf(leaf);
 		
@@ -216,6 +217,7 @@ export class Homepage {
 	async configure(leaf: WorkspaceLeaf): Promise<void> {
 		this.plugin.executing = false;
 		const view = leaf.view;
+		const history = view.leaf.history;
 		
 		if (!(view instanceof MarkdownView)) {
 			if (this.data.pin) view.leaf.setPinned(true);	
@@ -256,6 +258,7 @@ export class Homepage {
 			}
 		
 			await view.leaf.setViewState({type: "markdown", state: state});
+			view.leaf.history = history;
 		}
 		
 		this.configurePlugins();
