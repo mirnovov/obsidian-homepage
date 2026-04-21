@@ -366,7 +366,7 @@ export class Homepage {
 		
 		if (
 			leaf?.getViewState().type !== "empty" ||
-			leaf.parentSplit.children.length != 1
+			leaf?.parentSplit?.children?.length != 1
 		) return
 		
 		//should always behave the same regardless of mode
