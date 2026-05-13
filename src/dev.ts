@@ -29,7 +29,7 @@ type KeyedPluginList = Record<string, { repo: string }>;
 	await this.ensurePlugins(info._plugins, true);
 	
 	this.settings = info;
-	this.saveSettings();
+	await this.saveSettings();
 	this.homepage = this.getHomepage();
 	
 	console.log("Settings updated!");

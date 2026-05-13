@@ -72,14 +72,14 @@ export class HomepageSettingTab extends PluginSettingTab {
 
 		this.containerEl.empty();
 		
-		const mainGroup = new HomepageSettingGroup(this)
+		new HomepageSettingGroup(this)
 			.addSetting(setting => {
 				setting
 				.setName(tr("homepageSettingTitle"))
 				.addDropdown(async dropdown => {
 					for (const key of Object.values(Kind)) {
 						if (!this.plugin.hasRequiredPlugin(key)) {
-							if (key == this.plugin.homepage.data.kind) pluginDisabled = true;
+							if (key as string == this.plugin.homepage.data.kind) pluginDisabled = true;
 							else {
 								dropdown.selectEl.createEl(
 									"option", { text: tr(key), attr: { disabled: true } }
@@ -93,7 +93,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 					dropdown.setValue(this.plugin.homepage.data.kind);
 					dropdown.onChange(async option => {
 						this.plugin.homepage.data.kind = option;
-						if (option == Kind.Random) this.plugin.homepage.data.value = "";
+						if (option as Kind == Kind.Random) this.plugin.homepage.data.value = "";
 						
 						await this.plugin.homepage.save();
 						this.display();
@@ -154,11 +154,11 @@ export class HomepageSettingTab extends PluginSettingTab {
 					);
 				
 				if (this.plugin.settings.separateMobile) {
-					const mobileInfo = document.createElement("div");
+					const mobileInfo = createDiv();
 				
 					setting.setClass("nv-mobile-setting");			
 					mobileInfo.className = "mod-warning nv-mobile-info";
-					mobileInfo.innerHTML = tr(
+					mobileInfo.innerText = tr(
 						Platform.isMobile ? "separateMobileWarnMobile" : "separateMobileWarnDesktop"
 					);
 					
@@ -215,7 +215,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 			vaultGroup.disableSettings("openMode");
 		}
 		
-		if (PERIODIC_KINDS.includes(kind as Kind) || kind === Kind.Journal) {
+		if (PERIODIC_KINDS.includes(kind) || kind === Kind.Journal) {
 			vaultGroup.disableSettings("autoCreate");
 		}
 	}

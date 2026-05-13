@@ -1,5 +1,6 @@
 import { EN } from "./locale/en";
 import { RU } from "./locale/ru";
+import { getLanguage } from "obsidian";
 
 type LocaleData = Partial<typeof EN>;
 
@@ -13,7 +14,7 @@ let hasChosenLocale = false;
 
 export function tr(phrase: string, ...replacements: string[]): string {
 	if (!hasChosenLocale) {
-		let langCode = localStorage.getItem("language")
+		let langCode = getLanguage()
 			?.toLowerCase()
 			?.split("-")[0] || "en";
 			

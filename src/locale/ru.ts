@@ -1,4 +1,4 @@
-import { Mode, Kind, Period, View } from "src/homepage";
+import { Mode, Kind, Period, View } from "../homepage";
 
 export const RU: Record<string, string> = {
 	//Mode enum
@@ -40,10 +40,10 @@ export const RU: Record<string, string> = {
 	
 	//General UI messages
 	pluginUnavailable: `Невозможно открыть домашнюю страницу: плагин недоступен.`,
-	journalUnavailable: `Журнал \"?0\" не найден.`,
-	workspaceUnavailable: `Рабочее пространство \"?0\" не найдено.`,
-	noteUnavailable: `Файл \"?0\" не найден.`,
-	homepageChanged: `Домашняя страница изменена на \"?0\".`,
+	journalUnavailable: `Журнал "?0" не найден.`,
+	workspaceUnavailable: `Рабочее пространство "?0" не найдено.`,
+	noteUnavailable: `Файл "?0" не найден.`,
+	homepageChanged: `Домашняя страница изменена на "?0".`,
 	momentUpgradeNotice: `Заметки, зависящие от даты, удалены из Homepage. Используйте периодическую или ежедневную заметку.`,
 	
 	//Settings items

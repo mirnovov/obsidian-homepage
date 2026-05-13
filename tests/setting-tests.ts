@@ -1,7 +1,7 @@
-import { Kind, Mode, View } from "src/homepage";
-import { LEGACY_MOMENT_KIND } from "src/periodic";
-import { HomepageSettings, DEFAULT_SETTINGS } from "src/settings";
-import { sleep } from "src/utils";
+import { Kind, Mode, View } from "../src/homepage";
+import { LEGACY_MOMENT_KIND } from "../src/periodic";
+import { HomepageSettings, DEFAULT_SETTINGS } from "../src/settings";
+import { sleep } from "../src/utils";
 import HomepageTestPlugin from "./harness";
 
 export default class SettingTests {

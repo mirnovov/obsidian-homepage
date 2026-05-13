@@ -1,6 +1,6 @@
 import { MarkdownView } from "obsidian";
-import { View } from "src/homepage";
-import { sleep } from "src/utils";
+import { View } from "../src/homepage";
+import { sleep } from "../src/utils";
 import HomepageTestPlugin from "./harness";
 
 export default class ViewTests {

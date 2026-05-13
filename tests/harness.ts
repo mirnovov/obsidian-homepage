@@ -1,8 +1,8 @@
 import { ButtonComponent, Modal, getIcon } from "obsidian";
-import { HomepageData } from "src/homepage";
-import HomepagePlugin from "src/main";
-import { DEFAULT_DATA } from "src/settings";
-import { detachAllLeaves, sleep } from "src/utils";
+import { HomepageData } from "../src/homepage";
+import HomepagePlugin from "../src/main";
+import { DEFAULT_DATA } from "../src/settings";
+import { detachAllLeaves, sleep } from "../src/utils";
 
 type Result = {
 	name: string,

@@ -5,7 +5,7 @@ import { DEFAULT_SETTINGS, HomepageSettings, HomepageSettingTab } from "./settin
 import { tr } from "./locale";
 
 declare const DEV: boolean;
-if (DEV) import("./dev");
+if (DEV) void import("./dev");
 
 const ICON: string = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5"><path d="M10.025 21H6v-7H3v-1.5L12 3l9 9.5V14h-3v7h-4v-7h-3.975v7Z" style="fill:none;stroke:currentColor;stroke-width:2px"/></svg>`
 
@@ -56,11 +56,11 @@ export default class HomepagePlugin extends Plugin {
 			name: tr("setToActiveFile"),
 			checkCallback: checking => {
 				if (checking) return this.homepage.canSetToFile();
-				this.homepage.setToActiveFile();
+				void this.homepage.setToActiveFile();
 			}
 		});
 		
-		this?.registerCliHandler(
+		this.registerCliHandler(
 			"homepage",
 			tr("cliOpenHomepageDesc"),
 			null,
@@ -70,7 +70,7 @@ export default class HomepagePlugin extends Plugin {
 			}
 		);
 		
-		this?.registerCliHandler(
+		this.registerCliHandler(
 			"homepage:read",
 			tr("cliReadHomepageDesc"),
 			null,
@@ -83,7 +83,7 @@ export default class HomepagePlugin extends Plugin {
 		if (DEV) window.homepage = this;
 	}
 	
-	async onunload(): Promise<void> {
+	onunload(): void {
 		this.app.workspace.off("layout-change", this.onLayoutChange)
 		this.unpatchNewTabPage();
 		this.unpatchOpeningBehaviour();
@@ -101,7 +101,7 @@ export default class HomepagePlugin extends Plugin {
 		if (this.settings.separateMobile && Platform.isMobile) {
 			if (!(MOBILE in this.settings.homepages)) {
 				this.settings.homepages[MOBILE] = { ...this.settings.homepages?.[DEFAULT] };
-				this.settings.homepages[MOBILE].commands = [ ...this.settings.homepages?.[DEFAULT]?.commands ];
+				this.settings.homepages[MOBILE].commands = [ ...this.settings.homepages?.[DEFAULT]?.commands || [] ];
 			}
 			
 			return new Homepage(MOBILE, this);
@@ -207,7 +207,7 @@ export default class HomepagePlugin extends Plugin {
 			this.patchNewTabPage();
 					
 			if (openInitially) await this.homepage.open();
-			else this.app.nvOrig_runOpeningBehavior(path);
+			else void this.app.nvOrig_runOpeningBehavior(path);
 			
 			this.loaded = true;
 			
@@ -238,7 +238,7 @@ export default class HomepagePlugin extends Plugin {
 			if (hasMoment) new Notice(tr("momentUpgradeNotice"));
 			settings.version = 4;
 			
-			this.saveData(settings);
+			void this.saveData(settings);
 			return settings;
 		}
 
@@ -266,7 +266,7 @@ export default class HomepagePlugin extends Plugin {
 		delete data.workspaceEnabled;
 		settings.homepages[DEFAULT] = data;
 		
-		this.saveData(settings);
+		void this.saveData(settings);
 		return settings;
 	}
 }

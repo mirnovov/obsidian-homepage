@@ -195,14 +195,6 @@
 	max-width: calc(100% - 100px);
 }
 
-.is-phone .nv-mobile-setting {
-	row-gap: var(--size-4-2);
-}
-
-.is-phone .nv-mobile-setting .setting-item-info {
-	max-width: calc(100% - 100px);
-}
-
 .is-phone .nv-command-pill {
 	width: 100%;
 	border: none;

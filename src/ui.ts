@@ -36,10 +36,11 @@ class FileSuggest extends AbstractInputSuggest<TFile> {
 		else {
 			//we don't use trimFile here as the extension isn't displayed here
 			el.setText(file.path.split(".").slice(0, -1).join("."))
-			el.insertAdjacentHTML(
-				"beforeend", 
-				`<div class="nav-file-tag nv-homepage-file-tag">${file.extension}</div>`
-			);
+
+			const tag = new HTMLDivElement();
+			tag.className = "nav-file-tag nv-homepage-file-tag";
+			tag.textContent = file.extension;
+			el.append(tag);
 		}
 	}
 
@@ -149,7 +150,7 @@ export class CommandBox {
 			this.container = setting.settingEl.createDiv({ cls: "nv-command-box" });
 		});
 		
-		this.dropzone = document.createElement("div");
+		this.dropzone = createDiv();
 		
 		this.dropzone.className = "nv-command-pill nv-dropzone";
 		this.dropzone.addEventListener("dragenter", e => e.preventDefault());
@@ -228,20 +229,20 @@ export class CommandBox {
 	
 	delete(command: CommandData): void {
 		this.homepage.data.commands.remove(command);
-		this.homepage.save();
+		void this.homepage.save();
 		this.update();
 	}
 	
-	showMenu(command: CommandData, event: MouseEvent, button: ButtonComponent): void {
+	showMenu(command: CommandData, _event: MouseEvent, button: ButtonComponent): void {
 		const menu = new Menu();
 
 		for (const key of Object.values(Period)) {
 			menu.addItem(item => {
-				item.setTitle(tr(key as string));
+				item.setTitle(tr(key));
 				item.setChecked(command.period == key);
 				item.onClick(() => {
 					command.period = key;
-					this.homepage.save();
+					void this.homepage.save();
 					this.update();
 				});
 			});
@@ -278,7 +279,7 @@ export class CommandBox {
 			this.indexOf(this.dropzone), 0, this.activeCommand
 		);
 		
-		this.homepage.save();
+		void this.homepage.save();
 		this.update();
 	}
 }
@@ -316,7 +317,7 @@ export class CommandSuggestModal extends FuzzySuggestModal<unknown> {
 			id: item.id, period: Period.Both 
 		});
 		
-		this.homepage.save();
+		void this.homepage.save();
 		this.tab.commandBox.update();
 	}
 }

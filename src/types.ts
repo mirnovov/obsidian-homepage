@@ -1,4 +1,4 @@
-import "obsidian";
+import { Command, PluginManifest, SplitDirection, TFile, moment } from "obsidian";
 import HomepagePlugin from "./main";
 import { HomepageSettings } from "./settings";
 
@@ -8,8 +8,8 @@ declare module "obsidian" {
 		plugins: PluginRegistry;
 		internalPlugins: PluginRegistry;
 		setting: any;
-		runOpeningBehavior: (path: string) => void;
-		nvOrig_runOpeningBehavior: (path: string) => void;
+		runOpeningBehavior: (path: string) => (void | Promise<void>);
+		nvOrig_runOpeningBehavior: (path: string) => (void | Promise<void>);
 		showReleaseNotes: () => void;
 		nvOrig_showReleaseNotes: () => void;
 	}
@@ -47,12 +47,12 @@ declare module "obsidian" {
 	}
 	
 	interface WorkspaceLeaf {
-		history: Object;
+		history: object;
 		parentSplit: WorkspaceSplit;
 	}
 	
 	interface WorkspaceMobileDrawer {
-		addHeaderButton(name: string, callback: Function): Element;
+		addHeaderButton(name: string, callback: (a: any) => void): Element;
 		updateInfo(): void;
 	}
 	
@@ -64,15 +64,12 @@ declare module "obsidian" {
 
 declare global {
 	interface Window {
-		OBS_ACT: string | any;
+		OBS_ACT: any;
 		Capacitor: any;
 		electron: any;
 		electronWindow: any;
 		homepage?: HomepagePlugin;
-	}
-	
-	interface URLSearchParams {
-		keys: () => Iterable<string>
+		moment: moment.Moment;
 	}
 
 	interface HomepageDebugPlugin extends HomepagePlugin {

@@ -100,15 +100,15 @@ export class Homepage {
 			new Notice(tr("pluginUnavailable"));
 			return;
 		}
-		else if (this.data.kind === Kind.Journal && !hasJournal(this)) {
+		else if (this.data.kind as Kind === Kind.Journal && !hasJournal(this)) {
 			new Notice(tr("journalUnavailable", this.data.value));
 			return;
 		}
 
-		if (this.data.kind === Kind.Workspace) {
+		if (this.data.kind as Kind === Kind.Workspace) {
 			await this.launchWorkspace();
 		}
-		else if (this.data.kind !== Kind.None) {
+		else if (this.data.kind as Kind !== Kind.None) {
 			let mode = this.plugin.loaded ? this.data.manualOpenMode : this.data.openMode;
 			if (alternate) mode = Mode.Retain;
 			
@@ -165,14 +165,14 @@ export class Homepage {
 			//The API is very finicky when the app is starting, so wait for things to initialise
 			if (this.app.workspace?.floatingSplit?.children) {
 				await sleep(0);
-				(this.app.workspace.floatingSplit.children as WorkspaceWindow[]).forEach(c => c.win!.close());
+				(this.app.workspace.floatingSplit.children as WorkspaceWindow[]).forEach(c => c.win.close());
 			}
 			
 			await detachAllLeaves(this.app);
 			await sleep(0);
 		}
 		
-		if (this.data.kind === Kind.Graph) leaf = await this.launchGraph(mode);
+		if (this.data.kind as Kind === Kind.Graph) leaf = await this.launchGraph(mode);
 		else leaf = await this.launchNote(mode);
 		if (!leaf) return;
 		
@@ -245,12 +245,12 @@ export class Homepage {
 		
 		if (this.data.pin) view.leaf.setPinned(true);	
 		
-		if (this.data.view !== View.Default) {
-			switch(this.data.view) {
+		if (this.data.view as View !== View.Default) {
+			switch(this.data.view as View) {
 				case View.LivePreview:
 				case View.Source:
 					state.mode = "source";
-					state.source = this.data.view != View.LivePreview;
+					state.source = this.data.view as View != View.LivePreview;
 					break;
 				case View.Reading:
 					state.mode = "preview";
@@ -273,7 +273,7 @@ export class Homepage {
 	}
 	
 	getOpened(): WorkspaceLeaf[] {
-		if (this.data.kind == Kind.Graph) return this.app.workspace.getLeavesOfType("graph");
+		if (this.data.kind as Kind == Kind.Graph) return this.app.workspace.getLeavesOfType("graph");
 		
 		const leaves = LEAF_TYPES.flatMap(i => this.app.workspace.getLeavesOfType(i));
 
@@ -290,7 +290,7 @@ export class Homepage {
 		let val = this.data.value;
 		let file;
 	
-		switch (this.data.kind) {
+		switch (this.data.kind as Kind) {
 			case Kind.Random:
 				file = randomFile(this.app);
 				if (file) val = file;
@@ -313,7 +313,7 @@ export class Homepage {
 			case Kind.WeeklyNote:
 			case Kind.MonthlyNote:
 			case Kind.YearlyNote:
-				val = await getPeriodicNote(this.data.kind, this.plugin);
+				val = await getPeriodicNote(this.data.kind as Kind, this.plugin);
 				break;
 		}
 	
@@ -338,7 +338,7 @@ export class Homepage {
 	}
 	
 	async revertView(): Promise<void> {
-		if (this.lastView == undefined || this.data.view == View.Default) return;
+		if (this.lastView == undefined || this.data.view == View.Default as string) return;
 		
 		const view = this.lastView.deref();
 		if (!view || equalsCaseless(trimFile(view.file!), this.computedValue)) return;

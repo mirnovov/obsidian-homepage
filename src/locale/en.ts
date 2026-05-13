@@ -1,4 +1,4 @@
-import { Mode, Kind, Period, View } from "src/homepage";
+import { Mode, Kind, Period, View } from "../homepage";
 
 export const EN: Record<string, string> = {
 	//Mode enum

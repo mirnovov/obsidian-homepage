@@ -1,6 +1,6 @@
 import { TAbstractFile } from "obsidian";
-import { Kind, Mode, Period } from "src/homepage";
-import { sleep } from "src/utils";
+import { Kind, Mode, Period } from "../src/homepage";
+import { sleep } from "../src/utils";
 import HomepageTestPlugin from "./harness";
 
 export default class OpeningTests {

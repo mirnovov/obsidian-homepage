@@ -1,6 +1,6 @@
 import { MarkdownView, TFile, WorkspaceLeaf, WorkspaceSplit, moment } from "obsidian";
-import { Kind, Period, View } from "src/homepage";
-import { sleep } from "src/utils";
+import { Kind, Period, View } from "../src/homepage";
+import { sleep } from "../src/utils";
 import HomepageTestPlugin from "./harness";
 
 export default class PluginTests {
@@ -85,7 +85,7 @@ export default class PluginTests {
 		await this.homepage.open();
 		
 		const file = this.app.workspace.getActiveFile();
-		const name = moment().format("YYYY-MM-DD") + ".md";
+		const name = window.moment().format("YYYY-MM-DD") + ".md";
 		
 		this.assert(file?.name == name, file, name);
 		this.app.vault.delete(this.app.vault.getAbstractFileByPath(name) as TFile);
@@ -99,7 +99,7 @@ export default class PluginTests {
 		this.homepage.data.kind = Kind.DailyNote;
 		await this.homepage.save();
 		
-		const name = moment().format("YYYY-MM-DD") + ".md";
+		const name = window.moment().format("YYYY-MM-DD") + ".md";
 		this.app.vault.create(name, "test");
 	
 		await this.homepage.open();
@@ -121,7 +121,7 @@ export default class PluginTests {
 		await this.homepage.open();
 		
 		const file = this.app.workspace.getActiveFile();
-		const name = moment().format("gggg-[W]ww") + ".md";
+		const name = window.moment().format("gggg-[W]ww") + ".md";
 		
 		this.assert(file?.name == name, file, name);
 		this.app.vault.delete(this.app.vault.getAbstractFileByPath(name) as TFile);
@@ -198,7 +198,7 @@ export default class PluginTests {
 		await this.homepage.open();
 		
 		const file = this.app.workspace.getActiveFile();
-		const name = "j-" + moment().format("YYYY-MM-DD") + ".md";
+		const name = "j-" + window.moment().format("YYYY-MM-DD") + ".md";
 		
 		this.assert(file?.name == name, file, name);
 		this.app.vault.delete(this.app.vault.getAbstractFileByPath(name) as TFile);

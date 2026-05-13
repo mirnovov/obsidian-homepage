@@ -37,9 +37,8 @@ function getFilesInFolder(folder: TFolder): TFile[] {
 	let files: TFile[] = [];
 	
 	for (const item of folder.children) {
-		if (!(item instanceof TFolder)) files.push(item as TFile);
-		
-		else files.push(...getFilesInFolder(item as TFolder))
+		if (item instanceof TFile) files.push(item);
+		else if (item instanceof TFolder) files.push(...getFilesInFolder(item))
 	}
 	
 	return files;
@@ -54,7 +53,7 @@ export function equalsCaseless(a: string, b: string): boolean {
 }
 
 export function sleep(ms: number): Promise<void> {
-	return new Promise(resolve => setTimeout(resolve, ms));
+	return new Promise(resolve => window.setTimeout(resolve, ms));
 }
 
 export async function detachAllLeaves(app: App): Promise<void> {
@@ -125,6 +124,6 @@ export function hasLayoutChange(app: App): Promise<void | void[]> {
 	
 	return Promise.race([
 		Promise.all(promises), 
-		new Promise<void>(resolve => setTimeout(resolve, 1500))
+		new Promise<void>(resolve => window.setTimeout(resolve, 1500))
 	]);
 }

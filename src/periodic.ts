@@ -1,4 +1,4 @@
-import { Notice, Plugin, TFile, moment } from "obsidian";
+import { Plugin, TFile, moment } from "obsidian";
 import HomepagePlugin from "./main";
 import { Homepage, Kind } from "./homepage";
 import { trimFile } from "./utils";
@@ -59,7 +59,7 @@ export const LEGACY_MOMENT_KIND: string = "Date-dependent file";
 export async function getPeriodicNote(kind: Kind, plugin: HomepagePlugin): Promise<string> {
 	const periodicNotes = plugin.communityPlugins["periodic-notes"],
 		info = PERIODIC_INFO[kind],
-		date = moment().startOf(info.noun as moment.unitOfTime.StartOf);
+		date = window.moment().startOf(info.noun as moment.unitOfTime.StartOf);
 	let note;
 		
 	if (isLegacyPeriodicNotes(periodicNotes)) {
@@ -121,7 +121,7 @@ export async function getJournalNote(journalName: string, plugin: HomepagePlugin
 	await journal.autoCreate();
 	journal.config.value.autoCreate = origAutoCreate;
 	
-	const today = moment().locale(JOURNAL_CUSTOM_LOCALE).startOf("day");
+	const today = window.moment().locale(JOURNAL_CUSTOM_LOCALE).startOf("day");
 	const path = journal.getNotePath(journal?.get(today));
 	
 	return path.replace(/\.md$/, "");
