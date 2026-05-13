@@ -252,7 +252,7 @@ class HomepageSettingGroup extends SettingGroup {
 		this.settings = tab.settings;
 	}
 	
-	addDropdown(key: HomepageKey<string>, source: object, callback?: Callback<string>): HomepageSettingGroup {
+	addDropdown(key: HomepageKey<string>, source: Record<string, string>, callback?: Callback<string>): HomepageSettingGroup {
 		this.addSetting(setting => {
 			setting
 			.setName(tr(key))

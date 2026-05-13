@@ -57,7 +57,7 @@ export const PERIODIC_KINDS: Kind[] = [
 export const LEGACY_MOMENT_KIND: string = "Date-dependent file";
 
 export async function getPeriodicNote(kind: Kind, plugin: HomepagePlugin): Promise<string> {
-	const periodicNotes = plugin.communityPlugins["periodic-notes"],
+	const periodicNotes = plugin.communityPlugins["periodic-notes"]!,
 		info = PERIODIC_INFO[kind],
 		date = window.moment().startOf(info.noun as moment.unitOfTime.StartOf);
 	let note;
@@ -106,12 +106,12 @@ function isLegacyPeriodicNotes(periodicNotes: Plugin): boolean {
 }
 
 export function hasJournal(homepage: Homepage): boolean { 
-	const journals = homepage.plugin.communityPlugins["journals"];	
+	const journals = homepage.plugin.communityPlugins["journals"]!;	
 	return !!journals.getJournal(homepage.data.value);
 }
 
 export async function getJournalNote(journalName: string, plugin: HomepagePlugin) {
-	const journals = plugin.communityPlugins["journals"];	
+	const journals = plugin.communityPlugins["journals"]!;	
 	const journal = journals.getJournal(journalName);
 	const origAutoCreate = journal.config.value.autoCreate;
 	

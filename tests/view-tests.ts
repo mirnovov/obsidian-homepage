@@ -1,9 +1,9 @@
 import { MarkdownView } from "obsidian";
 import { View } from "../src/homepage";
 import { sleep } from "../src/utils";
-import HomepageTestPlugin from "./harness";
+import HomepageTestPlugin, { TestSuite } from "./harness";
 
-export default class ViewTests {
+export default class ViewTests extends TestSuite {
 	async autoScroll(this: HomepageTestPlugin) {
 		this.homepage.data.autoScroll = true;
 		await this.homepage.save();

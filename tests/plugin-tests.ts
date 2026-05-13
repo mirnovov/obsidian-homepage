@@ -1,9 +1,9 @@
 import { MarkdownView, TFile, WorkspaceLeaf, WorkspaceSplit, moment } from "obsidian";
 import { Kind, Period, View } from "../src/homepage";
 import { sleep } from "../src/utils";
-import HomepageTestPlugin from "./harness";
+import HomepageTestPlugin, { TestSuite } from "./harness";
 
-export default class PluginTests {
+export default class PluginTests extends TestSuite {
 	async workspaces(this: HomepageTestPlugin) {
 		await this.app.workspace.openLinkText("Note A", "", false);
 		

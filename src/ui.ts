@@ -1,6 +1,6 @@
 import { 
-	App, AbstractInputSuggest, ButtonComponent, Command, FuzzySuggestModal, 
-	Menu, Notice, 	Setting, SettingGroup, TAbstractFile, TFile, TFolder, getIcon, setTooltip, 
+	App, AbstractInputSuggest, ButtonComponent, Command, FuzzySuggestModal,
+	JournalsPlugin, Menu, Notice, Setting, SettingGroup, TAbstractFile, TFile, TFolder, getIcon, setTooltip,
 } from "obsidian";
 import { CommandData, Homepage, Kind, Period } from "./homepage";
 import { HomepageSettingTab } from "./settings"; 
@@ -37,7 +37,7 @@ class FileSuggest extends AbstractInputSuggest<TFile> {
 			//we don't use trimFile here as the extension isn't displayed here
 			el.setText(file.path.split(".").slice(0, -1).join("."))
 
-			const tag = new HTMLDivElement();
+			const tag = createDiv();
 			tag.className = "nav-file-tag nv-homepage-file-tag";
 			tag.textContent = file.extension;
 			el.append(tag);
@@ -99,9 +99,9 @@ class JournalSuggest extends AbstractInputSuggest<string> {
 	textInputEl: HTMLInputElement;
 	
 	getSuggestions(inputStr: string): string[] {
-		const journals: string[] = this.app.plugins.plugins.journals.journals.map(
-			(a: any): string => a.name
-		);
+		const journalsPlugin: JournalsPlugin = this.app.plugins.plugins.journals!;
+		
+		const journals: string[] = journalsPlugin.journals.map(j => j.name);
 		const inputLower = inputStr.toLowerCase();
 
 		return journals.filter(j => j.toLowerCase().contains(inputLower));

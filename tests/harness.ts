@@ -10,6 +10,10 @@ type Result = {
 	passed: boolean
 }
 
+export class TestSuite {
+	[key: string]: () => Promise<void>; 
+}
+
 const TEST_SUITES = [
 	import("./opening-tests"),
 	import("./plugin-tests"),
@@ -46,7 +50,7 @@ export default class HomepageTestPlugin extends HomepagePlugin {
 		modal.open();
 	}
 	
-	async runTests(suite: any): Promise<void> {
+	async runTests(suite: typeof TestSuite): Promise<void> {
 		const tests = new suite();
 		const className = tests.constructor.name;
 		

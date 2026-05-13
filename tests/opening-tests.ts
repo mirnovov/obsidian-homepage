@@ -1,9 +1,9 @@
 import { TAbstractFile } from "obsidian";
 import { Kind, Mode, Period } from "../src/homepage";
 import { sleep } from "../src/utils";
-import HomepageTestPlugin from "./harness";
+import HomepageTestPlugin, { TestSuite } from "./harness";
 
-export default class OpeningTests {
+export default class OpeningTests extends TestSuite {
 	async replaceAll(this: HomepageTestPlugin) {
 		await this.app.workspace.openLinkText("Note A", "", false);
 		await this.app.workspace.openLinkText("Note B", "", true);

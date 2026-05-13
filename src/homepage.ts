@@ -139,7 +139,7 @@ export class Homepage {
 	}
 	
 	async launchLeaf(mode: Mode): Promise<void> {
-		let leaf: WorkspaceLeaf | undefined;
+		let leaf: WorkspaceLeaf;
 
 		this.computedValue = await this.computeValue();
 		this.plugin.executing = true;
@@ -172,30 +172,34 @@ export class Homepage {
 			await sleep(0);
 		}
 		
-		if (this.data.kind as Kind === Kind.Graph) leaf = await this.launchGraph(mode);
-		else leaf = await this.launchNote(mode);
-		if (!leaf) return;
-		
-		await this.configure(leaf);
+		try {
+			if (this.data.kind as Kind === Kind.Graph) leaf = await this.launchGraph(mode);
+			else leaf = await this.launchNote(mode);
+					
+			await this.configure(leaf);
+		}
+		catch {
+			return;
+		}
 	}
 	
-	async launchGraph(mode: Mode): Promise<WorkspaceLeaf | undefined> {
+	async launchGraph(mode: Mode): Promise<WorkspaceLeaf> {
 		if (mode === Mode.Retain) {
 			const leaf = this.app.workspace.getLeaf("tab");
 			this.app.workspace.setActiveLeaf(leaf);
 		}
 		
 		this.app.commands.executeCommandById("graph:open");
-		return this.app.workspace.getActiveViewOfType(OView)?.leaf;
+		return this.app.workspace.getActiveViewOfType(OView)!.leaf;
 	}
 	
-	async launchNote(mode: Mode): Promise<WorkspaceLeaf | undefined> {
+	async launchNote(mode: Mode): Promise<WorkspaceLeaf> {
 		let file = this.app.metadataCache.getFirstLinkpathDest(this.computedValue, "/");
 		
 		if (!file) {
 			if (!this.data.autoCreate) {
 				new Notice(tr("noteUnavailable", this.computedValue));
-				return undefined;
+				throw new Error(tr("noteUnavailable", this.computedValue));
 			}
 			
 			file = await this.app.vault.create(untrimName(this.computedValue), "");

@@ -13,8 +13,8 @@ export default class HomepagePlugin extends Plugin {
 	homepage: Homepage;
 	settings: HomepageSettings;
 
-	internalPlugins: Record<string, any>;
-	communityPlugins: Record<string, any>;
+	internalPlugins: typeof this.app.internalPlugins.plugins;
+	communityPlugins: typeof this.app.plugins.plugins;
 	newRelease: boolean = false;
 	
 	loaded: boolean = false;
@@ -115,7 +115,7 @@ export default class HomepagePlugin extends Plugin {
 		if (settingsData?.version !== 4) {
 			if (!settingsData) return Object.assign({}, DEFAULT_SETTINGS);
 			
-			return this.upgradeSettings(settingsData);
+			return this.upgradeSettings(settingsData as HomepageLegacySettings);
 		}
 		
 		return settingsData;
@@ -155,7 +155,7 @@ export default class HomepagePlugin extends Plugin {
 			case Kind.Graph:
 				return this.internalPlugins["graph"]?.enabled;
 			case Kind.Journal:
-				return this.communityPlugins["journals"];
+				return "journals" in this.communityPlugins;
 			case Kind.DailyNote:
 			case Kind.WeeklyNote:
 			case Kind.MonthlyNote:
@@ -181,7 +181,7 @@ export default class HomepagePlugin extends Plugin {
 		const ntp = this.communityPlugins["new-tab-default-page"];
 		if (!ntp) return;
 		
-		ntp.checkForNewTab = ntp._checkForNewTab;
+		ntp.checkForNewTab = ntp.nvOrig_checkForNewTab;
 	}
 	
 	patchReleaseNotes(): void {
@@ -219,7 +219,7 @@ export default class HomepagePlugin extends Plugin {
 		this.app.runOpeningBehavior = this.app.nvOrig_runOpeningBehavior;
 	}
 	
-	upgradeSettings(data: any): HomepageSettings {
+	upgradeSettings(data: HomepageLegacySettings): HomepageSettings {
 		if (data.version == 3) {
 			const settings = data as HomepageSettings;
 			let hasMoment = false;
@@ -245,7 +245,7 @@ export default class HomepagePlugin extends Plugin {
 		const settings: HomepageSettings = Object.assign({}, DEFAULT_SETTINGS);
 		
 		if (data.workspaceEnabled) {
-			data.value = data.workspace;
+			data.value = data.workspace || "";
 			data.kind = Kind.Workspace;
 		}
 		else if (data.momentFormat) {
@@ -253,7 +253,7 @@ export default class HomepagePlugin extends Plugin {
 			new Notice(tr("momentUpgradeNotice"));
 		}
 		else {
-			data.value = data.defaultNote;
+			data.value = data.defaultNote || "Home";
 			data.kind = Kind.File;
 		}
 		

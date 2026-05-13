@@ -2,9 +2,9 @@ import { Kind, Mode, View } from "../src/homepage";
 import { LEGACY_MOMENT_KIND } from "../src/periodic";
 import { HomepageSettings, DEFAULT_SETTINGS } from "../src/settings";
 import { sleep } from "../src/utils";
-import HomepageTestPlugin from "./harness";
+import HomepageTestPlugin, { TestSuite } from "./harness";
 
-export default class SettingTests {
+export default class SettingTests extends TestSuite {
 	async loadEmptySettings(this: HomepageTestPlugin) {
 		this.settings = {} as HomepageSettings;
 		this.saveSettings();
