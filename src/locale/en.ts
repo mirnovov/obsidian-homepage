@@ -62,8 +62,9 @@ export const EN: Record<string, string> = {
 	alwaysApplyDesc: "Use homepage settings when opening it normally, such as from a link or the file browser.",
 	separateMobile: "Separate mobile homepage",
 	separateMobileDesc: "For mobile devices, store the homepage and its settings separately.",
-	separateMobileWarnMobile: "<b>Mobile settings are stored separately.</b> Therefore, changes to other settings will not affect desktop devices. To edit desktop settings, use a desktop device.",
-	separateMobileWarnDesktop: "<b>Mobile settings are stored separately.</b> Therefore, changes to other settings will not affect mobile devices. To edit mobile settings, use a mobile device.",
+	separateMobileWarnPrefix: "Mobile settings are stored separately.",
+	separateMobileWarnMobile: "Therefore, changes to other settings will not affect desktop devices. To edit desktop settings, use a desktop device.",
+	separateMobileWarnDesktop: "Therefore, changes to other settings will not affect mobile devices. To edit mobile settings, use a mobile device.",
 	
 	commandsGroup: "Commands",
 	commandsDesc: "Select commands that will be executed when opening the homepage.",

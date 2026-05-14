@@ -5,7 +5,7 @@
 
 .setting-item[nv-greyed] {
 	opacity: .5; 
-	pointer-events: none !important;
+	pointer-events: none;
 }
 
 #nv-main-setting {
@@ -155,20 +155,15 @@
 	height: auto;
 }
 
-#nv-main-setting + .setting-item, .nv-command-desc + .setting-item {
-	padding-top: 20px; 
-	border-top: none !important;
-}
-
-.nv-debug-button {
+button.nv-debug-button {
 	margin: 3em 0 -0.2em;
 	font-size: var(--font-ui-smaller);
 	padding: 0;
 	height: auto;
 	float: right;
-	box-shadow: none !important;
-	background: none !important;
-	color: var(--text-accent);
+	box-shadow: none;
+	background: none;
+	color: var(--text-color);
 	font-weight: 600;
 	cursor: pointer;
 }
@@ -216,8 +211,12 @@
 	justify-content: space-between;
 }
 
+.is-phone .nv-command-add-button {
+	padding: var(--size-2-3) var(--size-4-3);
+}
+
 .is-phone .nv-command-pill button {
 	line-height: var(--font-ui-medium);
 	height: 100%;
-	margin: 0 !important;
+	margin: 0;
 }

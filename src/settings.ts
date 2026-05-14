@@ -158,9 +158,11 @@ export class HomepageSettingTab extends PluginSettingTab {
 				
 					setting.setClass("nv-mobile-setting");			
 					mobileInfo.className = "mod-warning nv-mobile-info";
-					mobileInfo.innerText = tr(
+					mobileInfo.createEl("b", { text: tr("separateMobileWarnPrefix") });
+					
+					mobileInfo.append(" " + tr(
 						Platform.isMobile ? "separateMobileWarnMobile" : "separateMobileWarnDesktop"
-					);
+					));
 					
 					setting.settingEl.append(mobileInfo);
 				}
