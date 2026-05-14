@@ -329,8 +329,11 @@ export class Homepage {
 		await this.plugin.saveSettings();
 	}
 	
-	async setToActiveFile(): Promise<void> {		
-		this.data.value = trimFile(this.app.workspace.getActiveFile()!);
+	async setToActiveFile(): Promise<void> {	
+		const activeFile = this.app.workspace.getActiveFile();
+		if (!activeFile) return;
+			
+		this.data.value = trimFile(activeFile);
 		await this.save();
 		
 		new Notice(tr("homepageChanged", this.data.value));
@@ -345,7 +348,7 @@ export class Homepage {
 		if (this.lastView == undefined || this.data.view == View.Default as string) return;
 		
 		const view = this.lastView.deref();
-		if (!view || equalsCaseless(trimFile(view.file!), this.computedValue)) return;
+		if (!view?.file || equalsCaseless(trimFile(view.file), this.computedValue)) return;
 	
 		const state = view.getState(),
 			config = this.app.vault.config,
@@ -379,9 +382,9 @@ export class Homepage {
 	
 	async apply(): Promise<void> {
 		const currentView = this.app.workspace.getActiveViewOfType(FileView);
-		if (!currentView) return;
+		if (!currentView?.file) return;
 		
-		const currentValue = trimFile(currentView.file!);
+		const currentValue = trimFile(currentView.file);
 		if (this.openedViews.get(currentView) === currentValue) return;
 		
 		this.openedViews.set(currentView, currentValue);

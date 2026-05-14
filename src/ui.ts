@@ -99,7 +99,7 @@ class JournalSuggest extends AbstractInputSuggest<string> {
 	textInputEl: HTMLInputElement;
 	
 	getSuggestions(inputStr: string): string[] {
-		const journalsPlugin: JournalsPlugin = this.app.plugins.plugins.journals!;
+		const journalsPlugin = this.app.plugins.plugins.journals as JournalsPlugin;
 		
 		const journals: string[] = journalsPlugin.journals.map(j => j.name);
 		const inputLower = inputStr.toLowerCase();
@@ -212,7 +212,7 @@ export class CommandBox {
 				
 			if (!appCommand) {
 				pill.classList.add("nv-command-invalid");
-				pill.prepend(getIcon("ban")!);
+				pill.prepend(getIcon("ban") as SVGSVGElement);
 				
 				setTooltip(pill, tr("commandUnavailable"), { delay: 0.001 });
 			}
