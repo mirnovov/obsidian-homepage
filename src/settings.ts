@@ -40,7 +40,7 @@ export const DEFAULT_DATA: HomepageData = {
 };
 
 export class HomepageSettingTab extends PluginSettingTab {
-	icon = "homepage";
+	icon = "house";
 	
 	plugin: HomepagePlugin;
 	settings: HomepageSettings;

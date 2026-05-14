@@ -1,4 +1,4 @@
-import { Notice, Keymap, Platform, Plugin, WorkspaceLeaf, addIcon } from "obsidian";
+import { Notice, Keymap, Platform, Plugin, WorkspaceLeaf } from "obsidian";
 import { DEFAULT, MOBILE, Homepage, Kind, Period } from "./homepage";
 import { hasRequiredPeriodicity, LEGACY_MOMENT_KIND } from "./periodic";
 import { DEFAULT_SETTINGS, HomepageSettings, HomepageSettingTab } from "./settings";
@@ -6,8 +6,6 @@ import { tr } from "./locale";
 
 declare const DEV: boolean;
 if (DEV) void import("./dev");
-
-const ICON: string = `<svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5"><path d="M10.025 21H6v-7H3v-1.5L12 3l9 9.5V14h-3v7h-4v-7h-3.975v7Z" style="fill:none;stroke:currentColor;stroke-width:2px"/></svg>`
 
 export default class HomepagePlugin extends Plugin {
 	homepage: Homepage;
@@ -31,9 +29,8 @@ export default class HomepagePlugin extends Plugin {
 		this.communityPlugins = this.app.plugins.plugins;
 		this.homepage = this.getHomepage();
 
-		addIcon("homepage", ICON);
 		this.addRibbonIcon(
-			"homepage", 
+			"house", 
 			"Open homepage", 
 			e => this.homepage.open(
 				e.button == 1 || e.button == 2 || Keymap.isModifier(e, "Mod")
