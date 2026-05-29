@@ -13,6 +13,7 @@ declare module "obsidian" {
 		nvOrig_runOpeningBehavior: (path: string) => (void | Promise<void>);
 		showReleaseNotes: () => void;
 		nvOrig_showReleaseNotes: () => void;
+		viewRegistry: ViewRegistry;
 	}
 	
 	interface CommandRegistry {
@@ -70,6 +71,10 @@ declare module "obsidian" {
 			focusNewTab?: string | boolean;
 			defaultViewMode?: string;
 		};
+	}
+	
+	interface ViewRegistry {
+		typeByExtension: Record<string, string>
 	}
 	
 	interface Workspace {

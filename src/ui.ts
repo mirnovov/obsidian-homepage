@@ -1,80 +1,14 @@
 import { 
 	App, AbstractInputSuggest, ButtonComponent, Command, FuzzySuggestModal,
-	JournalsPlugin, Menu, Notice, Setting, SettingGroup, TAbstractFile, TFile, TFolder, getIcon, setTooltip,
+	JournalsPlugin, Menu, Notice, Setting, getIcon, setTooltip,
 } from "obsidian";
-import { CommandData, Homepage, Kind, Period } from "./homepage";
+import { CommandData, Homepage, Period } from "./homepage";
 import { HomepageSettingTab } from "./settings"; 
-import { trimFile } from "./utils";
 import { tr } from "./locale";
 
-type Suggestor = typeof FileSuggest | typeof FolderSuggest | typeof JournalSuggest | typeof WorkspaceSuggest;
+export type Suggestor = typeof JournalSuggest | typeof WorkspaceSuggest;
 
-class FileSuggest extends AbstractInputSuggest<TFile> {
-	textInputEl: HTMLInputElement;
-	
-	getSuggestions(inputStr: string): TFile[] {
-		const abstractFiles = this.app.vault.getAllLoadedFiles();
-		const files: TFile[] = [];
-		const inputLower = inputStr.toLowerCase();
-
-		abstractFiles.forEach((file: TAbstractFile) => {
-			if (
-				file instanceof TFile && ["md", "canvas", "base"].contains(file.extension) &&
-				file.path.toLowerCase().contains(inputLower)
-			) {
-				files.push(file);
-			}
-		});
-
-		return files;
-	}
-
-	renderSuggestion(file: TFile, el: HTMLElement) {
-		if (file.extension == "md") {
-			el.setText(trimFile(file));
-		}
-		else {
-			//we don't use trimFile here as the extension isn't displayed here
-			el.setText(file.path.split(".").slice(0, -1).join("."))
-
-			const tag = createDiv();
-			tag.className = "nav-file-tag nv-homepage-file-tag";
-			tag.textContent = file.extension;
-			el.append(tag);
-		}
-	}
-
-	selectSuggestion(file: TFile) {
-		this.textInputEl.value = trimFile(file);
-		this.textInputEl.trigger("input");
-		this.close();
-	}
-}
-
-class FolderSuggest extends AbstractInputSuggest<TFolder> {
-	textInputEl: HTMLInputElement;
-	
-	getSuggestions(inputStr: string): TFolder[] {
-		const inputLower = inputStr.toLowerCase();
-
-		return this.app.vault.getAllFolders().filter(f =>
-			f.path.toLowerCase().contains(inputLower)
-		);
-	}
-	
-	renderSuggestion(folder: TFolder, el: HTMLElement) {
-		el.setText(folder.path);
-	}
-
-	selectSuggestion(folder: TFolder) {
-		this.textInputEl.value = folder.path;
-		this.textInputEl.trigger("input");
-		this.close();
-	}
-}
-
-
-class WorkspaceSuggest extends AbstractInputSuggest<string> {
+export class WorkspaceSuggest extends AbstractInputSuggest<string> {
 	textInputEl: HTMLInputElement;
 	
 	getSuggestions(inputStr: string): string[] {
@@ -95,7 +29,7 @@ class WorkspaceSuggest extends AbstractInputSuggest<string> {
 	}
 }
 
-class JournalSuggest extends AbstractInputSuggest<string> {
+export class JournalSuggest extends AbstractInputSuggest<string> {
 	textInputEl: HTMLInputElement;
 	
 	getSuggestions(inputStr: string): string[] {
@@ -118,14 +52,6 @@ class JournalSuggest extends AbstractInputSuggest<string> {
 	}
 }
 
-export const SUGGESTORS: Partial<Record<Kind, Suggestor>> = {
-	[Kind.File]: FileSuggest,
-	[Kind.Workspace]: WorkspaceSuggest,
-	[Kind.RandomFolder]: FolderSuggest,
-	[Kind.NewNote]: FileSuggest,
-	[Kind.Journal]: JournalSuggest
-} 
-
 export class CommandBox {
 	app: App;
 	homepage: Homepage;
@@ -137,19 +63,12 @@ export class CommandBox {
 	activeDrag: HTMLElement | null;
 	activeCommand: CommandData | null;
 
-	constructor(tab: HomepageSettingTab, group: SettingGroup) {
+	constructor(tab: HomepageSettingTab, setting: Setting) {
 		this.app = tab.plugin.app;
 		this.homepage = tab.plugin.homepage;
 		this.tab = tab;
 		
-		group.addSetting(setting => {
-			setting.settingEl.addClass("nv-command-setting");
-			setting.descEl.addClass("nv-command-desc");
-			setting.descEl.innerText = tr("commandsDesc");
-
-			this.container = setting.settingEl.createDiv({ cls: "nv-command-box" });
-		});
-		
+		this.container = setting.settingEl.createDiv({ cls: "nv-command-box" });		
 		this.dropzone = createDiv();
 		
 		this.dropzone.className = "nv-command-pill nv-dropzone";

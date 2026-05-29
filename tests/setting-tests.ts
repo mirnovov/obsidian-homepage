@@ -53,7 +53,7 @@ export default class SettingTests extends TestSuite {
 		setting.open();
 		setting.openTabById("homepage");
 		await sleep(100);
-		this.assert(document.getElementsByClassName("nv-debug-button").length > 0);
+		this.assert(document.getElementsByClassName("nv-settings-group").length == 4);
 		setting.close();
 	}
 	
