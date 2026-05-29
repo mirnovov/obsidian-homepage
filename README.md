@@ -31,5 +31,4 @@ Additionally, pre-release versions can be either installed manually or via tools
 
 <br>
 <br>
-
-<a href="https://ko-fi.com/novov"><img src="https://www.ko-fi.com/img/donate_sm.png"/></a>
+<a href="https://ko-fi.com/V7V814HOAQ"><img height="36" style="border:0px;height:36px;" src="https://storage.ko-fi.com/cdn/kofi5.png?v=6" border="0" alt="Buy Me a Coffee at ko-fi.com" /></a>
