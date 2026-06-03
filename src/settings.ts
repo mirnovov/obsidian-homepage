@@ -1,4 +1,4 @@
-import { App, ButtonComponent, Notice, Platform, PluginSettingTab, Setting, SettingGroup, normalizePath } from "obsidian";
+import { App, ButtonComponent, Notice, Platform, PluginSettingTab, Setting, SettingGroup, apiVersion, normalizePath } from "obsidian";
 import HomepagePlugin from "./main";
 import { UNCHANGEABLE, HomepageData, Kind, Mode, View } from "./homepage";
 import { PERIODIC_KINDS } from "./periodic";
@@ -231,7 +231,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 			_internalPlugins: Object.values(this.plugin.internalPlugins).flatMap(
 				p => p.enabled ? [p.instance.id] : []
 			),
-			_obsidianVersion: window.electron?.ipcRenderer.sendSync("version") || "unknown"
+			_obsidianVersion: apiVersion
 		};
 		
 		await navigator.clipboard.writeText(JSON.stringify(info));
