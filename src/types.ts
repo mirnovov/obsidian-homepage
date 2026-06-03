@@ -185,9 +185,6 @@ declare global {
 	}
 	
 	interface Electron {
-		ipcRenderer: {
-			sendSync: (data: string) => string;
-		};
 		remote: {
 			app: {
 				quit: () => void;
