@@ -43,13 +43,11 @@ export class HomepageSettingTab extends PluginSettingTab {
 	icon = "house";
 	
 	plugin: HomepagePlugin;
-	settings: HomepageSettings;
 	commandBox: CommandBox;
 
 	constructor(app: App, plugin: HomepagePlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
-		this.settings = plugin.settings;
 		
 		this.plugin.addCommand({
 			id: "copy-debug-info",
@@ -225,7 +223,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 	async copyDebugInfo(): Promise<void> {
 		const config = this.app.vault.config;
 		const info = {
-			...this.settings,
+			...this.plugin.settings,
 			_defaultViewMode: config.defaultViewMode || "default",
 			_livePreview: config.livePreview !== undefined ? config.livePreview : "default",
 			_focusNewTab: config.focusNewTab !== undefined ? config.focusNewTab : "default",
@@ -244,14 +242,12 @@ export class HomepageSettingTab extends PluginSettingTab {
 class HomepageSettingGroup extends SettingGroup {
 	elements: Record<string, Setting> = {};
 	plugin: HomepagePlugin;
-	settings: HomepageSettings;
 	
 	constructor(tab: HomepageSettingTab, name?: string) {
 		super(tab.containerEl);
 		if (name) this.setHeading(tr(name));
 		
 		this.plugin = tab.plugin;
-		this.settings = tab.settings;
 	}
 	
 	addDropdown(key: HomepageKey<string>, source: Record<string, string>, callback?: Callback<string>): HomepageSettingGroup {
