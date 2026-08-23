@@ -126,7 +126,7 @@ export default class HomepagePlugin extends Plugin {
 		let action: string, params: Array<string>;
 		
 		if (Platform.isMobile) {
-			const launchUrl = await window.Capacitor.Plugins.App.getLaunchUrl();
+			const launchUrl = await window.Capacitor?.Plugins?.App?.getLaunchUrl();
 			if (!launchUrl) return false;
 			
 			const url = new URL(launchUrl.url);
