@@ -164,7 +164,7 @@ declare module "obsidian" {
 declare global {
 	interface Window {
 		OBS_ACT?: Record<string, string>;
-		Capacitor: Capacitor;
+		Capacitor?: Capacitor;
 		electron: Electron;
 		electronWindow: ElectronWindow;
 		homepage?: HomepagePlugin;
