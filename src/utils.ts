@@ -1,5 +1,9 @@
 import { App, Platform, TFolder, TFile, View as OView, WorkspaceMobileDrawer } from "obsidian";
 
+export function isSupportedExtension(app: App, file: TFile): boolean {
+	return Object.keys(app.viewRegistry.typeByExtension).includes(file.extension);
+}
+
 export function trimFile(file: TFile): string {
 	if (!file) return "";
 	return file.extension == "md" ? file.path.slice(0, -3): file.path;

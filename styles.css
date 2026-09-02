@@ -3,50 +3,29 @@
   to { opacity: 0; }
 }
 
-.setting-item[nv-greyed] {
+.nv-settings-group .checkbox-container.is-disabled,
+.nv-settings-group .setting-item.is-disabled .setting-item-info  {
 	opacity: .5; 
-	pointer-events: none;
 }
 
-#nv-main-setting {
+#nv-setting-homepage-kind {
 	flex-wrap: wrap;
+	row-gap: 0;
 }
 
-#nv-main-setting .setting-item-control {
-	padding-top: var(--size-4-1);
-	flex-basis: 100%;
-	align-items: stretch;
-}
-
-#nv-main-setting .setting-item-control input, #nv-main-setting .setting-item-control select {
-	font-size: var(--font-ui-medium);
+#nv-setting-homepage-kind .setting-item-control .dropdown {
 	font-weight: 600;
 }
 
-#nv-main-setting .setting-item-control select {
-	padding: var(--size-4-3) var(--size-4-4);
-	padding-right: var(--size-4-8);
-	height: auto;
-}
-
-#nv-main-setting .setting-item-control input {
-	flex-grow: 1;
-	padding: var(--size-4-5) var(--size-4-4);
-}
-
-#nv-main-setting .setting-item-control input[disabled] {
-	opacity: 0.3;
-}
-
-#nv-main-setting #nv-desc, #nv-main-setting #nv-info {
+#nv-setting-homepage-kind #nv-desc {
 	flex-basis: 100%;
-}
-
-#nv-main-setting #nv-desc {
-	font-weight: 500;
-	color: var(--text-normal);
-	font-size: var(--font-ui-small);
-	padding: 10px 0 0;
+	font-weight: 400;
+	color: var(--text-muted);
+	font-size: var(--font-ui-smaller);
+	padding: var(--setting-items-padding-y) 0 0;
+	margin: var(--setting-items-padding-y) 0 0;
+	line-height: var(--line-height-tight);
+	border-top: 1px solid var(--setting-items-border-color);
 }
 
 #nv-main-setting #nv-desc.mod-warning {
@@ -84,8 +63,8 @@
 	margin-right: var(--size-4-18);
 }
 
-.nv-command-desc {
-	padding: 0;
+.nv-command-setting .setting-item-name {
+	display: none;
 }
 
 .nv-command-box {
@@ -153,23 +132,6 @@
 	font-size: var(--font-ui-small);
 	padding: var(--size-2-2) var(--size-4-2);
 	height: auto;
-}
-
-button.nv-debug-button {
-	margin: 3em 0 -0.2em;
-	font-size: var(--font-ui-smaller);
-	padding: 0;
-	height: auto;
-	float: right;
-	box-shadow: none;
-	background: none;
-	color: var(--text-color);
-	font-weight: 600;
-	cursor: pointer;
-}
-
-.nv-debug-button:hover, .nv-debug-button:active {
-	text-decoration: underline;
 }
 
 .is-phone #nv-main-setting .setting-item-control {

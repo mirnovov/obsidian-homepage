@@ -54,6 +54,8 @@ export const EN: Record<string, string> = {
 	openingFailed: `The homepage "?0" failed to open due to an error.`,
 	
 	//Settings items
+	homepageKind: "Homepage action",
+	homepageKindDesc: "Choose an action for the homepage.",
 	openOnStartup: "Open on startup",
 	openOnStartupDesc: "When launching Obsidian, open the homepage.",
 	openOnStartupWarn: `This will override the built-in "Default file to open" setting.`,
@@ -106,10 +108,10 @@ export const EN: Record<string, string> = {
 	"Random fileDesc": "A random note, base, or canvas from your Obsidian folder will be selected.",
 	"Random in folderDesc": "Enter a folder. A random note, base, or canvas from it will be selected.",
 	"JournalDesc": "Enter a Journal to use.",
-	"Daily noteDesc": "Your Daily Note or Periodic Daily Note will be used.",
-	"Weekly noteDesc": "Your Periodic Weekly Note will be used.",
-	"Monthly noteDesc": "Your Periodic Monthly Note will be used.",
-	"Yearly noteDesc": "Your Periodic Yearly Note will be used.",
+	"Daily NoteDesc": "Your Daily Note or Periodic Daily Note will be used.",
+	"Weekly NoteDesc": "Your Periodic Weekly Note will be used.",
+	"Monthly NoteDesc": "Your Periodic Monthly Note will be used.",
+	"Yearly NoteDesc": "Your Periodic Yearly Note will be used.",
 	homepageSettingTitle: "Homepage",
 	pluginUnavailableSettings: `The plugin required for this homepage type isn't available.`,
 	copyDebugInfoNotice: "Copied homepage debug information to clipboard",
