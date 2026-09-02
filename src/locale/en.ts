@@ -51,6 +51,7 @@ export const EN: Record<string, string> = {
 	noteUnavailable: `Cannot find the file "?0" to use as the homepage.`,
 	homepageChanged: `The homepage has been changed to "?0".`,
 	momentUpgradeNotice: `Date-dependent notes in Homepage have been removed. Set your homepage as a Periodic or Daily Note instead.`,
+	openingFailed: `The homepage "?0" failed to open due to an error.`,
 	
 	//Settings items
 	openOnStartup: "Open on startup",

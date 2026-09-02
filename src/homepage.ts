@@ -178,7 +178,9 @@ export class Homepage {
 					
 			await this.configure(leaf);
 		}
-		catch {
+		catch (e) {
+			console.warn(tr("openingFailed", this.computedValue));
+			console.error(e);
 			this.plugin.executing = false;
 			return;
 		}
