@@ -1,4 +1,4 @@
-import { App, Notice, Platform, PluginSettingTab, Setting, SettingDefinitionItem, SettingGroupItem, SettingDefinitionControl, TFile, apiVersion } from "obsidian";
+import { App, Notice, Platform, PluginSettingTab, Setting, SettingDefinitionItem, SettingGroupItem, SettingDefinitionControl, TFile, apiVersion, DropdownComponent } from "obsidian";
 import HomepagePlugin from "./main";
 import { UNCHANGEABLE, HomepageData, Kind, Mode, View } from "./homepage";
 import { PERIODIC_KINDS } from "./periodic";
@@ -80,17 +80,15 @@ export class HomepageSettingTab extends PluginSettingTab {
 		
 	getSettingDefinitions(): SettingDefinitionItem[] {
 		let kindControls: SettingGroupItem[] = [];
+		let activeKind = this.plugin.homepage.data.kind as Kind;
 		
-		for (const kind of Object.values(Kind)) {
-			if (UNCHANGEABLE.contains(kind)) continue;
-			
+		if (!UNCHANGEABLE.contains(activeKind)) {
 			let setting: Record<string, unknown> = {
-				name: tr(kind),
-				desc: tr(kind + "Desc"),
-				visible: () => this.plugin.homepage.data.kind as Kind == kind,
+				name: tr(activeKind),
+				desc: tr(activeKind + "Desc")
 			};
 						
-			switch(kind) {
+			switch(activeKind) {
 				case Kind.File:
 					setting.control = { 
 						type: "file", key: "value", filter: (f: TFile) => isSupportedExtension(this.app, f) 
@@ -110,7 +108,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 					break;
 			}
 			
-			kindControls.push(setting as unknown as SettingGroupItem);
+			kindControls = [setting as unknown as SettingGroupItem];
 		}
 		
 		return [
@@ -251,8 +249,9 @@ export class HomepageSettingTab extends PluginSettingTab {
 				
 				await this.plugin.homepage.save();
 				
-				this.refreshDomState();
-				this.renderKindDropdown(setting);
+				this.update();
+				(setting.components[0] as DropdownComponent).selectEl.blur();
+				//this.renderKindDropdown(setting);
 			});
 		});
 
@@ -280,6 +279,8 @@ export class HomepageSettingTab extends PluginSettingTab {
 	
 	renderCommands(setting: Setting) {
 		setting.settingEl.addClass("nv-command-setting");
+		setting.settingEl.querySelector(".nv-command-box")?.detach();
+		
 		this.commandBox = new CommandBox(this, setting);
 	}
 	
