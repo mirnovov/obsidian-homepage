@@ -1,6 +1,6 @@
 import { Notice, Keymap, Platform, Plugin, WorkspaceLeaf } from "obsidian";
 import { DEFAULT, MOBILE, Homepage, Kind, Period } from "./homepage";
-import { hasRequiredPeriodicity, LEGACY_MOMENT_KIND } from "./periodic";
+import { getJournalsApi, hasRequiredPeriodicity, LEGACY_MOMENT_KIND } from "./periodic";
 import { DEFAULT_SETTINGS, HomepageSettings, HomepageSettingTab } from "./settings";
 import { tr } from "./locale";
 
@@ -152,7 +152,7 @@ export default class HomepagePlugin extends Plugin {
 			case Kind.Graph:
 				return this.internalPlugins["graph"]?.enabled;
 			case Kind.Journal:
-				return "journals" in this.communityPlugins;
+				return getJournalsApi(this.app) !== null;
 			case Kind.DailyNote:
 			case Kind.WeeklyNote:
 			case Kind.MonthlyNote:

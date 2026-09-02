@@ -13,7 +13,8 @@
 	"license": "MIT",
 	"dependencies": {
 		"obsidian": "^1.13.0",
-		"obsidian-daily-notes-interface": "^0.9.4"
+		"obsidian-daily-notes-interface": "^0.9.4",
+		"obsidian-journals-api": "^1.0.0"
 	},
 	"devDependencies": {
 		"@eslint/js": "^10.0.1",

@@ -8,8 +8,7 @@ import {
 	createMonthlyNote, getWeeklyNote, getAllWeeklyNotes,
 	createYearlyNote, getYearlyNote, getAllYearlyNotes  	
 } from "obsidian-daily-notes-interface";
-
-const JOURNAL_CUSTOM_LOCALE = "custom-journal-locale";
+import { getJournalsApi } from "obsidian-journals-api";
 
 interface KindInfo {
 	noun: string,
@@ -18,6 +17,8 @@ interface KindInfo {
 	get: (date: moment.Moment, dailyNotes: Record<string, TFile>) => TFile,
 	getAll: () => Record<string, TFile>
 }
+
+export { getJournalsApi } from "obsidian-journals-api";
 
 export const PERIODIC_INFO: Record<string, KindInfo> = {
 	[Kind.DailyNote]: {
@@ -105,24 +106,16 @@ function isLegacyPeriodicNotes(periodicNotes: Plugin): boolean {
 	return (periodicNotes?.manifest.version || "0").startsWith("0");
 }
 
-export function hasJournal(homepage: Homepage): boolean { 
-	const journals = homepage.plugin.communityPlugins["journals"]!;	
-	return !!journals.getJournal(homepage.data.value);
+export async function hasJournal(homepage: Homepage): Promise<boolean> { 
+	const journals = getJournalsApi(homepage.plugin.app);
+	if (!journals) return false;
+	
+	return (await journals.journalInfo(homepage.data.value)) !== null;
 }
 
 export async function getJournalNote(journalName: string, plugin: HomepagePlugin) {
-	const journals = plugin.communityPlugins["journals"]!;	
-	const journal = journals.getJournal(journalName);
-	const origAutoCreate = journal.config.value.autoCreate;
+	const journals = getJournalsApi(plugin.app)!;
+	const { note } = await journals.ensureNote(journalName, "today", { confirm: false });
 	
-	// this is hacky, but the core logic is in private methods
-	journals.reprocessNotes();
-	journal.config.value.autoCreate = true; 
-	await journal.autoCreate();
-	journal.config.value.autoCreate = origAutoCreate;
-	
-	const today = window.moment().locale(JOURNAL_CUSTOM_LOCALE).startOf("day");
-	const path = journal.getNotePath(journal?.get(today));
-	
-	return path.replace(/\.md$/, "");
+	return note.path.replace(/\.md$/, "");
 }

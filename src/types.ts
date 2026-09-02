@@ -25,7 +25,6 @@ declare module "obsidian" {
 		manifests: Record<string, PluginManifest>;
 		plugins: Record<string, Plugin> & {
 			"dataview"?: DataviewPlugin,
-			"journals"?: JournalsPlugin,
 			"obsidian-file-color"?: FileColorPlugin,
 			"new-tab-default-page"?: NewTabDefaultPagePlugin,
 			"periodic-notes"?: PeriodicNotesPlugin
@@ -108,26 +107,6 @@ declare module "obsidian" {
 	interface FileColorPlugin extends Plugin {
 		generateColorStyles: () => void;
 	}
-	
-	interface JournalsPlugin extends Plugin {
-		getJournal: (id: string) => Journal;
-		journals: Journal[];
-		reprocessNotes: () => void;
-	}
-	
-	interface Journal {
-		autoCreate: () => Promise<void>;
-		config: {
-			value: {
-				autoCreate: boolean;
-			}
-		}
-		get: (date: moment.Moment) => JournalNoteData;
-		getNotePath: (metadata: JournalNoteData) => string;
-		name: string;
-	}
-	
-	type JournalNoteData = unknown;
 	
 	interface NewTabDefaultPagePlugin extends Plugin {
 		checkForNewTab: (e: WeakSet<WorkspaceLeaf>) => Promise<void>;

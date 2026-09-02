@@ -1,8 +1,9 @@
 import { 
 	App, AbstractInputSuggest, ButtonComponent, Command, FuzzySuggestModal,
-	JournalsPlugin, Menu, Notice, Setting, SettingGroup, TAbstractFile, TFile, TFolder, getIcon, setTooltip,
+	Menu, Notice, Setting, SettingGroup, TAbstractFile, TFile, TFolder, getIcon, setTooltip,
 } from "obsidian";
 import { CommandData, Homepage, Kind, Period } from "./homepage";
+import { getJournalsApi } from "./periodic";
 import { HomepageSettingTab } from "./settings"; 
 import { trimFile } from "./utils";
 import { tr } from "./locale";
@@ -98,13 +99,14 @@ class WorkspaceSuggest extends AbstractInputSuggest<string> {
 class JournalSuggest extends AbstractInputSuggest<string> {
 	textInputEl: HTMLInputElement;
 	
-	getSuggestions(inputStr: string): string[] {
-		const journalsPlugin = this.app.plugins.plugins.journals as JournalsPlugin;
+	async getSuggestions(inputStr: string): Promise<string[]> {
+		const journals = getJournalsApi(this.app);
+		if (!journals) return [];
 		
-		const journals: string[] = journalsPlugin.journals.map(j => j.name);
+		const names = (await journals.listJournals()).map(j => j.name);
 		const inputLower = inputStr.toLowerCase();
-
-		return journals.filter(j => j.toLowerCase().contains(inputLower));
+		
+		return names.filter(j => j.toLowerCase().contains(inputLower));
 	}
 
 	renderSuggestion(journal: string, el: HTMLElement) {

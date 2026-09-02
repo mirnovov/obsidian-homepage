@@ -100,7 +100,7 @@ export class Homepage {
 			new Notice(tr("pluginUnavailable"));
 			return;
 		}
-		else if (this.data.kind as Kind === Kind.Journal && !hasJournal(this)) {
+		else if (this.data.kind as Kind === Kind.Journal && !(await hasJournal(this))) {
 			new Notice(tr("journalUnavailable", this.data.value));
 			return;
 		}
