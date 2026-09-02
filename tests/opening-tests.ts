@@ -162,5 +162,27 @@ export default class OpeningTests extends TestSuite {
 		const file = this.app.workspace.getActiveFile();
 		const leaves = this.app.workspace.getLeavesOfType("markdown");
 		this.assert(file?.name == "Home.md" && leaves.length == 1, file, leaves);
-	}	
+	}
+	
+	async openWhenEmptyNonexistentThenExtant(this: HomepageTestPlugin) {
+		// issue #149
+		this.homepage.data.openWhenEmpty = true;
+		this.homepage.data.value = "Nonexistent.md";
+		await this.homepage.save();
+		
+		this.app.workspace.iterateRootLeaves(l => l.detach());
+		await sleep(500);
+		
+		await this.homepage.open();
+		
+		this.homepage.data.value = "Home.md";
+		await this.homepage.save();
+		
+		this.app.workspace.iterateRootLeaves(l => l.detach());
+		await sleep(500);
+		
+		const file = this.app.workspace.getActiveFile();
+		const leaves = this.app.workspace.getLeavesOfType("markdown");
+		this.assert(file?.name == "Home.md" && leaves.length == 1, file, leaves);
+	}
 }

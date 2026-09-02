@@ -179,6 +179,7 @@ export class Homepage {
 			await this.configure(leaf);
 		}
 		catch {
+			this.plugin.executing = false;
 			return;
 		}
 	}
