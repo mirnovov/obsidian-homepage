@@ -21,7 +21,7 @@ type KeyedPluginList = Record<string, { repo: string }>;
 		if (present) plugin.enable();
 		else plugin.disable();
 		
-		console.log(
+		console.debug(
 			`${present ? "Enabled" : "Disabled"} internal plugin ${pluginName}`
 		);
 	}
@@ -32,7 +32,7 @@ type KeyedPluginList = Record<string, { repo: string }>;
 	await this.saveSettings();
 	this.homepage = this.getHomepage();
 	
-	console.log("Settings updated!");
+	console.debug("Settings updated!");
 };
 
 (HomepagePlugin.prototype as HomepageDebugPlugin).ensurePlugins = async function (this: HomepageDebugPlugin, plugins: string[], enable: boolean): Promise<void> {
@@ -64,6 +64,6 @@ type KeyedPluginList = Record<string, { repo: string }>;
 			await pluginRegistry.disablePlugin(id);
 		}
 		
-		console.log(`${manifest.name} ${manifest.version} installed for testing`);
+		console.debug(`${manifest.name} ${manifest.version} installed for testing`);
 	}
 };
