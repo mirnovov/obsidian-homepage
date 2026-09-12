@@ -17,6 +17,7 @@ export default class HomepagePlugin extends Plugin {
 	
 	loaded: boolean = false;
 	executing: boolean = false;
+	openingWhenEmpty: boolean = false;
 	
 	interstitial: HTMLElement;
 	

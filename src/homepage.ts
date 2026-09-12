@@ -80,7 +80,6 @@ export class Homepage {
 	openedViews: WeakMap<FileView, string> = new WeakMap();
 	computedValue: string;
 	cachedNewFile?: string;
-	private openingWhenEmpty: boolean = false;
 	
 	constructor(name: string, plugin: HomepagePlugin) {
 		this.name = name;
@@ -372,26 +371,24 @@ export class Homepage {
 	}
 	
 	async openWhenEmpty(): Promise<void> {
-		if (!this.plugin.loaded || this.plugin.executing || this.openingWhenEmpty) return;
-		const workspace = this.app.workspace;
-		const leaves: WorkspaceLeaf[] = [];
-		workspace.iterateAllLeaves(leaf => {
-			const root = leaf.getRoot();
-			if (root === workspace.rootSplit || root === workspace.floatingSplit) leaves.push(leaf);
-		});
+		if (!this.plugin.loaded || this.plugin.executing || this.plugin.openingWhenEmpty) return;
 
-		// Sidebar focus does not indicate whether the content area is empty.
+		const leaves: WorkspaceLeaf[] = [];
+		
+		this.app.workspace.iterateRootLeaves(l => leaves.push(l));
+		this.app.workspace.iterateLeaves(this.app.workspace.floatingSplit, l => leaves.push(l))
+
 		if (!leaves.length || leaves.some(leaf => leaf.getViewState().type !== "empty")) return;
 
-		this.openingWhenEmpty = true;
+		this.plugin.openingWhenEmpty = true;
+		
 		try {
-			// Reuse an empty content leaf rather than opening into the focused sidebar.
-			workspace.setActiveLeaf(leaves[0]);
-			// Always behave the same regardless of mode.
+			this.app.workspace.setActiveLeaf(leaves[0]);
+			// Always behave the same regardless of mode
 			await this.open(true);
 		}
 		finally {
-			this.openingWhenEmpty = false;
+			this.plugin.openingWhenEmpty = false;
 		}
 	}
 
