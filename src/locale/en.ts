@@ -61,6 +61,8 @@ export const EN: Record<string, string> = {
 	openOnStartupWarn: `This will override the built-in "Default file to open" setting.`,
 	openWhenEmpty: "Open when empty", 
 	openWhenEmptyDesc: "When there are no tabs open, open the homepage.", 
+	openOnNewTab: "Open on new tab", 
+	openOnNewTabDesc: "When opening a new tab, open the homepage.", 
 	alwaysApply: "Use when opening normally", 
 	alwaysApplyDesc: "Use homepage settings when opening it normally, such as from a link or the file browser.",
 	separateMobile: "Separate mobile homepage",

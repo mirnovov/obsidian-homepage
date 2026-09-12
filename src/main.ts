@@ -92,6 +92,7 @@ export default class HomepagePlugin extends Plugin {
 	onLayoutChange = async (): Promise<void> => {
 		if (this.homepage.data.revertView) await this.homepage.revertView();
 		if (this.homepage.data.openWhenEmpty) await this.homepage.openWhenEmpty();
+		if (this.homepage.data.openOnNewTab) await this.homepage.openOnNewTab();
 		if (this.homepage.data.alwaysApply) await this.homepage.apply();
 	}
 	

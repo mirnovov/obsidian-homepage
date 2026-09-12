@@ -19,6 +19,7 @@ export interface HomepageData {
 	view: string,
 	revertView: boolean,
 	openWhenEmpty: boolean,
+	openOnNewTab: boolean,
 	refreshDataview: boolean,
 	autoCreate: boolean,
 	autoScroll: boolean,
@@ -78,6 +79,7 @@ export class Homepage {
 	name: string;
 	lastView?: WeakRef<MarkdownView> = undefined;
 	openedViews: WeakMap<FileView, string> = new WeakMap();
+	openedTabs: WeakSet<WorkspaceLeaf> = new WeakSet();
 	computedValue: string;
 	cachedNewFile?: string;
 	
@@ -390,6 +392,20 @@ export class Homepage {
 		finally {
 			this.plugin.openingWhenEmpty = false;
 		}
+	}
+	
+	async openOnNewTab(): Promise<void> {
+		if (!this.plugin.loaded || this.plugin.executing || this.plugin.openingWhenEmpty) return;
+		
+		this.app.workspace.iterateAllLeaves((leaf) => {
+			if (this.openedTabs.has(leaf)) return;
+			this.openedTabs.add(leaf);
+			
+			if (leaf.view.getViewType() !== "empty") return;
+			
+			this.app.workspace.setActiveLeaf(leaf);
+			void this.open(true);
+		});
 	}
 
 	async apply(): Promise<void> {

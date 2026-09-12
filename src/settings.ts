@@ -30,6 +30,7 @@ export const DEFAULT_DATA: HomepageData = {
 	view: View.Default,
 	revertView: true,
 	openWhenEmpty: false,
+	openOnNewTab: false,
 	refreshDataview: false,
 	autoCreate: false,
 	autoScroll: false,
@@ -134,6 +135,7 @@ export class HomepageSettingTab extends PluginSettingTab {
 						render: s => this.renderOpenOnStartup(s),
 					},
 					this.createToggle("openWhenEmpty"),
+					this.createToggle("openOnNewTab"),
 					this.createToggle("alwaysApply"),
 					{
 						name: tr("separateMobile"),

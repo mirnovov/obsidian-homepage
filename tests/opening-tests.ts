@@ -237,4 +237,16 @@ export default class OpeningTests extends TestSuite {
 		const leaves = this.app.workspace.getLeavesOfType("markdown");
 		this.assert(file?.name == "Home.md" && leaves.length == 1, file, leaves);
 	}
+	
+	async openOnNewTab(this: HomepageTestPlugin) {
+		this.homepage.data.openOnNewTab = true;
+		await this.homepage.save();
+		
+		this.app.commands.executeCommandById("workspace:new-tab");
+		await sleep(100);
+		
+		const file = this.app.workspace.getActiveFile();
+		const leaves = this.app.workspace.getLeavesOfType("markdown");
+		this.assert(file?.name == "Home.md" && leaves.length == 1, file, leaves);
+	}
 }
