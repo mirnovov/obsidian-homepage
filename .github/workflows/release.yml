@@ -12,14 +12,15 @@ jobs:
       attestations: write
     steps:
       - name: Set up repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Set up Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: "25.x"
+          node-version: "lts/*"
+          cache: "npm"
       - name: Build plugin
         run: |
-          npm install
+          npm ci
           npm run build
       - name: Generate attestation
         uses: actions/attest-build-provenance@v2
