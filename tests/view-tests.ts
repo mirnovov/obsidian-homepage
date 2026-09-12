@@ -93,7 +93,7 @@ export default class ViewTests extends TestSuite {
 	
 	async reversionCaseInsensitive(this: HomepageTestPlugin) {
 		this.homepage.data.view = View.Reading;
-		this.homepage.data.value = "home";
+		this.homepage.data.value = "Home.md";
 		this.homepage.save();
 	
 		this.homepage.open();

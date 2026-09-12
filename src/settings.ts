@@ -16,13 +16,13 @@ export interface HomepageSettings {
 }
 
 export const DEFAULT_SETTINGS: HomepageSettings = {
-	version: 4,
+	version: 5,
 	homepages: {},
 	separateMobile: false
 }
 
 export const DEFAULT_DATA: HomepageData = {
-	value: "Home",
+	value: "Home.md",
 	kind: Kind.File,
 	openOnStartup: true,
 	openMode: Mode.ReplaceAll,
@@ -253,7 +253,6 @@ export class HomepageSettingTab extends PluginSettingTab {
 				
 				this.update();
 				(setting.components[0] as DropdownComponent).selectEl.blur();
-				//this.renderKindDropdown(setting);
 			});
 		});
 

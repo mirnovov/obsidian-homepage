@@ -3,7 +3,7 @@ import HomepagePlugin from "./main";
 import { PERIODIC_KINDS, getJournalNote, getPeriodicNote, hasJournal } from "./periodic";
 import { tr } from "./locale";
 import { DEFAULT_DATA } from "./settings";
-import { detachAllLeaves, emptyActiveView, equalsCaseless, hasLayoutChange, randomFile, sleep, trimFile, untrimName } from "./utils";
+import { detachAllLeaves, emptyActiveView, equalsCaseless, hasLayoutChange, randomFile, sleep } from "./utils";
 
 export const LEAF_TYPES: string[] = ["markdown", "canvas", "kanban", "bases"];
 
@@ -207,7 +207,7 @@ export class Homepage {
 				throw new Error(tr("noteUnavailable", this.computedValue));
 			}
 			
-			file = await this.app.vault.create(untrimName(this.computedValue), "");
+			file = await this.app.vault.create(this.computedValue, "");
 		}
 		
 		const content = await this.app.vault.cachedRead(file);
@@ -288,10 +288,7 @@ export class Homepage {
 
 		return leaves.filter(leaf => {
 			const name = leaf.view.getState().file as string;
-			return equalsCaseless(
-				name.endsWith("md") ? name.slice(0, -3) : name, 
-				this.computedValue
-			);
+			return equalsCaseless(name, this.computedValue);
 		});
 	}
 	
@@ -310,7 +307,7 @@ export class Homepage {
 				break;
 			case Kind.NewNote:
 				if (!this.cachedNewFile) {
-					this.cachedNewFile = trimFile(await this.app.fileManager.createNewFile("", val));
+					this.cachedNewFile = (await this.app.fileManager.createNewFile("", val)).path;
 				}
 				
 				val = this.cachedNewFile;
@@ -338,7 +335,7 @@ export class Homepage {
 		const activeFile = this.app.workspace.getActiveFile();
 		if (!activeFile) return;
 			
-		this.data.value = trimFile(activeFile);
+		this.data.value = activeFile.path;
 		await this.save();
 		
 		new Notice(tr("homepageChanged", this.data.value));
@@ -353,7 +350,7 @@ export class Homepage {
 		if (this.lastView == undefined || this.data.view == View.Default as string) return;
 		
 		const view = this.lastView.deref();
-		if (!view?.file || equalsCaseless(trimFile(view.file), this.computedValue)) return;
+		if (!view?.file || equalsCaseless(view.file?.path, this.computedValue)) return;
 	
 		const state = view.getState(),
 			config = this.app.vault.config,
@@ -412,7 +409,7 @@ export class Homepage {
 		const currentView = this.app.workspace.getActiveViewOfType(FileView);
 		if (!currentView?.file) return;
 		
-		const currentValue = trimFile(currentView.file);
+		const currentValue = currentView.file.path;
 		if (this.openedViews.get(currentView) === currentValue) return;
 		
 		this.openedViews.set(currentView, currentValue);

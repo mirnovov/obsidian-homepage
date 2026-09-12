@@ -5,6 +5,9 @@ import HomepageTestPlugin, { TestSuite } from "./harness";
 
 export default class PluginTests extends TestSuite {
 	async workspaces(this: HomepageTestPlugin) {
+		this.homepage.data.value = "Home";
+		await this.homepage.save();
+		
 		await this.app.workspace.openLinkText("Note A", "", false);
 		
 		const bottom = this.app.workspace.getLeaf("split", "horizontal");
@@ -134,7 +137,7 @@ export default class PluginTests extends TestSuite {
 
 		this.homepage.data.view = View.Reading;
 		this.homepage.data.refreshDataview = true;
-		this.homepage.data.value = "Dataview";
+		this.homepage.data.value = "Dataview.md";
 		await sleep(100);
 		
 		let previous = "";

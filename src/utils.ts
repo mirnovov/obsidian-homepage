@@ -4,11 +4,6 @@ export function isSupportedExtension(app: App, file: TFile): boolean {
 	return Object.keys(app.viewRegistry.typeByExtension).includes(file.extension);
 }
 
-export function trimFile(file: TFile): string {
-	if (!file) return "";
-	return file.extension == "md" ? file.path.slice(0, -3): file.path;
-}
-
 export function untrimName(name: string): string {
 	const hasExtension = name.split("/").slice(-1)[0].contains(".");
 	return hasExtension ? name : `${name}.md`;
@@ -31,7 +26,7 @@ export function randomFile(app: App, root: string | undefined = undefined): stri
 	
 	if (files.length) {
 		const indice = Math.floor(Math.random() * files.length);
-		return trimFile(files[indice]);
+		return files[indice].path;
 	}
 
 	return undefined;

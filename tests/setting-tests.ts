@@ -80,13 +80,33 @@ export default class SettingTests extends TestSuite {
 		this.app.vault.delete(dailyNote);
 	}
 	
+	async upgradeMarkdownFilenameSettings(this: HomepageTestPlugin) {
+		this.homepage.data.value = "Home";
+		this.settings.version = 4;
+		this.homepage.save();
+		
+		this.settings = await this.loadSettings();
+		this.homepage = this.getHomepage();
+		
+		this.assert(this.homepage.data.value == "Home.md", this.homepage.data.value);
+
+		this.homepage.data.value = "Home.base";
+		this.settings.version = 4;
+		this.homepage.save();
+		
+		this.settings = await this.loadSettings();
+		this.homepage = this.getHomepage();
+		
+		this.assert(this.homepage.data.value == "Home.base", this.homepage.data.value);
+	}
+
 	async setToActiveFile(this: HomepageTestPlugin) {
 		await this.app.workspace.openLinkText("Note A", "", false);
 		
 		this.app.commands.executeCommandById("homepage:set-to-active-file");
 		await sleep(100);
 		
-		this.assert(this.homepage.data.value == "Note A", this.homepage.data.value);
+		this.assert(this.homepage.data.value == "Note A.md", this.homepage.data.value);
 		
 		await this.homepage.open();
 		

@@ -74,7 +74,7 @@ export default class OpeningTests extends TestSuite {
 	}
 	
 	async autoCreate(this: HomepageTestPlugin) {
-		this.homepage.data.value = "temp";
+		this.homepage.data.value = "temp.md";
 		this.homepage.data.autoCreate = true;
 		await this.homepage.save();
 		await this.homepage.open();

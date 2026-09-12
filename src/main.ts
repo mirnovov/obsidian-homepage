@@ -2,6 +2,7 @@ import { Notice, Keymap, Platform, Plugin, WorkspaceLeaf } from "obsidian";
 import { DEFAULT, MOBILE, Homepage, Kind, Period } from "./homepage";
 import { getJournalsApi, hasRequiredPeriodicity, LEGACY_MOMENT_KIND } from "./periodic";
 import { DEFAULT_SETTINGS, HomepageSettings, HomepageSettingTab } from "./settings";
+import { untrimName } from "./utils";
 import { tr } from "./locale";
 
 declare const DEV: boolean;
@@ -111,7 +112,7 @@ export default class HomepagePlugin extends Plugin {
 	async loadSettings(): Promise<HomepageSettings> {
 		const settingsData: HomepageSettings = await this.loadData();
 		
-		if (settingsData?.version !== 4) {
+		if (settingsData?.version !== 5) {
 			if (!settingsData) return Object.assign({}, DEFAULT_SETTINGS);
 			
 			return this.upgradeSettings(settingsData as HomepageLegacySettings);
@@ -219,28 +220,35 @@ export default class HomepagePlugin extends Plugin {
 	}
 	
 	upgradeSettings(data: HomepageLegacySettings): HomepageSettings {
-		if (data.version == 3) {
+		if (data.version >= 3) {
 			const settings = data as HomepageSettings;
-			let hasMoment = false;
-			
+
 			for (const homepage of Object.values(settings.homepages)) {
-				homepage.commands = (homepage.commands as unknown as string[]).map(id => { 
-					return { id: id, period: Period.Both }
-				});
-				
-				if (homepage.kind == LEGACY_MOMENT_KIND) {
-					hasMoment = true;
-					homepage.kind = Kind.DailyNote;
-				}
-			}
+				if (homepage.kind == Kind.File) homepage.value = untrimName(homepage.value);
+			} 
 			
-			if (hasMoment) new Notice(tr("momentUpgradeNotice"));
-			settings.version = 4;
+			if (data.version < 4) {
+				let hasMoment = false;
+				
+				for (const homepage of Object.values(settings.homepages)) {
+					homepage.commands = (homepage.commands as unknown as string[]).map(id => { 
+						return { id: id, period: Period.Both }
+					});
+					
+					if (homepage.kind == LEGACY_MOMENT_KIND) {
+						hasMoment = true;
+						homepage.kind = Kind.DailyNote;
+					}
+				}
+				
+				if (hasMoment) new Notice(tr("momentUpgradeNotice"));
+			}
+			settings.version = 5;
 			
 			void this.saveData(settings);
 			return settings;
 		}
-
+		
 		const settings: HomepageSettings = Object.assign({}, DEFAULT_SETTINGS);
 		
 		if (data.workspaceEnabled) {
@@ -252,7 +260,7 @@ export default class HomepagePlugin extends Plugin {
 			new Notice(tr("momentUpgradeNotice"));
 		}
 		else {
-			data.value = data.defaultNote || "Home";
+			data.value = untrimName(data.defaultNote || "Home");
 			data.kind = Kind.File;
 		}
 		

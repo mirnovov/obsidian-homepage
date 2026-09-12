@@ -83,7 +83,7 @@ export async function getPeriodicNote(kind: Kind, plugin: HomepagePlugin): Promi
 		);
 	}
 	
-	return trimFile(note);
+	return note.path;
 }
 
 export function hasRequiredPeriodicity(kind: Kind, plugin: HomepagePlugin): boolean {
