@@ -77,7 +77,8 @@ declare module "obsidian" {
 	}
 	
 	interface Workspace {
-		floatingSplit: WorkspaceSplit
+		floatingSplit: WorkspaceSplit;
+		iterateLeaves(split: WorkspaceSplit, callback: (leaf: WorkspaceLeaf) => void): void;
 	}
 	
 	interface WorkspaceItem {

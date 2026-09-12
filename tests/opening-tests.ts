@@ -1,4 +1,4 @@
-import { TAbstractFile } from "obsidian";
+import { TAbstractFile, WorkspaceLeaf } from "obsidian";
 import { Kind, Mode, Period } from "../src/homepage";
 import { sleep } from "../src/utils";
 import HomepageTestPlugin, { TestSuite } from "./harness";
@@ -164,6 +164,58 @@ export default class OpeningTests extends TestSuite {
 		this.assert(file?.name == "Home.md" && leaves.length == 1, file, leaves);
 	}
 	
+	async openWhenEmptySidebarFocus(this: HomepageTestPlugin) {
+		// issue #154
+		this.app.workspace.iterateRootLeaves(leaf => leaf.detach());
+		await sleep(100);
+		
+		const sidebar = this.app.workspace.getLeavesOfType("file-explorer")[0];
+		this.assert(!!sidebar, "File explorer must be enabled");
+		
+		this.app.workspace.setActiveLeaf(sidebar);
+		await this.homepage.openWhenEmpty();
+
+		const leaves: WorkspaceLeaf[] = [];
+		this.app.workspace.iterateRootLeaves(leaf => leaves.push(leaf));
+		
+		this.assert(leaves.length === 1 && leaves[0].getViewState().state?.file === "Home.md", leaves);
+		this.assert(sidebar.getViewState().type === "file-explorer", sidebar);
+	}
+
+	async openWhenEmptyWithContentInAnotherSplit(this: HomepageTestPlugin) {
+		await this.app.workspace.openLinkText("Note A", "", false);
+		const empty = this.app.workspace.getLeaf("split");
+		await empty.setViewState({ type: "empty", state: {} });
+		
+		this.app.workspace.setActiveLeaf(empty);
+		await this.homepage.openWhenEmpty();
+
+		this.assert(empty.getViewState().type === "empty", empty);
+		this.assert(this.app.workspace.getLeavesOfType("markdown").length === 1);
+		
+		this.app.workspace.iterateRootLeaves(leaf => leaf.detach());
+	}
+
+	async openWhenEmptyReentrant(this: HomepageTestPlugin) {
+		this.app.workspace.iterateRootLeaves(leaf => leaf.detach());
+		await sleep(100);
+		const original = this.homepage.open;
+		let calls = 0;
+		
+		this.homepage.open = async () => {
+			calls++;
+			await sleep(50);
+		};
+		
+		try {
+			await Promise.all([this.homepage.openWhenEmpty(), this.homepage.openWhenEmpty()]);
+			this.assert(calls === 1, calls);
+		}
+		finally {
+			this.homepage.open = original;
+		}
+	}
+
 	async openWhenEmptyNonexistentThenExtant(this: HomepageTestPlugin) {
 		// issue #149
 		this.homepage.data.openWhenEmpty = true;

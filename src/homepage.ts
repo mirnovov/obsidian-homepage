@@ -371,18 +371,27 @@ export class Homepage {
 	}
 	
 	async openWhenEmpty(): Promise<void> {
-		if (!this.plugin.loaded || this.plugin.executing) return;
-		const leaf = this.app.workspace.getActiveViewOfType(OView)?.leaf;
+		if (!this.plugin.loaded || this.plugin.executing || this.plugin.openingWhenEmpty) return;
+
+		const leaves: WorkspaceLeaf[] = [];
 		
-		if (
-			leaf?.getViewState().type !== "empty" ||
-			leaf?.parentSplit?.children?.length != 1
-		) return
+		this.app.workspace.iterateRootLeaves(l => leaves.push(l));
+		this.app.workspace.iterateLeaves(this.app.workspace.floatingSplit, l => leaves.push(l))
+
+		if (!leaves.length || leaves.some(leaf => leaf.getViewState().type !== "empty")) return;
+
+		this.plugin.openingWhenEmpty = true;
 		
-		//should always behave the same regardless of mode
-		await this.open(true);
+		try {
+			this.app.workspace.setActiveLeaf(leaves[0]);
+			// Always behave the same regardless of mode
+			await this.open(true);
+		}
+		finally {
+			this.plugin.openingWhenEmpty = false;
+		}
 	}
-	
+
 	async apply(): Promise<void> {
 		const currentView = this.app.workspace.getActiveViewOfType(FileView);
 		if (!currentView?.file) return;
