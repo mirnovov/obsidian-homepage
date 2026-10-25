@@ -224,7 +224,7 @@ export default class HomepagePlugin extends Plugin {
 			const settings = data as HomepageSettings;
 
 			for (const homepage of Object.values(settings.homepages)) {
-				if (homepage.kind == Kind.File) homepage.value = untrimName(homepage.value);
+				if (homepage.kind as Kind == Kind.File) homepage.value = untrimName(homepage.value);
 			} 
 			
 			if (data.version < 4) {
