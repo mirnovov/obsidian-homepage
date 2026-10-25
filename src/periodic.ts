@@ -1,7 +1,6 @@
 import { Plugin, TFile, moment } from "obsidian";
 import HomepagePlugin from "./main";
 import { Homepage, Kind } from "./homepage";
-import { trimFile } from "./utils";
 import { 
 	createDailyNote, getDailyNote, getAllDailyNotes,
 	createWeeklyNote, getMonthlyNote, getAllMonthlyNotes,
